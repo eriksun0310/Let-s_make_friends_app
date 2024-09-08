@@ -42,15 +42,15 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ gender = "man" }) => {
   const [image, setImage] = useState<string>(peopleImages[gender][0].imageUrl);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <View style={styles.container}>
+      {/* <View style={styles.header}>
         <TouchableOpacity>
           <XIcon size={24} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton}>
           <Text style={styles.saveButtonText}>儲存</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View style={styles.avatarContainer}>
         <View style={[styles.avatar]}>
@@ -124,7 +124,7 @@ const AvatarCreator: React.FC<AvatarCreatorProps> = ({ gender = "man" }) => {
           ))}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -161,10 +161,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     overflow: "hidden",
   },
-  hairStyle: {
-    width: "100%",
-    height: "100%",
-  },
+
   footer: {
     flexDirection: "row",
     justifyContent: "center",
