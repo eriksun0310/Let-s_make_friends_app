@@ -9,42 +9,98 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import Button from "../components/Button";
-import { useNavigation } from "@react-navigation/native";
-import FlatButton from "../components/FlatButton";
-import CustomTextInput from "../components/CustomTextInput";
 
-const Register = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>會員註冊</Text>
+import CustomTextInput from "../components/ui/CustomTextInput";
+import RegisterForm, { Form } from "../components/auth/RegisterForm";
+import RegisterContent from "../components/auth/RegisterContent";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { createUser } from "../util/auth";
 
-        <CustomTextInput label="名稱" />
-        <CustomTextInput label="Email" />
+export interface IsValidItem {
+  value: boolean;
+  errorText: string;
+}
 
-        <CustomTextInput label="密碼" />
-        <CustomTextInput label="確認密碼" />
+export interface IsValid {
+  name: IsValidItem;
+  email: IsValidItem;
+  password: IsValidItem;
+  confirmPassword: IsValidItem;
+}
 
-        <Button
-          text="註冊"
-          //TODO: 要驗證DB 輸入的表單規則是否正確
-          onPress={() => {
-            navigation.replace("loginEmail");
-          }}
-        />
-        <FlatButton
-          onPress={() => {
-            navigation.navigate("loginEmail");
-          }}
-        >
-          已有會員? 會員登入
-        </FlatButton>
-      </View>
-    </SafeAreaView>
-  );
+interface RegisterProps {
+  navigation: NavigationProp<any>;
+}
+
+const initIsValid = {
+  name: { value: false, errorText: "" },
+  email: { value: false, errorText: "" },
+  password: { value: false, errorText: "" },
+  confirmPassword: { value: false, errorText: "" },
+};
+
+const Register: React.FC<RegisterProps> = ({ navigation }) => {
+  //
+  const [isLoading, setLoading] = useState(false);
+  // 檢查輸入資訊,是否有符合規則
+  // const [isValid, setIsValid] = useState<IsValid>(initIsValid);
+
+  // const submitHandle = (form: Form) => {
+  //   let { name, email, password, confirmPassword } = form;
+
+  //   email = email.trim();
+  //   password = password.trim();
+  //   const nameIsValid = name.length > 0;
+  //   const emailIsValid = email.includes("@");
+  //   // 密碼6-8位
+  //   const passwordIsValid = password.length >= 6 && password.length <= 8;
+  //   const confirmPasswordIsValid =
+  //     confirmPassword === password &&
+  //     password.length >= 6 &&
+  //     password.length <= 8;
+
+  //   //驗證表單規則
+  //   if (
+  //     !nameIsValid ||
+  //     !emailIsValid ||
+  //     !passwordIsValid ||
+  //     !confirmPasswordIsValid
+  //   ) {
+  //     setIsValid({
+  //       name: { value: !nameIsValid, errorText: "請輸入名稱" },
+  //       email: { value: !emailIsValid, errorText: "請輸入信箱正確的格式" },
+  //       password: { value: !passwordIsValid, errorText: "密碼需至少六位數" },
+  //       confirmPassword: {
+  //         value: !confirmPasswordIsValid,
+  //         errorText: "輸入密碼不一致",
+  //       },
+  //     });
+  //   } else {
+  //     setIsValid(initIsValid);
+  //   }
+
+  //   // 回到會員登入
+  //   // navigation.replace("loginEmail");
+  // };
+
+  // 註冊
+  const signUpHandler = async (form: Form) => {
+    setLoading(true);
+
+    await createUser(form);
+    setLoading(false);
+
+    // 回到會員登入
+    // navigation.replace("loginEmail");
+  };
+
+  if (isLoading) {
+    return <LoadingOverlay message="註冊中 ..." />;
+  }
+
+  return <RegisterContent getFormValue={signUpHandler} />;
 };
 
 const styles = StyleSheet.create({

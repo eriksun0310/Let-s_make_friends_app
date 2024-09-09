@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
-import Button from "../components/Button";
+
 
 import { Colors } from "../constants/style";
-import FlatButton from "../components/FlatButton";
-import CustomTextInput from "../components/CustomTextInput";
+
+import CustomTextInput from "../components/ui/CustomTextInput";
+import FlatButton from "../components/ui/FlatButton";
+import Button from "../components/ui/Button";
 
 const LoginEmail = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -14,7 +16,9 @@ const LoginEmail = ({ navigation }) => {
       <View style={styles.content}>
         <Text style={styles.title}>歡迎回來</Text>
 
-        <CustomTextInput label="Email" />
+        {/* login form 拆出去 */}
+
+        <CustomTextInput label="Email" value={email} setValue={setEmail} />
         <Button
           text="繼續"
           onPress={() => {

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
-import BorderButton from "../components/BorderButton";
+import BorderButton from "../components/ui/BorderButton";
 import HeadShot from "../components/HeadShot";
-import MultipleText from "../components/MultipleText";
-import Button from "../components/Button";
+import MultipleText from "../components/ui/MultipleText";
+import Button from "../components/ui/Button";
+
 interface PersonalProps {
   navigation: NavigationProp<any>;
 }

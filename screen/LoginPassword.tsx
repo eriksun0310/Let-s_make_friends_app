@@ -10,11 +10,12 @@ import {
   Platform,
   Pressable,
 } from "react-native";
-import Button from "../components/Button";
+
 import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../constants/style";
-import FlatButton from "../components/FlatButton";
-import CustomTextInput from "../components/CustomTextInput";
+
+import CustomTextInput from "../components/ui/CustomTextInput";
+import Button from "../components/ui/Button";
 
 // TODO: 到時候要從DB 帶入名稱
 const LoginPassword = ({ navigation }) => {
@@ -27,9 +28,10 @@ const LoginPassword = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>歡迎回來 Lin</Text>
+        <Text style={styles.title}>Hi! Lin 歡迎回來</Text>
 
-        <CustomTextInput label="密碼" />
+        {/* login form 拆出去 */}
+        <CustomTextInput label="密碼"  value={email}  setValue={setEmail}/>
 
         {/* TODO: 要驗證DB 輸入的密碼是否正確 */}
         <Button
