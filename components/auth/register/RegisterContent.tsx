@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import RegisterForm, { Form } from "./RegisterForm";
-import { IsValid } from "../../screen/Register";
-import Button from "../ui/Button";
-import FlatButton from "../ui/FlatButton";
+
+import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import RegisterForm, { Form } from "./RegisterForm";
+export interface IsValidItem {
+  value: boolean;
+  errorText: string;
+}
+export interface IsValid {
+  name: IsValidItem;
+  email: IsValidItem;
+  password: IsValidItem;
+  confirmPassword: IsValidItem;
+}
+
 
 const initIsValid = {
   name: { value: false, errorText: "" },
@@ -12,7 +22,11 @@ const initIsValid = {
   password: { value: false, errorText: "" },
   confirmPassword: { value: false, errorText: "" },
 };
-const RegisterContent = ({ getFormValue }) => {
+interface RegisterContentProps {
+  getFormValue: (form: Form) => void;
+}
+
+const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
   const navigation = useNavigation();
 
   // 檢查輸入資訊,是否有符合規則

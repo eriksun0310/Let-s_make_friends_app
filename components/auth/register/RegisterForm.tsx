@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import CustomTextInput from "../ui/CustomTextInput";
-import FlatButton from "../ui/FlatButton";
-import { useNavigation } from "@react-navigation/native";
-import Button from "../ui/Button";
-import { IsValid } from "../../screen/Register";
+import CustomTextInput from "../../ui/CustomTextInput";
+import Button from "../../ui/Button";
+import { IsValid } from "./RegisterContent";
 
 export interface Form {
   name: string;
@@ -15,15 +13,10 @@ export interface Form {
 interface RegisterFormProps {
   isValid: IsValid;
   onSubmit: (form: Form) => void;
-  // navigation: any;
 }
 
 // TODO: getFormValues
-const RegisterForm: React.FC<RegisterFormProps> = ({
-  isValid,
-  onSubmit,
-  // navigation,
-}) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
   // 取得輸入資訊,是否有符合規則
   const {
     name: nameIsValid,

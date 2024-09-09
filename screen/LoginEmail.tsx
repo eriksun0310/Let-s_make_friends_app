@@ -1,59 +1,39 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { NavigationProp } from "@react-navigation/native";
+import LoginContent from "../components/auth/login/LoginContent";
 
+interface LoginEmailProps {
+  navigation: NavigationProp<any>;
+}
 
-import { Colors } from "../constants/style";
+const LoginEmail: React.FC<LoginEmailProps> = ({ navigation }) => {
+  const [isCheckMember, setIsCheckMember] = useState({
+    value: false,
+    errorText: "沒有此會員帳號",
+  });
 
-import CustomTextInput from "../components/ui/CustomTextInput";
-import FlatButton from "../components/ui/FlatButton";
-import Button from "../components/ui/Button";
-
-const LoginEmail = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+  //檢查是否有會員
+  const checkMember = (email: string) => {
+    // TODO: 用email 要去DB 確認有無會員,如果沒有的話,value 會是true
+    if (!email) {
+      setIsCheckMember((prev) => ({
+        ...prev,
+        value: true,
+      }));
+      // 有會員
+    } else {
+      setIsCheckMember((prev) => ({
+        ...prev,
+        value: false,
+      }));
+      // 登入密碼頁面
+      navigation.navigate("loginPassword");
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>歡迎回來</Text>
-
-        {/* login form 拆出去 */}
-
-        <CustomTextInput label="Email" value={email} setValue={setEmail} />
-        <Button
-          text="繼續"
-          onPress={() => {
-            // TODO: 要去DB 確認有無會員
-            navigation.navigate("loginPassword");
-          }}
-        />
-
-        <FlatButton
-          onPress={() => {
-            navigation.navigate("register");
-          }}
-        >
-          尚未有會員? 註冊會員
-        </FlatButton>
-      </View>
-    </SafeAreaView>
+    <LoginContent type="email" getValue={checkMember} isValid={isCheckMember} />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 40,
-  },
-});
 
 export default LoginEmail;

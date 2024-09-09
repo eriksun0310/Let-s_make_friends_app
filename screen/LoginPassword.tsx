@@ -1,65 +1,41 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-} from "react-native";
+import { NavigationProp } from "@react-navigation/native";
+import LoginContent from "../components/auth/login/LoginContent";
 
-import { useNavigation } from "@react-navigation/native";
-import { Colors } from "../constants/style";
-
-import CustomTextInput from "../components/ui/CustomTextInput";
-import Button from "../components/ui/Button";
-
+interface LoginEmailProps {
+  navigation: NavigationProp<any>;
+}
 // TODO: 到時候要從DB 帶入名稱
-const LoginPassword = ({ navigation }) => {
-  //   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
+const LoginPassword: React.FC<LoginEmailProps> = ({ navigation }) => {
+  const [isCheckPassword, setIsCheckPassword] = useState({
+    value: false,
+    errorText: "會員密碼錯誤",
+  });
+  const confirmPassword = (password: string) => {
+    // TODO: 用password 去DB 確認會員密碼是否正確,如果不正確,value 會是true
 
-  // 有會員
-  const [isMember, setIsMember] = useState(false);
+    if (!password) {
+      setIsCheckPassword((prev) => ({
+        ...prev,
+        value: true,
+      }));
+    } else {
+      setIsCheckPassword((prev) => ({
+        ...prev,
+        value: false,
+      }));
+      // 登入主頁面
+      navigation.navigate("main");
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Hi! Lin 歡迎回來</Text>
-
-        {/* login form 拆出去 */}
-        <CustomTextInput label="密碼"  value={email}  setValue={setEmail}/>
-
-        {/* TODO: 要驗證DB 輸入的密碼是否正確 */}
-        <Button
-          text="登入"
-          onPress={() => {
-            navigation.navigate("main");
-          }}
-        />
-      </View>
-    </SafeAreaView>
+    <LoginContent
+      type="password"
+      getValue={confirmPassword}
+      isValid={isCheckPassword}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 40,
-  },
-});
 
 export default LoginPassword;
