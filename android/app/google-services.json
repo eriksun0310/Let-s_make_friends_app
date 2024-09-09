@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "702293093831",
+    "firebase_url": "https://let-s-make-friends-app-default-rtdb.firebaseio.com",
+    "project_id": "let-s-make-friends-app",
+    "storage_bucket": "let-s-make-friends-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702293093831:android:c355f1c8ce32c086a2fde2",
+        "android_client_info": {
+          "package_name": "com.erika.lets_make_friends_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFlMxzYHtj4ovO0PxNldXhEO4qPK9HPUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
