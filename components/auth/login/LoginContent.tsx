@@ -32,7 +32,10 @@ const LoginContent: React.FC<LoginContentProps> = ({
           isValid={isValid}
           label={type === "email" ? "信箱" : "密碼"}
           value={value}
-          setValue={setValue}
+          setValue={(v) => {
+            console.log("v", v);
+            setValue(v);
+          }}
           secure={type === "password"}
         />
         <Button
@@ -45,6 +48,7 @@ const LoginContent: React.FC<LoginContentProps> = ({
         {type === "email" && (
           <FlatButton
             onPress={() => {
+              
               navigation.navigate("register");
             }}
           >

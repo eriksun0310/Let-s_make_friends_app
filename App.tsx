@@ -1,5 +1,6 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import { Button, Text } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -13,6 +14,11 @@ import Personal from "./screen/Personal";
 import LoginEmail from "./screen/LoginEmail";
 import Register from "./screen/Register";
 import LoginPassword from "./screen/LoginPassword";
+import AuthContextProvider, { AuthContext } from "./store/authContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -48,96 +54,135 @@ const MainTabNavigator = () => {
   );
 };
 
+// 註冊頁面(未驗證)
+const AuthStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="loginEmail"
+        options={{
+          title: "會員登入信箱",
+          headerShown: false,
+        }}
+        component={LoginEmail}
+      />
+      <Stack.Screen
+        name="loginPassword"
+        options={{
+          title: "會員登入密碼",
+          headerShown: false,
+        }}
+        component={LoginPassword}
+      />
+      <Stack.Screen
+        name="register"
+        options={{
+          title: "會員註冊",
+          headerShown: false,
+        }}
+        component={Register}
+      />
+    </Stack.Navigator>
+  );
+};
+
+// 已登入後的頁面(有驗證)
+const AuthenticatedStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="loginEmail"
+        options={{
+          title: "會員登入信箱",
+          headerShown: false,
+        }}
+        component={LoginEmail}
+      />
+      <Stack.Screen
+        name="loginPassword"
+        options={{
+          title: "會員登入密碼",
+          headerShown: false,
+        }}
+        component={LoginPassword}
+      />
+      <Stack.Screen
+        name="register"
+        options={{
+          title: "會員註冊",
+          headerShown: false,
+        }}
+        component={Register}
+      />
+
+      <Stack.Screen
+        name="main"
+        options={{
+          title: "主畫面",
+          headerShown: false,
+        }}
+        component={MainTabNavigator}
+      />
+
+      <Stack.Screen
+        name="avatarCreator"
+        options={{
+          title: "編輯大頭貼",
+          headerRight: () => <Button title="儲存" onPress={() => {}} />,
+        }}
+        component={AvatarCreator}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const Navigation = () => {
+  const authCtx = useContext(AuthContext);
+
+  console.log("authCtx.isAuthenticated", authCtx.isAuthenticated);
+  return (
+    <NavigationContainer>
+      <AuthenticatedStack></AuthenticatedStack>
+      {/* {authCtx.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+    </NavigationContainer>
+  );
+};
+
+const Root = () => {
+  //正在嘗試登錄用戶
+  const [isTryingLogin, setIsTryingLogin] = useState(true);
+  const authCtx = useContext(AuthContext);
+  useEffect(() => {
+    const fetchToken = async () => {
+      // 如果 AsyncStorage 有token 就會自動登入
+      const storedToken = await AsyncStorage.getItem("token");
+      if (storedToken) {
+        authCtx.authenticatedToken(storedToken);
+      }
+      setIsTryingLogin(false);
+    };
+    fetchToken().finally(() => {
+      SplashScreen.hideAsync();
+    });
+  }, []);
+
+  // 正在嘗試登錄用戶
+  if (isTryingLogin) {
+    //確保不要看到 login 閃爍的畫面
+    return null; // 可以加載一個自定義載入畫面
+  }
+
+  return <Navigation />;
+};
+
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="loginEmail"
-            options={{
-              title: "會員登入",
-              headerShown: false,
-            }}
-            component={LoginEmail}
-          />
+    <>
+      <StatusBar style="light"></StatusBar>
 
-          <Stack.Screen
-            name="register"
-            options={{
-              title: "會員註冊",
-              headerShown: false,
-            }}
-            component={Register}
-          />
-          <Stack.Screen
-            name="loginPassword"
-            options={{
-              title: "會員註冊",
-              headerShown: false,
-            }}
-            component={LoginPassword}
-          />
-
-          <Stack.Screen
-            name="main"
-            options={{
-              title: "會員註冊",
-              headerShown: false,
-            }}
-            component={MainTabNavigator}
-          />
-
-          <Stack.Screen
-            name="avatarCreator"
-            options={{
-              title: "編輯大頭貼",
-              headerRight: () => <Button title="儲存" onPress={() => {}} />,
-            }}
-            component={AvatarCreator}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+      <AuthContextProvider>
+        <Root />
+      </AuthContextProvider>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  chatItem: {
-    flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  chatIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  chatInfo: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  chatName: {
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  chatMessage: {
-    color: "gray",
-  },
-  saveButton: {
-    backgroundColor: "#3D74DB",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  saveButtonText: {
-    color: "#FFF",
-    fontWeight: "bold",
-  },
-});

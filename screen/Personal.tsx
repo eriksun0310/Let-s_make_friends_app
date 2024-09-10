@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import BorderButton from "../components/ui/BorderButton";
 import HeadShot from "../components/HeadShot";
 import MultipleText from "../components/ui/MultipleText";
 import Button from "../components/ui/Button";
+import { AuthContext } from "../store/authContext";
 
 interface PersonalProps {
   navigation: NavigationProp<any>;
@@ -19,6 +20,8 @@ const dataList = {
 };
 
 const Personal: React.FC<PersonalProps> = ({ navigation }) => {
+  const authCtx = useContext(AuthContext);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -37,6 +40,7 @@ const Personal: React.FC<PersonalProps> = ({ navigation }) => {
           <Button
             text="登出"
             onPress={() => {
+              authCtx.logout();
               navigation.navigate("loginEmail");
             }}
           />

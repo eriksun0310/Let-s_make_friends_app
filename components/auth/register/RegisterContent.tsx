@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import RegisterForm, { Form } from "./RegisterForm";
+import { AuthContext } from "../../../store/authContext";
 export interface IsValidItem {
   value: boolean;
   errorText: string;
@@ -14,7 +15,6 @@ export interface IsValid {
   password: IsValidItem;
   confirmPassword: IsValidItem;
 }
-
 
 const initIsValid = {
   name: { value: false, errorText: "" },
@@ -28,6 +28,7 @@ interface RegisterContentProps {
 
 const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
   const navigation = useNavigation();
+  const authCtx = useContext(AuthContext);
 
   // 檢查輸入資訊,是否有符合規則
   const [isValid, setIsValid] = useState<IsValid>(initIsValid);
@@ -68,6 +69,12 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
     }
   };
 
+  // 回到登入頁面
+  const backToLogin = () => {
+    authCtx.logout();
+    navigation.navigate("loginEmail");
+  };
+
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -75,13 +82,7 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
           <Text style={styles.title}>會員註冊</Text>
 
           <RegisterForm isValid={isValid} onSubmit={submitHandle} />
-          <FlatButton
-            onPress={() => {
-              navigation.navigate("loginEmail");
-            }}
-          >
-            已有會員? 會員登入
-          </FlatButton>
+          <FlatButton onPress={backToLogin}>已有會員? 會員登入</FlatButton>
         </View>
       </SafeAreaView>
     </>
