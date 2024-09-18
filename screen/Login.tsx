@@ -7,7 +7,7 @@ interface LoginEmailProps {
   navigation: NavigationProp<any>;
 }
 
-const LoginEmail: React.FC<LoginEmailProps> = ({ navigation }) => {
+const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const [isCheckMember, setIsCheckMember] = useState({
     value: false,
     errorText: "沒有此會員帳號",
@@ -15,9 +15,9 @@ const LoginEmail: React.FC<LoginEmailProps> = ({ navigation }) => {
 
   //檢查是否有會員
   const checkMember = async (email: string) => {
-    const memberName = await checkEmail(email);
+    // const memberName = await checkEmail(email);
 
-    console.log("memberName", memberName);
+    // console.log("memberName", memberName);
 
     // TODO: 用email 要去DB 確認有無會員,如果沒有的話,value 會是true
     // if (!email) {
@@ -37,8 +37,8 @@ const LoginEmail: React.FC<LoginEmailProps> = ({ navigation }) => {
   };
 
   return (
-    <LoginContent type="email" getValue={checkMember} isValid={isCheckMember} />
+    <LoginContent  getValue={checkMember} isValid={isCheckMember} />
   );
 };
 
-export default LoginEmail;
+export default Login;

@@ -11,9 +11,9 @@ import { MessageCircle, User, Map as MapIcon } from "lucide-react-native";
 import Chat from "./screen/Chat";
 import Map from "./screen/Map";
 import Personal from "./screen/Personal";
-import LoginEmail from "./screen/LoginEmail";
+import Login from "./screen/Login";
 import Register from "./screen/Register";
-import LoginPassword from "./screen/LoginPassword";
+// import LoginPassword from "./screen/LoginPassword";
 import AuthContextProvider, { AuthContext } from "./store/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
@@ -59,21 +59,14 @@ const AuthStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="loginEmail"
+        name="login"
         options={{
-          title: "會員登入信箱",
+          title: "會員登入",
           headerShown: false,
         }}
-        component={LoginEmail}
+        component={Login}
       />
-      <Stack.Screen
-        name="loginPassword"
-        options={{
-          title: "會員登入密碼",
-          headerShown: false,
-        }}
-        component={LoginPassword}
-      />
+
       <Stack.Screen
         name="register"
         options={{
@@ -82,6 +75,7 @@ const AuthStack = () => {
         }}
         component={Register}
       />
+   
     </Stack.Navigator>
   );
 };
@@ -96,16 +90,16 @@ const AuthenticatedStack = () => {
           title: "會員登入信箱",
           headerShown: false,
         }}
-        component={LoginEmail}
+        component={Login}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="loginPassword"
         options={{
           title: "會員登入密碼",
           headerShown: false,
         }}
         component={LoginPassword}
-      />
+      /> */}
       <Stack.Screen
         name="register"
         options={{

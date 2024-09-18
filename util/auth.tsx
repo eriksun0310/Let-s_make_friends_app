@@ -119,29 +119,29 @@ export const login = (form: Form) => {
 //檢查會員信箱是否已註冊
 export const checkEmail = async (email: string) => {
   console.log("email", email);
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      console.log("user", user);
-      const idToken = await user.getIdToken();
-      const db = firebase.database();
-      const ref = db
-        .ref("users")
-        .orderByChild("email")
-        .equalTo(email)
-        .auth(idToken);
-      const snapshot = await ref.once("value");
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        const name = userData.name;
-        console.log("name", name);
-        return name;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  });
+  // firebase.auth().onAuthStateChanged((user) => {
+  //   if (user) {
+  //     console.log("user", user);
+  //     const idToken = await user.getIdToken();
+  //     const db = firebase.database();
+  //     const ref = db
+  //       .ref("users")
+  //       .orderByChild("email")
+  //       .equalTo(email)
+  //       .auth(idToken);
+  //     const snapshot = await ref.once("value");
+  //     if (snapshot.exists()) {
+  //       const userData = snapshot.val();
+  //       const name = userData.name;
+  //       console.log("name", name);
+  //       return name;
+  //     } else {
+  //       return null;
+  //     }
+  //   } else {
+  //     return null;
+  //   }
+  // });
 };
 
 // 會員註冊
