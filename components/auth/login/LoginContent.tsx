@@ -6,8 +6,8 @@ import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { IsValidItem } from "../register/RegisterContent";
 import * as Google from "expo-auth-session/providers/google";
-import { firebase } from "../../../util/firebase";
-
+import { auth, GoogleAuthProvider } from "../../../util/firebase";
+import { makeRedirectUri } from "expo-auth-session";
 interface LoginContentProps {
   getValue: (email: string) => void;
   isValid: IsValidItem;
@@ -18,28 +18,29 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
     expoClientId: "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",
     androidClientId: "你的Android客戶端ID",
     iosClientId: "你的iOS客戶端ID",
-    // redirectUri: Google.makeRedirectUri({
-    //   useProxy: true, // 在開發階段使用Expo代理服務
-    // }),
+    scopes: ["profile", "email"], // 設定範疇
+    redirectUri: makeRedirectUri({
+      useProxy: true,
+    }),
   });
 
   const navigation = useNavigation();
   const [value, setValue] = useState("");
 
   useEffect(() => {
+    console.log("response", response);
     if (response?.type === "success") {
       const { id_token } = response.params;
-      const credential = firebase.auth.GoogleAuthProvider.credential(id_token);
-      // firebase
-      //   .auth()
-      //   .signInWithCredential(credential)
-      //   .then(() => {
-      //     // 導向到 "main" 畫面
-      //     // navigation.navigate("main");
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
+      const credential = GoogleAuthProvider.credential(id_token);
+      auth
+        .signInWithCredential(credential)
+        .then(() => {
+          // 導向主畫面
+          navigation.navigate("main");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }, [response]);
   return (
