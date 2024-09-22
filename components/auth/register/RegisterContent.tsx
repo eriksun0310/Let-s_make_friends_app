@@ -10,14 +10,12 @@ export interface IsValidItem {
   errorText: string;
 }
 export interface IsValid {
-  name: IsValidItem;
   email: IsValidItem;
   password: IsValidItem;
   confirmPassword: IsValidItem;
 }
 
 const initIsValid = {
-  name: { value: false, errorText: "" },
   email: { value: false, errorText: "" },
   password: { value: false, errorText: "" },
   confirmPassword: { value: false, errorText: "" },
@@ -34,11 +32,10 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
   const [isValid, setIsValid] = useState<IsValid>(initIsValid);
 
   const submitHandle = (form: Form) => {
-    let { name, email, password, confirmPassword } = form;
+    let { email, password, confirmPassword } = form;
 
     email = email.trim();
     password = password.trim();
-    const nameIsValid = name.length > 0;
     const emailIsValid = email.includes("@");
     // 密碼6-8位
     const passwordIsValid = password.length >= 6 && password.length <= 8;
@@ -49,13 +46,11 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
 
     //驗證表單規則
     if (
-      !nameIsValid ||
       !emailIsValid ||
       !passwordIsValid ||
       !confirmPasswordIsValid
     ) {
       setIsValid({
-        name: { value: !nameIsValid, errorText: "請輸入名稱" },
         email: { value: !emailIsValid, errorText: "請輸入信箱正確的格式" },
         password: { value: !passwordIsValid, errorText: "密碼需至少六位數" },
         confirmPassword: {
@@ -72,7 +67,7 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
   // 回到登入頁面
   const backToLogin = () => {
     authCtx.logout();
-    navigation.navigate("loginEmail");
+    navigation.navigate("login");
   };
 
   return (

@@ -6,7 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import AvatarCreator from "./screen/AvatarCreator";
+import AvatarCreator from "./screen/EditHeadShot";
 import { MessageCircle, User, Map as MapIcon } from "lucide-react-native";
 import Chat from "./screen/Chat";
 import Map from "./screen/Map";
@@ -80,35 +80,10 @@ const AuthStack = () => {
   );
 };
 
-// 已登入後的頁面(有驗證)
+// 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
 const AuthenticatedStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="loginEmail"
-        options={{
-          title: "會員登入信箱",
-          headerShown: false,
-        }}
-        component={Login}
-      />
-      {/* <Stack.Screen
-        name="loginPassword"
-        options={{
-          title: "會員登入密碼",
-          headerShown: false,
-        }}
-        component={LoginPassword}
-      /> */}
-      <Stack.Screen
-        name="register"
-        options={{
-          title: "會員註冊",
-          headerShown: false,
-        }}
-        component={Register}
-      />
-
       <Stack.Screen
         name="main"
         options={{
@@ -136,8 +111,7 @@ const Navigation = () => {
   console.log("authCtx.isAuthenticated", authCtx.isAuthenticated);
   return (
     <NavigationContainer>
-      <AuthenticatedStack></AuthenticatedStack>
-      {/* {authCtx.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+      {authCtx.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

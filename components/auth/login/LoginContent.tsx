@@ -5,44 +5,51 @@ import Button from "../../ui/Button";
 import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { IsValidItem } from "../register/RegisterContent";
-import * as Google from "expo-auth-session/providers/google";
-import { auth, GoogleAuthProvider } from "../../../util/firebase";
-import { makeRedirectUri } from "expo-auth-session";
+import { LoginForm } from "../../../screen/Login";
+// import * as Google from "expo-auth-session/providers/google";
+// import { auth, GoogleAuthProvider } from "../../../util/firebase";
+// import { makeRedirectUri } from "expo-auth-session";
+
 interface LoginContentProps {
-  getValue: (email: string) => void;
+  getValue: (form: LoginForm) => void;
   isValid: IsValidItem;
 }
 
+
+//TODO: 以後再來處理 GOOGLE登入
 const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: "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",
-    androidClientId: "你的Android客戶端ID",
-    iosClientId: "你的iOS客戶端ID",
-    scopes: ["profile", "email"], // 設定範疇
-    redirectUri: makeRedirectUri({
-      useProxy: true,
-    }),
-  });
+  // const [request, response, promptAsync] = Google.useAuthRequest({
+  //   expoClientId: "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",
+  //   androidClientId: "你的Android客戶端ID",
+  //   iosClientId: "你的iOS客戶端ID",
+  //   scopes: ["profile", "email"], // 設定範疇
+  //   redirectUri: makeRedirectUri({
+  //     useProxy: true,
+  //   }),
+  // });
 
   const navigation = useNavigation();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState<LoginForm>({
+    email: "",
+    password: "",
+  });
 
-  useEffect(() => {
-    console.log("response", response);
-    if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      auth
-        .signInWithCredential(credential)
-        .then(() => {
-          // 導向主畫面
-          navigation.navigate("main");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }, [response]);
+  // useEffect(() => {
+  //   console.log("response", response);
+  //   if (response?.type === "success") {
+  //     const { id_token } = response.params;
+  //     // const credential = GoogleAuthProvider.credential(id_token);
+  //     // auth
+  //     //   .signInWithCredential(credential)
+  //     //   .then(() => {
+  //     //     // 導向主畫面
+  //     //     navigation.navigate("main");
+  //     //   })
+  //     //   .catch((error) => {
+  //     //     console.error(error);
+  //     //   });
+  //   }
+  // }, [response]);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -50,20 +57,24 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
 
         <CustomTextInput
           isValid={isValid}
-          label="信箱"
-          value={value}
+          label="Email"
+          value={value.email}
           setValue={(v) => {
-            console.log("v", v);
-            setValue(v);
+            setValue((prev) => ({
+              ...prev,
+              email: v,
+            }));
           }}
         />
         <CustomTextInput
           isValid={isValid}
           label="密碼"
-          value={value}
+          value={value.password}
           setValue={(v) => {
-            console.log("v", v);
-            setValue(v);
+            setValue((prev) => ({
+              ...prev,
+              password: v,
+            }));
           }}
           secure
         />

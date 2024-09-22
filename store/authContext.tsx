@@ -6,14 +6,14 @@ interface AuthContext {
   token: string;
   isAuthenticated: boolean;
   authenticatedToken: (token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContext>({
   token: "",
   isAuthenticated: false, //是否登入
   authenticatedToken: () => {}, //成功登入、註冊
-  logout: () => {}, //登出
+  logout: () => Promise.resolve(), //登出
 });
 
 const AuthContextProvider = ({ children }) => {
@@ -30,9 +30,10 @@ const AuthContextProvider = ({ children }) => {
   };
 
   //登出
-  const logout = () => {
+  const logout = async (): Promise<void> => {
     setToken("");
-    AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("token");
+    return Promise.resolve();
   };
 
   const value = {

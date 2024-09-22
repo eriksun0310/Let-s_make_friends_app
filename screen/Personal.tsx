@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import BorderButton from "../components/ui/BorderButton";
-import HeadShot from "../components/HeadShot";
+import HeadShot from "../components/personal/HeadShot";
 import MultipleText from "../components/ui/MultipleText";
 import Button from "../components/ui/Button";
 import { AuthContext } from "../store/authContext";
@@ -40,8 +40,10 @@ const Personal: React.FC<PersonalProps> = ({ navigation }) => {
           <Button
             text="登出"
             onPress={() => {
-              authCtx.logout();
-              navigation.navigate("loginEmail");
+              // 確保isAuthenticated:false才跳轉login頁面
+              authCtx.logout().then(() => {
+                navigation.navigate("login");
+              });
             }}
           />
         </View>

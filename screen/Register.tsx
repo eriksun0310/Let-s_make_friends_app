@@ -21,13 +21,13 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
   const signUpHandler = async (form: Form) => {
     setLoading(true);
     try {
-      const token = await createUser(form);
+      const token = await createUser(form.email, form.password);
 
       console.log("token  signUpHandler ", token);
       authCtx.authenticatedToken(token);
 
       // 註冊成功後回到登入頁面
-      navigation.replace("loginEmail");
+      navigation.replace("login");
     } catch (error) {
       console.log("error", error);
       setError("註冊失敗，請稍後再試");

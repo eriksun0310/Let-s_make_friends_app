@@ -4,7 +4,6 @@ import Button from "../../ui/Button";
 import { IsValid } from "./RegisterContent";
 
 export interface Form {
-  name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -19,14 +18,12 @@ interface RegisterFormProps {
 const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
   // 取得輸入資訊,是否有符合規則
   const {
-    name: nameIsValid,
     email: emailIsValid,
     password: passwordIsValid,
     confirmPassword: confirmPasswordIsValid,
   } = isValid;
 
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -42,13 +39,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
 
   return (
     <>
-      <CustomTextInput
-        label="名稱"
-        value={form.name}
-        setValue={(v) => handleChange("name", v)}
-        placeholder="請輸入名稱"
-        isValid={nameIsValid}
-      />
       <CustomTextInput
         label="Email"
         value={form.email}

@@ -19,15 +19,16 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal:5
     // flex: 1,
   },
   button: {
-    backgroundColor: "#ADD8E6", // 淺藍色
+    // backgroundColor: "#ADD8E6", // 淺藍色
     borderRadius: 10, // 圓角
     paddingVertical: 4,
     paddingHorizontal: 20,
     borderWidth: 2, // 外框線
-    borderColor: "black", // 黑色的外框線
+    borderColor: "#ADD8E6", // 黑色的外框線
   },
   buttonText: {
     fontSize: 20,
