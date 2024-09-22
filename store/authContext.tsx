@@ -15,7 +15,13 @@ export const AuthContext = createContext<AuthContext>({
   logout: () => Promise.resolve(), //登出
 });
 
-const AuthContextProvider = ({ children }) => {
+interface AuthContextProviderProps {
+  children: React.ReactNode;
+}
+
+const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
+  children,
+}) => {
   const [token, setToken] = useState("");
 
   //設置認證過的token

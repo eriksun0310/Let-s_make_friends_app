@@ -17,6 +17,8 @@ import Register from "./screen/Register";
 import AuthContextProvider, { AuthContext } from "./store/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
+import MoreAboutMe from "./screen/MoreAboutMe";
+import EditPersonal from "./screen/EditPersonal";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -75,7 +77,6 @@ const AuthStack = () => {
         }}
         component={Register}
       />
-   
     </Stack.Navigator>
   );
 };
@@ -91,6 +92,23 @@ const AuthenticatedStack = () => {
           headerShown: false,
         }}
         component={MainTabNavigator}
+      />
+      <Stack.Screen
+        name="moreAboutMe"
+        options={{
+          title: "更加認識我",
+          headerShown: false,
+        }}
+        component={MoreAboutMe}
+      />
+
+      <Stack.Screen
+        name="editPersonal"
+        options={{
+          title: "編輯 個人資料",
+          headerShown: false,
+        }}
+        component={EditPersonal}
       />
 
       <Stack.Screen

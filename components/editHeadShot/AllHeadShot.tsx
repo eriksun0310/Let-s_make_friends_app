@@ -41,6 +41,7 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
         {Object.keys(imageUrls)?.map((key) => {
           return (
             <TouchableOpacity
+              key={key}
               style={styles.tabButton}
               onPress={() => setType(key as Type)}
             >
