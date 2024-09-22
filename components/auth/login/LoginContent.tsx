@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
 import Button from "../../ui/Button";
 import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
-import { IsValidItem } from "../register/RegisterContent";
-import { LoginForm } from "../../../screen/Login";
+import type{ LoginForm, LoginIsValid } from "../../../shared/types";
 // import * as Google from "expo-auth-session/providers/google";
 // import { auth, GoogleAuthProvider } from "../../../util/firebase";
 // import { makeRedirectUri } from "expo-auth-session";
 
 interface LoginContentProps {
   getValue: (form: LoginForm) => void;
-  isValid: IsValidItem;
+  isValid: LoginIsValid;
 }
-
 
 //TODO: 以後再來處理 GOOGLE登入
 const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
+  const { email: emailIsValid, password: passwordIsValid } = isValid;
+
   // const [request, response, promptAsync] = Google.useAuthRequest({
   //   expoClientId: "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",
   //   androidClientId: "你的Android客戶端ID",
@@ -56,7 +56,7 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
         <Text style={styles.title}>歡迎回來</Text>
 
         <CustomTextInput
-          isValid={isValid}
+          isValid={emailIsValid}
           label="Email"
           value={value.email}
           setValue={(v) => {
@@ -67,7 +67,7 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
           }}
         />
         <CustomTextInput
-          isValid={isValid}
+          isValid={passwordIsValid}
           label="密碼"
           value={value.password}
           setValue={(v) => {

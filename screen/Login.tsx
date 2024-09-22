@@ -1,28 +1,65 @@
 import React, { useContext, useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import LoginContent from "../components/auth/login/LoginContent";
-import {  login } from "../util/auth";
+import { login } from "../util/auth";
 import { AuthContext } from "../store/authContext";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
-
-export interface LoginForm {
-  email: string;
-  password: string;
-}
+import type { LoginForm, LoginIsValid } from "../shared/types";
 
 interface LoginEmailProps {
   navigation: NavigationProp<any>;
 }
+
+interface catchErrorProps {
+  errorMessage: string;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  setIsValid: React.Dispatch<React.SetStateAction<LoginIsValid>>;
+}
+
+// 接收錯誤
+const catchError = ({
+  errorMessage,
+  setError,
+  setIsValid,
+}: catchErrorProps) => {
+  if (errorMessage === "INVALID_LOGIN_CREDENTIALS") {
+    setIsValid((prev) => ({
+      ...prev,
+      email: {
+        value: true,
+        errorText: "信箱或密碼錯誤，請再試一次",
+      },
+    }));
+  } else if (errorMessage === "MISSING_PASSWORD") {
+    setIsValid((prev) => ({
+      ...prev,
+      password: {
+        value: true,
+        errorText: "請輸入密碼",
+      },
+    }));
+  } else if (errorMessage === "INVALID_EMAIL") {
+    setIsValid((prev) => ({
+      ...prev,
+      email: {
+        value: true,
+        errorText: "信箱格式錯誤，請確認後再試",
+      },
+    }));
+  } else {
+    setError("登入失敗，請稍後再試");
+  }
+};
 
 const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [isCheckMember, setIsCheckMember] = useState({
-    value: false,
-    errorText: "沒有此會員帳號",
+  const [isValid, setIsValid] = useState<LoginIsValid>({
+    email: { value: false, errorText: "" },
+    password: { value: false, errorText: "" },
   });
 
   //處理登入的事件
@@ -36,8 +73,13 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       // 登入成功,回到首頁
       navigation.replace("main");
     } catch (error) {
-      console.log("error", error);
-      setError("登入失敗，請稍後再試");
+      const errorMessage = error.error.message as string;
+
+      catchError({
+        errorMessage,
+        setError,
+        setIsValid,
+      });
     } finally {
       setLoading(false);
     }
@@ -50,7 +92,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   return (
     <>
       {error && <Text>{error}</Text>}
-      <LoginContent getValue={loginHandler} isValid={isCheckMember} />
+      <LoginContent getValue={loginHandler} isValid={isValid} />
     </>
   );
 };

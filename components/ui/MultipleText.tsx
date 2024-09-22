@@ -1,10 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-
 import BorderButton from "./BorderButton";
-
-//
-const dataList = ["看劇", "看電影"];
 
 interface MultipleTextProps {
   label: string;

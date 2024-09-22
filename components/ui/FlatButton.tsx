@@ -1,8 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constants/style";
+import { ReactNode } from "react";
 
+interface FlatButtonProps {
+  children: ReactNode;
+  onPress: () => void;
+}
 
-const FlatButton = ({ children, onPress }) => {
+const FlatButton: React.FC<FlatButtonProps> = ({ children, onPress }) => {
   return (
     <Pressable
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}

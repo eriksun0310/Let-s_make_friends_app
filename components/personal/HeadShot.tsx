@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { UserIcon } from "lucide-react-native";
 import { NavigationProp } from "@react-navigation/native";
 import React from "react";
 interface HeadShotProps {

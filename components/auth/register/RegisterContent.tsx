@@ -1,19 +1,10 @@
 import React, { useContext, useState } from "react";
-
 import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
-import RegisterForm, { Form } from "./RegisterForm";
+import RegisterForm from "./RegisterForm";
 import { AuthContext } from "../../../store/authContext";
-export interface IsValidItem {
-  value: boolean;
-  errorText: string;
-}
-export interface IsValid {
-  email: IsValidItem;
-  password: IsValidItem;
-  confirmPassword: IsValidItem;
-}
+import type { Form, RegisterIsValid } from "../../../shared/types";
 
 const initIsValid = {
   email: { value: false, errorText: "" },
@@ -29,7 +20,7 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
   const authCtx = useContext(AuthContext);
 
   // 檢查輸入資訊,是否有符合規則
-  const [isValid, setIsValid] = useState<IsValid>(initIsValid);
+  const [isValid, setIsValid] = useState<RegisterIsValid>(initIsValid);
 
   const submitHandle = (form: Form) => {
     let { email, password, confirmPassword } = form;
@@ -45,11 +36,7 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
       password.length <= 8;
 
     //驗證表單規則
-    if (
-      !emailIsValid ||
-      !passwordIsValid ||
-      !confirmPasswordIsValid
-    ) {
+    if (!emailIsValid || !passwordIsValid || !confirmPasswordIsValid) {
       setIsValid({
         email: { value: !emailIsValid, errorText: "請輸入信箱正確的格式" },
         password: { value: !passwordIsValid, errorText: "密碼需至少六位數" },

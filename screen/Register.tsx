@@ -4,15 +4,14 @@ import { Text } from "react-native";
 import RegisterContent from "../components/auth/register/RegisterContent";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { createUser } from "../util/auth";
-import { Form } from "../components/auth/register/RegisterForm";
 import { AuthContext } from "../store/authContext";
+import type { Form } from "../shared/types";
 
 interface RegisterProps {
   navigation: NavigationProp<any>;
 }
 
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
-  // const navigation = useNavigation();
   const authCtx = useContext(AuthContext);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");

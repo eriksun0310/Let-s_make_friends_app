@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   KeyboardTypeOptions,
 } from "react-native";
 import { Colors } from "../../constants/style";
-import { IsValidItem } from "../auth/register/RegisterContent";
+import type { IsValidItem } from "../../shared/types";
 
 interface CustomTextInputProps {
   keyboardType?: KeyboardTypeOptions;
@@ -18,8 +18,6 @@ interface CustomTextInputProps {
   value: string;
   setValue: (v: string) => void;
 }
-
-//TODO: 要加getValue:()=>{}
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
   keyboardType,
   placeholder,
@@ -29,7 +27,6 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   value,
   setValue,
 }) => {
-  // console.log("isValid", isValid);
   return (
     <>
       <View
@@ -59,7 +56,6 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
         value={value}
         placeholder={placeholder}
         keyboardType={keyboardType}
-        // autoCapitalize="none"
         secureTextEntry={secure}
       />
     </>
@@ -74,14 +70,10 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: "bold",
-    // marginBottom: 10,
   },
   errorText: {
     fontSize: 15,
     fontWeight: "bold",
-    // display:'flex',
-    // alignItems:'center'
-    // marginBottom: 1,
   },
   input: {
     borderWidth: 2,
@@ -95,7 +87,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.error,
     backgroundColor: Colors.error100,
-    // backgroundColor: Colors.error,
   },
 });
 export default CustomTextInput;

@@ -19,11 +19,9 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal:5
-    // flex: 1,
+    paddingHorizontal: 5,
   },
   button: {
-    // backgroundColor: "#ADD8E6", // 淺藍色
     borderRadius: 10, // 圓角
     paddingVertical: 4,
     paddingHorizontal: 20,

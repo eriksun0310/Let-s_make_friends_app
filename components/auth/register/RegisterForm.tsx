@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
 import Button from "../../ui/Button";
-import { IsValid } from "./RegisterContent";
-
-export interface Form {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import type { Form, RegisterIsValid } from "../../../shared/types";
 
 interface RegisterFormProps {
-  isValid: IsValid;
+  isValid: RegisterIsValid;
   onSubmit: (form: Form) => void;
 }
 

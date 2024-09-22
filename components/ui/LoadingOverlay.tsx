@@ -1,6 +1,9 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-const LoadingOverlay = ({ message }) => {
+interface LoadingOverlayProps {
+  message: string;
+}
+const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ message }) => {
   return (
     <View style={styles.rootContainer}>
       <Text style={styles.message}>{message}</Text>

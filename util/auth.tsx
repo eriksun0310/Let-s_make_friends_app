@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import firebase from "firebase/app";
 import "firebase/database";
 import { getDatabase, ref, set, update } from "firebase/database";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 // const firebaseConfig = {
 //   apiKey: process.env.API_KEY,
@@ -28,20 +28,23 @@ const API_KEY = process.env.API_KEY;
 // const app = initializeApp(firebaseConfig);
 // const database = getDatabase(app);
 
-// 驗證身分
+// authenticate:專門處理和firebase 的認證API 對接工作
 export const authenticate = async (
   mode: "signUp" | "signInWithPassword",
   email: string,
   password: string
 ) => {
-  console.log("API_KEY", API_KEY);
-  const url = `https://identitytoolkit.googleapis.com/v1/accounts:${mode}?key=${API_KEY}`;
-  const response = await axios.post(url, {
-    email: email,
-    password: password,
-    returnSecureToken: true,
-  });
-  return response;
+  try {
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:${mode}?key=${API_KEY}`;
+    const response = await axios.post(url, {
+      email: email,
+      password: password,
+      returnSecureToken: true,
+    });
+    return response;
+  } catch (error) {
+    throw error.response ? error.response.data : error;
+  }
 };
 
 // 會員註冊
@@ -55,10 +58,11 @@ export const createUser = async (email: string, password: string) => {
   }
 };
 
-//會員登入
+
+//login:具體的接口,專門處理會員登入的邏輯
 export const login = async (email: string, password: string) => {
   const response = await authenticate("signInWithPassword", email, password);
-  const token = response.data.idToken;
 
+  const token = response.data.idToken;
   return token;
 };
