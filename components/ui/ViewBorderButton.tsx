@@ -3,25 +3,14 @@ import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 
 interface BorderButtonProps {
   text: string;
-  value: string;
-  defaultValue: string[];
 }
 
-const BorderButton: React.FC<BorderButtonProps> = ({
-  text,
-  value,
-  defaultValue,
-}) => {
+const ViewBorderButton: React.FC<BorderButtonProps> = ({ text }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.button,
-          defaultValue.includes(value) ? styles.active : null,
-        ]}
-      >
+      <View style={[styles.button, text ? styles.active : null]}>
         <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -50,4 +39,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BorderButton;
+export default ViewBorderButton;

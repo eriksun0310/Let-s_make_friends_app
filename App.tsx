@@ -6,7 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import AvatarCreator from "./screen/EditHeadShot";
+import EditHeadShot from "./screen/EditHeadShot";
 import { MessageCircle, User, Map as MapIcon } from "lucide-react-native";
 import Chat from "./screen/Chat";
 import Map from "./screen/Map";
@@ -17,8 +17,9 @@ import Register from "./screen/Register";
 import AuthContextProvider, { AuthContext } from "./store/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
-import MoreAboutMe from "./screen/MoreAboutMe";
+import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
+import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,6 +52,12 @@ const MainTabNavigator = () => {
         name="personal"
         options={{ title: "個人資料" }}
         component={Personal}
+      />
+      {/* 到時候再拿掉 */}
+      <Tab.Screen
+        name="aboutMe"
+        options={{ title: "關於我設定" }}
+        component={AboutMe}
       />
     </Tab.Navigator>
   );
@@ -94,12 +101,21 @@ const AuthenticatedStack = () => {
         component={MainTabNavigator}
       />
       <Stack.Screen
-        name="moreAboutMe"
+        name="aboutMe"
         options={{
-          title: "更加認識我",
-          headerShown: false,
+          title: "關於我",
+          headerRight: () => <Button title="儲存" onPress={() => {}} />,
         }}
-        component={MoreAboutMe}
+        component={AboutMe}
+      />
+
+      <Stack.Screen
+        name="aboutMeSelectOption"
+        options={{
+          title: "關於我",
+          headerRight: () => <Button title="儲存" onPress={() => {}} />,
+        }}
+        component={AboutMeSelectOption}
       />
 
       <Stack.Screen
@@ -112,12 +128,12 @@ const AuthenticatedStack = () => {
       />
 
       <Stack.Screen
-        name="avatarCreator"
+        name="editHeadShot"
         options={{
           title: "編輯大頭貼",
           headerRight: () => <Button title="儲存" onPress={() => {}} />,
         }}
-        component={AvatarCreator}
+        component={EditHeadShot}
       />
     </Stack.Navigator>
   );

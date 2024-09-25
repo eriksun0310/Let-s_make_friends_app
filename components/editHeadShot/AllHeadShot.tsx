@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
 } from "react-native";
+import { Colors } from "../../constants/style";
 
 type Type = "people" | "animal";
 
@@ -47,7 +48,7 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
             >
               <Text
                 style={{
-                  color: type === key ? "#3D74DB" : "#000",
+                  color: type === key ? Colors.textBlue : Colors.text,
                 }}
               >
                 {key === "people" ? "人像" : "動物"}
@@ -101,8 +102,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   option: {
-    width: 90,
-    height: 90,
+    width: 80,
+    height: 80,
     margin: 8,
   },
   optionImage: {

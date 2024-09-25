@@ -1,6 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import BorderButton from "./BorderButton";
+import { useNavigation } from "@react-navigation/native";
+import ViewBorderButton from "./ViewBorderButton";
 
 interface MultipleTextProps {
   label: string;
@@ -8,13 +10,19 @@ interface MultipleTextProps {
 }
 
 const MultipleText: React.FC<MultipleTextProps> = ({ label, dataList }) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.TextContainer}>
+    <TouchableOpacity
+      style={styles.TextContainer}
+      onPress={() => navigation.navigate("aboutMeSelectOption")}
+    >
       <Text style={styles.label}>{label}：</Text>
+      {/* <TouchableOpacity style={styles.TextContainer}> */}
       {dataList.map((item, index) => {
-        return <BorderButton text={item} key={index} />;
+        return <ViewBorderButton text={item} key={index} />;
       })}
-    </View>
+      {/* </TouchableOpacity> */}
+    </TouchableOpacity>
   );
 };
 const styles = StyleSheet.create({

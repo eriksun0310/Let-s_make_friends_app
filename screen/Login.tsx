@@ -7,7 +7,8 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text, Alert } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 import { database, auth } from "../util/firebaseConfig";
-import { ref, set, get } from "firebase/database";
+import { ref, set, get, getDatabase } from "firebase/database";
+
 interface LoginEmailProps {
   navigation: NavigationProp<any>;
 }
@@ -85,48 +86,68 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
     password: { value: false, errorText: "" },
   });
 
+  //
+  const checkIfUserExist = async (userId) => {
+    const db = getDatabase();
+    const userRef = ref(db, `users/${userId}`);
+    try {
+      const snapshot = await get(userRef);
+      return snapshot.exists();
+    } catch (error) {
+      console.log("error");
+      return false;
+    }
+  };
+
   //處理登入的事件
   // TODO:帳號密碼輸入錯誤的提示
   const loginHandler = async (form: LoginForm) => {
     setLoading(true);
     try {
       const { token, userId } = await login(form.email, form.password);
-      authCtx.authenticatedToken(token);
 
+      const userExists = await checkIfUserExist(userId);
+      console.log("userExists", userExists);
+
+      if (userExists) {
+        navigation.replace("main");
+      } else {
+        navigation.replace("aboutMe");
+      }
+      authCtx.authenticatedToken(token);
       // if (!userId) {
       //   throw new Error("未能獲取用戶ID");
       // }
-      const userRef = ref(database, `users/${userId}`);
-      const snapshot = await get(userRef);
-      const userData = snapshot.val();
+      // console.log("userId", userId);
+      // const userRef = ref(database, `users/${userId}`);
+      // const snapshot = await get(userRef);
+      // const userData = snapshot.val();
       // TODO：userData 檢查是否有
 
-      console.log("userData", userData);
+      // console.log("userData", userData);
 
-      if (!userData) {
-        throw new Error("未能獲取用戶資料");
-      }
-
-   
+      // if (!userData) {
+      //   throw new Error("未能獲取用戶資料");
+      // }
 
       // 檢查必要欄位是否填寫
-      const missingFields = checkForMissingFields(userData);
+      // const missingFields = checkForMissingFields(userData);
 
-      if (missingFields.length > 0) {
-        const shouldUpdate = await showAlert(
-          "缺少資料",
-          `有未填寫的欄位：${missingFields.join(", ")}。是否要前往填寫？`
-        );
-        if (shouldUpdate) {
-          navigation.replace("editPersonal");
-        } else {
-          navigation.replace("main");
-        }
-      } else if (userData.isNewMember) {
-        navigation.replace("moreAboutMe");
-      } else {
-        navigation.replace("main");
-      }
+      // if (missingFields.length > 0) {
+      //   const shouldUpdate = await showAlert(
+      //     "缺少資料",
+      //     `有未填寫的欄位：${missingFields.join(", ")}。是否要前往填寫？`
+      //   );
+      //   if (shouldUpdate) {
+      //     navigation.replace("editPersonal");
+      //   } else {
+      //     navigation.replace("main");
+      //   }
+      // } else if (userData.isNewMember) {
+      //   navigation.replace("aboutMe");
+      // } else {
+      //   navigation.replace("main");
+      // }
 
       // // 登入成功,回到首頁
       // navigation.replace("main");

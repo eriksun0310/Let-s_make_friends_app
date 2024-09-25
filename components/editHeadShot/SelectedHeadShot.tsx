@@ -5,6 +5,7 @@ interface SelectedHeadShotProps {
   imageUrl: string;
 }
 
+//  編輯大頭貼 上面已選的 大頭貼
 const SelectedHeadShot: React.FC<SelectedHeadShotProps> = ({ imageUrl }) => {
   return (
     <View style={styles.avatarContainer}>

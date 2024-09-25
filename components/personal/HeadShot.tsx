@@ -10,14 +10,14 @@ const HeadShot: React.FC<HeadShotProps> = ({ navigation }) => {
     <View style={styles.avatarContainer}>
       <TouchableOpacity
         style={styles.option}
-        onPress={() => navigation.navigate("avatarCreator")}
+        onPress={() => navigation.navigate("editHeadShot")}
       >
         <Image
           source={require("../../assets/people/woman/girl.png")}
           style={styles.optionImage}
           resizeMode="contain"
         />
-      </TouchableOpacity >
+      </TouchableOpacity>
 
       {/* 名稱 */}
       <Text style={styles.label}>Lin</Text>

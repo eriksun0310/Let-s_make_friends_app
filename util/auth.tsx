@@ -63,7 +63,7 @@ export const createUser = async (email: string, password: string) => {
 export const login = async (email: string, password: string) => {
   const response = await authenticate("signInWithPassword", email, password);
 
-  console.log('response', response)
+  // console.log('response', response)
 
   const token = response.data.idToken;
   const userId = response.data.localId;
