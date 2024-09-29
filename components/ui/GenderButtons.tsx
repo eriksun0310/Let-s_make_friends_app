@@ -1,58 +1,35 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ButtonGroup } from "@rneui/themed";
+import { Text, StyleSheet, View } from "react-native";
+import { Colors } from "../../constants/style";
 
-// TODO:到時候給 註冊頁面用 性別按鈕
-const GenderButtons = () => {
-  const [gender, setGender] = useState<string>("");
+const gender = {
+  female: "女",
+  male: "男",
+};
+const GenderButtons = ({ value = "male", getValue }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    getValue(Object.keys(gender)[selectedIndex]);
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    const index = Object.keys(gender).indexOf(value);
+    if (index !== -1) {
+      setSelectedIndex(index);
+    }
+  }, [value]);
   return (
-    <View style={styles.genderButtons}>
-      {["Male", "Female", "Non-binary"].map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={[
-            styles.genderButton,
-            gender === option && styles.genderButtonSelected,
-          ]}
-          onPress={() => setGender(option)}
-        >
-          <Text
-            style={[
-              styles.genderButtonText,
-              gender === option && styles.genderButtonTextSelected,
-            ]}
-          >
-            {option}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
+    <ButtonGroup
+      buttons={[gender.female, gender.male]}
+      selectedIndex={selectedIndex}
+      onPress={(value) => {
+        setSelectedIndex(value);
+      }}
+      selectedButtonStyle={{ backgroundColor: Colors.button }}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  genderButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  genderButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-  genderButtonSelected: {
-    backgroundColor: "#FFD700",
-    borderColor: "#FFD700",
-  },
-  genderButtonText: {
-    textAlign: "center",
-  },
-  genderButtonTextSelected: {
-    fontWeight: "bold",
-  },
-});
 
 export default GenderButtons;

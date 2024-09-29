@@ -56,7 +56,10 @@ const MainTabNavigator = () => {
       {/* 到時候再拿掉 */}
       <Tab.Screen
         name="aboutMe"
-        options={{ title: "關於我設定" }}
+        options={{
+          title: "關於我設定",
+          headerRight: () => <Button title="儲存" onPress={() => {}} />,
+        }}
         component={AboutMe}
       />
     </Tab.Navigator>
