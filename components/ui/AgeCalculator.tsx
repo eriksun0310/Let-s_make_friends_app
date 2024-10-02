@@ -4,18 +4,24 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Colors } from "../../constants/style";
 import Input from "./Input";
 
-const AgeCalculator = ({ getValue }) => {
-  const [value, setValue] = useState({
+interface AgeCalculatorValue {
+  birthDate: Date | null;
+  age: number | null;
+}
+
+interface AgeCalculatorProps {
+  getValue: (v: AgeCalculatorValue) => void;
+}
+
+const AgeCalculator: React.FC<AgeCalculatorProps> = ({ getValue }) => {
+  const [value, setValue] = useState<AgeCalculatorValue>({
     birthDate: null,
     age: null,
   });
 
-  // const [birthDate, setBirthDate] = useState(null); // 儲存用戶選擇的生日
-  // const [age, setAge] = useState(null); // 儲存計算的年齡
-  //   const [showPicker, setShowPicker] = useState(true); // 控制日期選擇器顯示
-
   // 計算年齡的函數
-  const calculateAge = (date) => {
+  const calculateAge = (date: Date) => {
+
     const today = new Date();
     const birthDate = new Date(date);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -36,7 +42,7 @@ const AgeCalculator = ({ getValue }) => {
   };
 
   // 日期選擇處理
-  const onChange = (event, selectedDate) => {
+  const onChange = (event: any, selectedDate: Date) => {
     if (selectedDate) {
       setValue((prev) => ({
         ...prev,
@@ -65,7 +71,9 @@ const AgeCalculator = ({ getValue }) => {
           value={value?.birthDate || new Date()} // 如果沒有選擇生日，預設為當前日期
           mode="date"
           display="default"
-          onChange={onChange} // 當選擇日期時觸發
+          onChange={(event, selectedDate) =>
+            onChange(event, selectedDate as Date)
+          } // 當選擇日期時觸發
           maximumDate={new Date()} // 最大日期為今天，防止選擇未來的日期
         />
       </View>

@@ -115,7 +115,7 @@ const AuthenticatedStack = () => {
       <Stack.Screen
         name="aboutMeSelectOption"
         options={{
-          title: "關於我",
+          title: "關於我興趣的選項",
           headerRight: () => <Button title="儲存" onPress={() => {}} />,
         }}
         component={AboutMeSelectOption}
@@ -132,10 +132,21 @@ const AuthenticatedStack = () => {
 
       <Stack.Screen
         name="editHeadShot"
-        options={{
+        options={({ navigation, route }) => ({
           title: "編輯大頭貼",
-          headerRight: () => <Button title="儲存" onPress={() => {}} />,
-        }}
+          headerRight: () => (
+            <Button
+              title="儲存"
+              onPress={() => {
+                //步骤 2.点击保存按钮时，route.params?.onSave 被调用，并传递最新的 headShot。
+                if (route.params?.onSave) {
+                  route.params?.onSave(route.params?.headShot);
+                }
+                 navigation.goBack();
+              }}
+            />
+          ),
+        })}
         component={EditHeadShot}
       />
     </Stack.Navigator>

@@ -1,20 +1,19 @@
 import React from "react";
 import { View, StyleSheet, Image } from "react-native";
+import { HeadShot } from "../../shared/types";
+import ShowHeadShot from "./ShowHeadShot";
 
 interface SelectedHeadShotProps {
-  imageUrl: string;
+  headShot: HeadShot;
 }
 
 //  編輯大頭貼 上面已選的 大頭貼
-const SelectedHeadShot: React.FC<SelectedHeadShotProps> = ({ imageUrl }) => {
+const SelectedHeadShot: React.FC<SelectedHeadShotProps> = ({ headShot }) => {
+  // console.log("headShot", headShot);
   return (
     <View style={styles.avatarContainer}>
       <View style={[styles.avatar]}>
-        <Image
-          source={imageUrl as any}
-          style={styles.optionImage}
-          resizeMode="contain"
-        />
+        <ShowHeadShot imageUrl={headShot?.imageUrl} />
       </View>
     </View>
   );

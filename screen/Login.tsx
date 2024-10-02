@@ -107,7 +107,6 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       const { token, userId } = await login(form.email, form.password);
 
       const userExists = await checkIfUserExist(userId);
-      console.log("userExists", userExists);
 
       if (userExists) {
         navigation.replace("main");

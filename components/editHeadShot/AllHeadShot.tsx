@@ -8,8 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Colors } from "../../constants/style";
-
-type Type = "people" | "animal";
+import { HeadShot, ImageType } from "../../shared/types";
 
 export const imageUrls = {
   people: [
@@ -25,16 +24,14 @@ export const imageUrls = {
 };
 
 interface SelectedHeadShotProps {
-  imageUrl: string;
-  setImageUrl: React.Dispatch<React.SetStateAction<string>>;
+  headShot: HeadShot;
+  setHeadShot: React.Dispatch<React.SetStateAction<HeadShot>>;
 }
 
 const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
-  imageUrl,
-  setImageUrl,
+  headShot,
+  setHeadShot,
 }) => {
-  const [type, setType] = useState<Type>("people");
-
   return (
     <>
       {/* tab */}
@@ -44,11 +41,17 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
             <TouchableOpacity
               key={key}
               style={styles.tabButton}
-              onPress={() => setType(key as Type)}
+              onPress={() =>
+                setHeadShot((prev) => ({
+                  ...prev,
+                  imageType: key as ImageType,
+                }))
+              }
             >
               <Text
                 style={{
-                  color: type === key ? Colors.textBlue : Colors.text,
+                  color:
+                    headShot.imageType === key ? Colors.textBlue : Colors.text,
                 }}
               >
                 {key === "people" ? "人像" : "動物"}
@@ -61,17 +64,23 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
       {/* 大頭貼選項 */}
       <ScrollView>
         <View style={styles.optionsContainer}>
-          {imageUrls[type].map((item) => (
+          {imageUrls[headShot.imageType].map((item) => (
             <TouchableOpacity
               key={item.imageUrl}
               style={styles.option}
-              onPress={() => setImageUrl(item.imageUrl)}
+              onPress={() => {
+                // console.log("item", item);
+                setHeadShot((prev) => ({
+                  ...prev,
+                  imageUrl: item.imageUrl,
+                }));
+              }}
             >
               <Image
                 source={item.imageUrl}
                 style={[
                   styles.optionImage,
-                  item.imageUrl === imageUrl ? styles.selected : null,
+                  item.imageUrl === headShot.imageUrl ? styles.selected : null,
                 ]}
                 resizeMode="contain"
               />

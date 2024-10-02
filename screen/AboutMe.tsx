@@ -17,35 +17,47 @@ import Input from "../components/ui/Input";
 import TextArea from "../components/ui/TextArea";
 import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";
+import { Gender } from "../components/ui/types";
+import { HeadShot as HeadShotType } from "../shared/types";
 const interestList = ["看劇", "看電影"];
 const foodList = ["日式", "美式"];
-const tabs = {
-  interests: "興趣",
-  favoriteFood: "喜歡的食物",
-  dislikedFood: "不喜歡的食物",
-};
-const AboutMe = ({ navigation }) => {
-  const [index, setIndex] = useState(0);
 
-  const [form, setForm] = useState({
+interface From {
+  headShot: HeadShotType;
+  name: string;
+  introduce: string;
+  gender: Gender;
+  birthday: string;
+  age: number;
+}
+
+const AboutMe = ({ navigation }) => {
+  const [form, setForm] = useState<From>({
+    headShot: {
+      imageUrl: "",
+      imageType: "people",
+    },
     name: "",
     introduce: "",
-    gender: "",
+    gender: "male",
     birthday: "",
-    age: "",
+    age: 0,
   });
   //更新form state
-  const handleChange = (name: string, value: string) => {
+  const handleChange = (
+    name: string,
+    value: string | Date | number | Gender | HeadShotType
+  ) => {
     if (name === "birthday") {
-      const year = value?.getFullYear();
-      const month = String(value?.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以要加1
-      const day = String(value?.getDate()).padStart(2, "0");
+      const year = (value as Date)?.getFullYear();
+      const month = String((value as Date)?.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以要加1
+      const day = String((value as Date)?.getDate()).padStart(2, "0");
 
       const formattedDate = `${year}-${month}-${day}`;
 
       setForm((prev) => ({
         ...prev,
-        [name]: formattedDate,
+        birthday: formattedDate,
       }));
     } else {
       setForm((prev) => ({
@@ -55,12 +67,16 @@ const AboutMe = ({ navigation }) => {
     }
   };
 
-  console.log("form", form);
+  console.log("form", form.headShot);
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot navigation={navigation} />
+        <HeadShot
+          navigation={navigation}
+          headShot={form.headShot}
+          setHeadShot={(v) => handleChange("headShot", v)}
+        />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
@@ -78,20 +94,17 @@ const AboutMe = ({ navigation }) => {
           <Text style={styles.label}>性別：</Text>
           <GenderButtons
             getValue={(v) => {
-              // console.log("gender", v);
-              handleChange("gender", v);
+              handleChange("gender", v as Gender);
             }}
           />
 
           <AgeCalculator
             getValue={(v) => {
-              // console.log(v);
-              handleChange("birthday", v.birthDate);
-              handleChange("age", v.age);
+              handleChange("birthday", v.birthDate as Date);
+              handleChange("age", v.age as number);
             }}
           />
-          {/* <Text style={styles.label}>生日：</Text> */}
-          {/* <Text style={styles.label}>年齡：</Text> */}
+
           <MultipleText label="興趣" dataList={interestList} />
           <MultipleText label="美食" dataList={foodList} />
         </View>

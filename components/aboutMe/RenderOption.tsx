@@ -43,7 +43,7 @@ const RenderOption: React.FC<RenderOptionProps> = ({
         const option = optionList[currentTab][key];
         const defaultValue = userDB[currentTab];
 
-        console.log("defaultValue", defaultValue);
+      
 
         return (
           <BorderButton

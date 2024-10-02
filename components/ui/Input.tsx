@@ -2,16 +2,19 @@ import React from "react";
 import { Colors } from "../../constants/style";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 
-
-
 interface InputProps {
-    label: string;
-    multiline?: boolean;
-    value: string;
-    setValue?: (value: string) => void;
+  label: string;
+  multiline?: boolean;
+  value: string;
+  setValue?: (value: string) => void;
 }
-const Input: React.FC<InputProps> = ({ label, multiline = false, value, setValue }) => {
-  console.log("value", value);
+const Input: React.FC<InputProps> = ({
+  label,
+  multiline = false,
+  value,
+  setValue,
+}) => {
+
   return (
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}：</Text>
@@ -19,6 +22,8 @@ const Input: React.FC<InputProps> = ({ label, multiline = false, value, setValue
         style={[styles.input, multiline && styles.textArea]}
         onChangeText={setValue}
         value={value}
+        multiline={multiline} //啟用多行輸入
+        textAlignVertical="top" // 讓文字從頂部開始輸入
       />
     </View>
   );
@@ -32,11 +37,11 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 22,
     fontWeight: "bold",
-    width: 100,
+    width: 110,
   },
   textArea: {
-    height: 120, // 調整多行輸入框的高度
-    textAlignVertical: "top", // 讓文字從頂部開始輸入
+    minHeight: 40,
+    maxHeight: 120,
   },
   input: {
     height: 40,
