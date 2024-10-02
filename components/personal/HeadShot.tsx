@@ -6,12 +6,14 @@ import Feather from "@expo/vector-icons/Feather";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
 import { HeadShot as HeadShotType } from "../../shared/types";
 interface HeadShotProps {
+  name?: string;
   navigation: NavigationProp<any>;
   headShot: HeadShotType;
   setHeadShot: (v: HeadShotType) => void;
 }
 
 const HeadShot: React.FC<HeadShotProps> = ({
+  name,
   navigation,
   headShot,
   setHeadShot,
@@ -35,7 +37,7 @@ const HeadShot: React.FC<HeadShotProps> = ({
       </TouchableOpacity>
 
       {/* 名稱 */}
-      <Text style={styles.label}>Lin</Text>
+      {name && <Text style={styles.label}>{name}</Text>}
     </View>
   );
 };

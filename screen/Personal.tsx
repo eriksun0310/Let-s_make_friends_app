@@ -26,7 +26,7 @@ const Personal: React.FC<PersonalProps> = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot navigation={navigation} />
+        <HeadShot name="Lin" navigation={navigation}  />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
