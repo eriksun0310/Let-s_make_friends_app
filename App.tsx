@@ -20,6 +20,8 @@ import * as SplashScreen from "expo-splash-screen";
 import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
+import { Provider } from "react-redux";
+import store from "./store/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -114,10 +116,21 @@ const AuthenticatedStack = () => {
 
       <Stack.Screen
         name="aboutMeSelectOption"
-        options={{
+        options={({ navigation, route }) => ({
           title: "關於我興趣的選項",
-          headerRight: () => <Button title="儲存" onPress={() => {}} />,
-        }}
+          headerRight: () => (
+            <Button
+              title="儲存"
+              onPress={() => {
+                //步骤 2.点击保存按钮时，route.params?.onSave 被调用，并传递最新的 headShot。
+                if (route.params?.onSave) {
+                  route.params?.onSave(route.params?.selectedOption);
+                }
+                navigation.goBack();
+              }}
+            />
+          ),
+        })}
         component={AboutMeSelectOption}
       />
 
@@ -142,7 +155,7 @@ const AuthenticatedStack = () => {
                 if (route.params?.onSave) {
                   route.params?.onSave(route.params?.headShot);
                 }
-                 navigation.goBack();
+                navigation.goBack();
               }}
             />
           ),
@@ -196,9 +209,11 @@ export default function App() {
     <>
       <StatusBar style="light"></StatusBar>
 
-      <AuthContextProvider>
-        <Root />
-      </AuthContextProvider>
+      <Provider store={store}>
+        <AuthContextProvider>
+          <Root />
+        </AuthContextProvider>
+      </Provider>
     </>
   );
 }

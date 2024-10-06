@@ -4,21 +4,27 @@ import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 interface BorderButtonProps {
   text: string;
   value: string;
-  defaultValue: string[];
+  selectedOption: string[];
+  onPress: (v: string) => void;
 }
 
 const BorderButton: React.FC<BorderButtonProps> = ({
   text,
   value,
-  defaultValue,
+  selectedOption,
+  onPress,
+  
 }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={[
           styles.button,
-          defaultValue.includes(value) ? styles.active : null,
+          selectedOption?.includes(value) ? styles.active : null,
         ]}
+        onPress={() => {
+          onPress(value);
+        }}
       >
         <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>

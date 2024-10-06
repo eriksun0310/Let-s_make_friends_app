@@ -1,24 +1,15 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  ScrollView,
-  TextInput,
-} from "react-native";
-import { Icon } from "@rneui/themed";
-import { useState } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Colors } from "../constants/style";
-import RenderOption from "../components/aboutMe/RenderOption";
 import HeadShot from "../components/personal/HeadShot";
-import MultipleText from "../components/ui/MultipleText";
 import Input from "../components/ui/Input";
-import TextArea from "../components/ui/TextArea";
+
 import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";
 import { Gender } from "../components/ui/types";
 import { HeadShot as HeadShotType } from "../shared/types";
+import SelectedOption from "../components/aboutMe/SelectedOption";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../store/userSlice";
 const interestList = ["看劇", "看電影"];
 const foodList = ["日式", "美式"];
 
@@ -32,17 +23,9 @@ interface From {
 }
 
 const AboutMe = ({ navigation }) => {
-  const [form, setForm] = useState<From>({
-    headShot: {
-      imageUrl: "",
-      imageType: "people",
-    },
-    name: "",
-    introduce: "",
-    gender: "male",
-    birthday: "",
-    age: 0,
-  });
+  const userData = useSelector((state) => state.user.userData);
+  const dispatch = useDispatch();
+
   //更新form state
   const handleChange = (
     name: string,
@@ -55,58 +38,56 @@ const AboutMe = ({ navigation }) => {
 
       const formattedDate = `${year}-${month}-${day}`;
 
-      setForm((prev) => ({
-        ...prev,
-        birthday: formattedDate,
-      }));
+      dispatch(
+        setUserData({
+          birthday: formattedDate,
+        })
+      );
     } else {
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      dispatch(
+        setUserData({
+          [name]: value,
+        })
+      );
     }
   };
 
-  console.log("form", form.headShot);
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot
-          navigation={navigation}
-          headShot={form.headShot}
-          setHeadShot={(v) => handleChange("headShot", v)}
-        />
+        <HeadShot navigation={navigation} headShot={userData.headShot} />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
           <Input
             label="名稱"
-            value={form.name}
+            value={userData.name}
             setValue={(v) => handleChange("name", v)}
           />
           <Input
             multiline
             label="自我介紹"
-            value={form.introduce}
+            value={userData.introduce}
             setValue={(v) => handleChange("introduce", v)}
           />
           <Text style={styles.label}>性別：</Text>
           <GenderButtons
+            value={userData.gender}
             getValue={(v) => {
               handleChange("gender", v as Gender);
             }}
           />
 
           <AgeCalculator
+            // defaultValue={a}
             getValue={(v) => {
               handleChange("birthday", v.birthDate as Date);
               handleChange("age", v.age as number);
             }}
           />
 
-          <MultipleText label="興趣" dataList={interestList} />
-          <MultipleText label="美食" dataList={foodList} />
+          <SelectedOption />
         </View>
       </ScrollView>
     </View>

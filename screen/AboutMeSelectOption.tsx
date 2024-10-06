@@ -1,18 +1,52 @@
 import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 import { Tab, TabView } from "@rneui/themed";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
 import RenderOption from "../components/aboutMe/RenderOption";
+import { OptionList, SelectedOption, Tabs } from "../shared/types";
+import { useSelector } from "react-redux";
 
-const tabs = {
+const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
   dislikedFood: "不喜歡的食物",
 };
-const AboutMeSelectOption = () => {
+
+// 假設這是從db拿
+const userDB = {
+  interests: ["reading"],
+  favoriteFood: ["chocolate"],
+};
+
+const AboutMeSelectOption = ({ navigation, route }) => {
+  const userData = useSelector((state) => state.user.userData);
+  
+  const { currentTab,
+    //  selectedOption, setSelectedOption
+     } = route.params;
+
   const [index, setIndex] = useState(0);
 
-  console.log("index", index);
+  console.log("userData 22222", userData.selectedOption);
+
+  const selectedOption =userData.selectedOption
+
+  // const [selectedOption, setSelectedOption] = useState<SelectedOption>({});
+
+  // useEffect(() => {
+  //   navigation.setParams({
+  //     selectedOption,
+  //   });
+  // }, [selectedOption]);
+
+  // 當前選的tab
+  useEffect(() => {
+    const index = Object.keys(tabs).indexOf(currentTab);
+    if (index !== -1) {
+      setIndex(index);
+    }
+  }, [currentTab]);
+
   return (
     <View style={styles.screen}>
       <Tab
@@ -44,8 +78,12 @@ const AboutMeSelectOption = () => {
       <TabView value={index} onChange={setIndex} animationType="spring">
         {Object.keys(tabs)?.map((key) => (
           <TabView.Item>
-            {/* <Text>{tabs[key]}</Text> */}
-            <RenderOption currentTab={key} />
+            <RenderOption
+              currentTab={key}
+              defaultValue={selectedOption[key]}
+              selectedOption={selectedOption}
+              // setSelectedOption={setSelectedOption}
+            />
           </TabView.Item>
         ))}
       </TabView>

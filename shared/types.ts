@@ -27,3 +27,19 @@ export type HeadShot = {
   imageType: ImageType;
   imageUrl: string;
 };
+
+export type Tab = "interests" | "favoriteFood" | "dislikedFood";
+
+export type Tabs = {
+  [key in Tab]: string;
+};
+
+export type OptionList = {
+  interests: { [key: string]: string };
+  favoriteFood: { [key: string]: string };
+  dislikedFood: { [key: string]: string };
+};
+
+export interface SelectedOption {
+  [key: string]: string[];
+}

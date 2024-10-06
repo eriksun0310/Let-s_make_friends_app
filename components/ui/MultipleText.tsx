@@ -3,25 +3,53 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import BorderButton from "./BorderButton";
 import { useNavigation } from "@react-navigation/native";
 import ViewBorderButton from "./ViewBorderButton";
+import { SelectedOption, Tab } from "../../shared/types";
+import { Colors } from "../../constants/style";
 
 interface MultipleTextProps {
   label: string;
   dataList: string[];
+  currentTab: Tab;
 }
 
-const MultipleText: React.FC<MultipleTextProps> = ({ label, dataList }) => {
+const MultipleText: React.FC<MultipleTextProps> = ({
+  label,
+  currentTab,
+  dataList,
+}) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       style={styles.TextContainer}
-      onPress={() => navigation.navigate("aboutMeSelectOption")}
+      onPress={() =>
+        navigation.navigate("aboutMeSelectOption", {
+          currentTab: currentTab,
+        })
+      }
     >
       <Text style={styles.label}>{label}：</Text>
-      {/* <TouchableOpacity style={styles.TextContainer}> */}
-      {dataList.map((item, index) => {
-        return <ViewBorderButton text={item} key={index} />;
-      })}
-      {/* </TouchableOpacity> */}
+
+      {dataList?.length > 0 ? (
+        <View
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          {dataList?.map((item, index) => {
+            return <ViewBorderButton text={item} key={index} />;
+          })}
+        </View>
+      ) : (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("aboutMeSelectOption", {
+              currentTab: currentTab,
+            });
+          }}
+        >
+          <Text style={[styles.label, { color: Colors.textBlue }]}>
+            請選擇..
+          </Text>
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 };

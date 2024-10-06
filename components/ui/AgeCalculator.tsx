@@ -13,7 +13,10 @@ interface AgeCalculatorProps {
   getValue: (v: AgeCalculatorValue) => void;
 }
 
-const AgeCalculator: React.FC<AgeCalculatorProps> = ({ getValue }) => {
+const AgeCalculator: React.FC<AgeCalculatorProps> = ({
+
+  getValue,
+}) => {
   const [value, setValue] = useState<AgeCalculatorValue>({
     birthDate: null,
     age: null,
@@ -21,7 +24,6 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({ getValue }) => {
 
   // 計算年齡的函數
   const calculateAge = (date: Date) => {
-
     const today = new Date();
     const birthDate = new Date(date);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -55,8 +57,16 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({ getValue }) => {
   };
 
   useEffect(() => {
+
+
     getValue(value);
   }, [value]);
+
+  // useEffect(() => {
+  //   if (defaultValue) {
+  //     setValue(defaultValue);
+  //   }
+  // }, [defaultValue]);
 
   return (
     <>

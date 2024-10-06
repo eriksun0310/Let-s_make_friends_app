@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -23,15 +23,11 @@ export const imageUrls = {
   animal: [{ imageUrl: require("../../assets/animal/ostrich.png") }],
 };
 
-interface SelectedHeadShotProps {
+interface AllHeadShotProps {
   headShot: HeadShot;
   setHeadShot: React.Dispatch<React.SetStateAction<HeadShot>>;
 }
-
-const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
-  headShot,
-  setHeadShot,
-}) => {
+const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
   return (
     <>
       {/* tab */}
@@ -41,12 +37,12 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
             <TouchableOpacity
               key={key}
               style={styles.tabButton}
-              onPress={() =>
+              onPress={() => {
                 setHeadShot((prev) => ({
                   ...prev,
                   imageType: key as ImageType,
-                }))
-              }
+                }));
+              }}
             >
               <Text
                 style={{
@@ -69,7 +65,6 @@ const AllHeadShot: React.FC<SelectedHeadShotProps> = ({
               key={item.imageUrl}
               style={styles.option}
               onPress={() => {
-                // console.log("item", item);
                 setHeadShot((prev) => ({
                   ...prev,
                   imageUrl: item.imageUrl,
