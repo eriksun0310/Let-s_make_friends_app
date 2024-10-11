@@ -8,7 +8,6 @@ interface RegisterFormProps {
   onSubmit: (form: Form) => void;
 }
 
-// TODO: getFormValues
 const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
   // 取得輸入資訊,是否有符合規則
   const {
@@ -59,11 +58,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
         isValid={confirmPasswordIsValid}
       />
 
-      <Button
-        text="註冊"
-        //TODO: 要驗證DB 輸入的表單規則是否正確
-        onPress={() => onSubmit(form)}
-      />
+      <Button text="註冊" onPress={() => onSubmit(form)} />
     </>
   );
 };

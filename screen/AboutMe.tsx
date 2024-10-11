@@ -52,6 +52,7 @@ const AboutMe = ({ navigation }) => {
     }
   };
 
+  console.log("userData", userData);
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -80,10 +81,9 @@ const AboutMe = ({ navigation }) => {
           />
 
           <AgeCalculator
-            // defaultValue={a}
+            defaultValue={userData.birthday}
             getValue={(v) => {
               handleChange("birthday", v.birthDate as Date);
-              handleChange("age", v.age as number);
             }}
           />
 

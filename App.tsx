@@ -1,11 +1,9 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
-import { Button, Text } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { StyleSheet } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import EditHeadShot from "./screen/EditHeadShot";
 import { MessageCircle, User, Map as MapIcon } from "lucide-react-native";
 import Chat from "./screen/Chat";
@@ -20,8 +18,9 @@ import * as SplashScreen from "expo-splash-screen";
 import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import store from "./store/store";
+import { saveUserData } from "./util/auth";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +33,7 @@ const Stack = createStackNavigator();
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
+      initialRouteName="map"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           if (route.name === "chat") {
@@ -55,20 +55,11 @@ const MainTabNavigator = () => {
         options={{ title: "個人資料" }}
         component={Personal}
       />
-      {/* 到時候再拿掉 */}
-      <Tab.Screen
-        name="aboutMe"
-        options={{
-          title: "關於我設定",
-          headerRight: () => <Button title="儲存" onPress={() => {}} />,
-        }}
-        component={AboutMe}
-      />
     </Tab.Navigator>
   );
 };
 
-// 註冊頁面(未驗證)
+// 註冊頁面(登入、註冊)
 const AuthStack = () => {
   return (
     <Stack.Navigator>
@@ -95,6 +86,9 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
 const AuthenticatedStack = () => {
+  const userData = useSelector((state) => state.user.userData);
+  const authCtx = useContext(AuthContext);
+  const navigation = useNavigation();
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -109,7 +103,19 @@ const AuthenticatedStack = () => {
         name="aboutMe"
         options={{
           title: "關於我",
-          headerRight: () => <Button title="儲存" onPress={() => {}} />,
+          headerRight: () => (
+            <Button
+              title="儲存"
+              onPress={async () => {
+                // 檢查必填項目
+                if (userData.name) {
+                  await saveUserData(userData, authCtx.token);
+                  // 跳轉到地圖頁面
+                  navigation.navigate("main", { screen: "map" });
+                }
+              }}
+            />
+          ),
         }}
         component={AboutMe}
       />

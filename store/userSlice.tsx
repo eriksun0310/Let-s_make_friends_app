@@ -3,22 +3,21 @@ import { RootState } from "./store";
 
 const initialState = {
   userData: {
-    userID: "11111",
-    name: "lin",
+    userId: "",
+    name: "",
     gender: "female",
-    introduce: "Hi",
+    introduce: "",
     headShot: {
       imageUrl: "",
       imageType: "people",
     },
     selectedOption: {
-      interests: ["reading"],
-      favoriteFood: ["chocolate"],
-      dislikedFood: ["coriander"],
+      interests: [""],
+      favoriteFood: [""],
+      dislikedFood: [""],
     },
-    birthday: "2000-01-01",
-    age: 24,
-    email: "123@qq.com",
+    birthday: "",
+    email: "",
   },
 };
 
@@ -62,13 +61,10 @@ const userSlice = createSlice({
         }
       }
     },
-
-   
   },
 });
 
-export const { setUserData, setSelectedOption } =
-  userSlice.actions;
+export const { setUserData, setSelectedOption } = userSlice.actions;
 export const selectUser = (state: RootState) => state.user.userData;
 
 export default userSlice.reducer;

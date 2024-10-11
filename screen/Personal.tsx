@@ -11,7 +11,6 @@ interface PersonalProps {
   navigation: NavigationProp<any>;
 }
 
-//TODO:到時候再想 資料格式要怎麼存
 const interestList = ["看劇", "看電影"];
 const foodList = ["日式", "美式"];
 const dataList = {

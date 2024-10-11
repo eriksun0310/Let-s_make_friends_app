@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, TextInput, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Colors } from "../../constants/style";
 import Input from "./Input";
@@ -10,15 +10,19 @@ interface AgeCalculatorValue {
 }
 
 interface AgeCalculatorProps {
+  defaultValue: string; // 格式 "2022-01-01"
   getValue: (v: AgeCalculatorValue) => void;
 }
 
 const AgeCalculator: React.FC<AgeCalculatorProps> = ({
-
+  defaultValue,
   getValue,
 }) => {
+  //
+  const initialDate = defaultValue ? new Date(defaultValue) : new Date();
+
   const [value, setValue] = useState<AgeCalculatorValue>({
-    birthDate: null,
+    birthDate: initialDate,
     age: null,
   });
 
@@ -57,16 +61,17 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
   };
 
   useEffect(() => {
+    if (value.birthDate) {
+      calculateAge(value.birthDate);
+    }
+  }, [value.birthDate]);
 
-
-    getValue(value);
+  useEffect(() => {
+    console.log("value", value);
+    if (value?.age !== null) {
+      getValue(value);
+    }
   }, [value]);
-
-  // useEffect(() => {
-  //   if (defaultValue) {
-  //     setValue(defaultValue);
-  //   }
-  // }, [defaultValue]);
 
   return (
     <>

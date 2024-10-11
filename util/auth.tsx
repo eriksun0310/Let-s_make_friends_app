@@ -1,9 +1,10 @@
 import axios from "axios";
-import { initializeApp } from "firebase/app";
-import firebase from "firebase/app";
-import "firebase/database";
-import { getDatabase, ref, set, update } from "firebase/database";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+// import { initializeApp } from "firebase/app";
+// import firebase from "firebase/app";
+// import "firebase/database";
+
+// import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { database } from "./firebaseConfig";
 
 // const firebaseConfig = {
 //   apiKey: process.env.API_KEY,
@@ -13,8 +14,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 //   storageBucket: process.env.STORAGEBUCKET,
 //   messagingSenderId: process.env.MESSAGINGSENDERID,
 // };
-
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env.API_KEY,
   authDomain: process.env.AUTH_DOMAIN,
   databaseURL: process.env.DATABASEURL,
@@ -58,7 +58,6 @@ export const createUser = async (email: string, password: string) => {
   }
 };
 
-
 //login:具體的接口,專門處理會員登入的邏輯
 export const login = async (email: string, password: string) => {
   const response = await authenticate("signInWithPassword", email, password);
@@ -68,8 +67,55 @@ export const login = async (email: string, password: string) => {
   const token = response.data.idToken;
   const userId = response.data.localId;
 
+  console.log("login userId", userId);
+
   return {
     token,
-    userId
+    userId,
   };
+};
+
+const verifyToken = async (token) => {
+  console.log("token", token);
+  console.log("API_KEY", API_KEY);
+  const response = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/tokeninfo?key=${API_KEY}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ idToken: token }),
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  console.log("response", response);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Invalid token:", errorData);
+    return null;
+  }
+
+  return await response.json(); // 返回 token 的內容
+};
+
+// 儲存會員資料
+export const saveUserData = async (userData: any, token: string) => {
+  
+  try {
+    const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${userData.userId}.json`;
+
+    
+    await axios.put(url, userData)
+
+    // TODO: 20241010 先暫時寫入的時候 不用用auth
+  //   const response = await axios.put(url, userData, 
+  //     {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   }
+  // );
+    console.log("save userData success, response ");
+  } catch (error) {
+    console.log("error save userData", error);
+  }
 };
