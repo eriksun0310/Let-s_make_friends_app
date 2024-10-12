@@ -75,6 +75,7 @@ export const login = async (email: string, password: string) => {
   };
 };
 
+// 目前用不到
 const verifyToken = async (token) => {
   console.log("token", token);
   console.log("API_KEY", API_KEY);

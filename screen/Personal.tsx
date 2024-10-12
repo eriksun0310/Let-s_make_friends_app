@@ -6,6 +6,7 @@ import HeadShot from "../components/personal/HeadShot";
 import MultipleText from "../components/ui/MultipleText";
 import Button from "../components/ui/Button";
 import { AuthContext } from "../store/authContext";
+import { useSelector } from "react-redux";
 
 interface PersonalProps {
   navigation: NavigationProp<any>;
@@ -21,11 +22,13 @@ const dataList = {
 const Personal: React.FC<PersonalProps> = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
 
+  const userData = useSelector((state) => state.user.userData);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot name="Lin" navigation={navigation}  />
+        <HeadShot name="Lin" navigation={navigation} />
 
         {/* 性別 */}
         <View style={styles.formContainer}>

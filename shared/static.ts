@@ -1,0 +1,22 @@
+import { OptionList, Tabs } from "./types";
+
+export const tabs: Tabs = {
+    interests: "興趣",
+    favoriteFood: "喜歡的食物",
+    dislikedFood: "不喜歡的食物",
+  };
+
+// 預設(選項)資料
+export const optionList: OptionList = {
+  interests: {
+    reading: "讀書",
+  },
+
+  favoriteFood: {
+    chocolate: "巧克力",
+  },
+  dislikedFood: {
+    coriander: "香菜",
+    onion: "洋蔥",
+  },
+};

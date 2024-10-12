@@ -12,9 +12,9 @@ const initialState = {
       imageType: "people",
     },
     selectedOption: {
-      interests: [""],
-      favoriteFood: [""],
-      dislikedFood: [""],
+      interests: [],
+      favoriteFood: [],
+      dislikedFood: [],
     },
     birthday: "",
     email: "",

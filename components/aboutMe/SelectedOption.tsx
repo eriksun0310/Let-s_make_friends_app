@@ -1,6 +1,6 @@
 import React from "react";
 import MultipleText from "../ui/MultipleText";
-import {  Tab, Tabs } from "../../shared/types";
+import { Tab, Tabs } from "../../shared/types";
 import { useSelector } from "react-redux";
 
 const tabs: Tabs = {
@@ -23,7 +23,7 @@ const SelectedOption = () => {
       {Object.keys(tabs).map((key) => {
         return (
           <MultipleText
-            label={tabs[key as Tab]}
+            tabKey={tabs as Tab}
             currentTab={key as Tab}
             dataList={userData.selectedOption[key]}
           />

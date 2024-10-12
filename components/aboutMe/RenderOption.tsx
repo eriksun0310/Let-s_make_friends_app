@@ -4,20 +4,8 @@ import { View, StyleSheet } from "react-native";
 import { Tab, SelectedOption, OptionList } from "../../shared/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedOption } from "../../store/userSlice";
-// 預設資料
-const optionList: OptionList = {
-  interests: {
-    reading: "讀書",
-  },
+import { optionList } from "../../shared/static";
 
-  favoriteFood: {
-    chocolate: "巧克力",
-  },
-  dislikedFood: {
-    coriander: "香菜",
-    onion: "洋蔥",
-  },
-};
 
 interface RenderOptionProps {
   currentTab: Tab;

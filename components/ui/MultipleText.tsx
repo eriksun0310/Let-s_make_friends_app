@@ -1,19 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import BorderButton from "./BorderButton";
 import { useNavigation } from "@react-navigation/native";
 import ViewBorderButton from "./ViewBorderButton";
-import { SelectedOption, Tab } from "../../shared/types";
+import { Tab } from "../../shared/types";
 import { Colors } from "../../constants/style";
+import { optionList, tabs } from "../../shared/static";
 
 interface MultipleTextProps {
-  label: string;
+  tabKey: Tab;
   dataList: string[];
   currentTab: Tab;
 }
 
 const MultipleText: React.FC<MultipleTextProps> = ({
-  label,
   currentTab,
   dataList,
 }) => {
@@ -27,14 +26,16 @@ const MultipleText: React.FC<MultipleTextProps> = ({
         })
       }
     >
-      <Text style={styles.label}>{label}：</Text>
+      <Text style={styles.label}>{tabs[currentTab as Tab]}：</Text>
 
       {dataList?.length > 0 ? (
         <View
           style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
         >
           {dataList?.map((item, index) => {
-            return <ViewBorderButton text={item} key={index} />;
+            console.log("item", item);
+            const option = optionList?.[currentTab]?.[item];
+            return <ViewBorderButton text={option} key={index} />;
           })}
         </View>
       ) : (
