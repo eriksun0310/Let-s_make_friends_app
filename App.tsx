@@ -19,7 +19,7 @@ import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider, useSelector } from "react-redux";
-import store from "./store/store";
+import store, { RootState } from "./store/store";
 import { saveUserData } from "./util/auth";
 
 SplashScreen.preventAutoHideAsync();
@@ -86,7 +86,7 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
 const AuthenticatedStack = () => {
-  const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state:RootState) => state.user);
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
   return (
@@ -108,8 +108,8 @@ const AuthenticatedStack = () => {
               title="儲存"
               onPress={async () => {
                 // 檢查必填項目
-                if (userData.name) {
-                  await saveUserData(userData, authCtx.token);
+                if (user.name) {
+                  await saveUserData(user, authCtx.token);
                   // 跳轉到地圖頁面
                   navigation.navigate("main", { screen: "map" });
                 }

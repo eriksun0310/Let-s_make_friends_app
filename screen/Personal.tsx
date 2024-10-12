@@ -7,6 +7,9 @@ import MultipleText from "../components/ui/MultipleText";
 import Button from "../components/ui/Button";
 import { AuthContext } from "../store/authContext";
 import { useSelector } from "react-redux";
+import TextLabel from "../components/ui/Text";
+import { RootState } from "../store/store";
+import SelectedOption from "../components/aboutMe/SelectedOption";
 
 interface PersonalProps {
   navigation: NavigationProp<any>;
@@ -22,23 +25,27 @@ const dataList = {
 const Personal: React.FC<PersonalProps> = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
 
-  const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state: RootState) => state.user);
 
+  console.log("user", user);
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot name="Lin" navigation={navigation} />
+        <HeadShot
+          name={user.name}
+          navigation={navigation}
+          headShot={user.headShot}
+        />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
-          <Text style={styles.label}>自我介紹：HI</Text>
-          <Text style={styles.label}>性別：</Text>
-          <Text style={styles.label}>生日：</Text>
+          <TextLabel label="自我介紹" value={user.introduce} />
+          <TextLabel label="性別" value={user.gender} />
+          <TextLabel label="生日" value={user.birthday} />
           <Text style={styles.label}>年齡：</Text>
 
-          <MultipleText label="興趣" dataList={interestList} />
-          <MultipleText label="美食" dataList={foodList} />
+          <SelectedOption />
           <Button
             text="登出"
             onPress={() => {

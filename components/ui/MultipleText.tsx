@@ -7,7 +7,7 @@ import { Colors } from "../../constants/style";
 import { optionList, tabs } from "../../shared/static";
 
 interface MultipleTextProps {
-  tabKey: Tab;
+
   dataList: string[];
   currentTab: Tab;
 }

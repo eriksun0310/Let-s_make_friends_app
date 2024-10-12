@@ -1,31 +1,23 @@
 import React from "react";
 import MultipleText from "../ui/MultipleText";
-import { Tab, Tabs } from "../../shared/types";
+import { Tab } from "../../shared/types";
 import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { tabs } from "../../shared/static";
 
-const tabs: Tabs = {
-  interests: "興趣",
-  favoriteFood: "喜歡的食物",
-  dislikedFood: "不喜歡的食物",
-};
-
-const userDB = {
-  interests: ["reading"],
-  favoriteFood: ["chocolate"],
-};
 
 // 興趣、喜歡的食物、不喜歡的食物
 const SelectedOption = () => {
-  const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state: RootState) => state.user);
 
   return (
     <>
       {Object.keys(tabs).map((key) => {
         return (
           <MultipleText
-            tabKey={tabs as Tab}
+            key={key}
             currentTab={key as Tab}
-            dataList={userData.selectedOption[key]}
+            dataList={user.selectedOption[key]}
           />
         );
       })}

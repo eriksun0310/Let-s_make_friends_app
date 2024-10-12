@@ -99,24 +99,22 @@ const verifyToken = async (token) => {
 };
 
 // 儲存會員資料
-export const saveUserData = async (userData: any, token: string) => {
-  
+export const saveUserData = async (user: any, token: string) => {
   try {
-    const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${userData.userId}.json`;
+    const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${user.userId}.json`;
 
-    
-    await axios.put(url, userData)
+    await axios.put(url, user);
 
     // TODO: 20241010 先暫時寫入的時候 不用用auth
-  //   const response = await axios.put(url, userData, 
-  //     {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   }
-  // );
-    console.log("save userData success, response ");
+    //   const response = await axios.put(url, user,
+    //     {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   }
+    // );
+    console.log("save user success, response ");
   } catch (error) {
-    console.log("error save userData", error);
+    console.log("error save user", error);
   }
 };

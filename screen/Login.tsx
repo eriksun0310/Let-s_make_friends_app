@@ -9,7 +9,7 @@ import type { LoginForm, LoginIsValid } from "../shared/types";
 import { database, auth } from "../util/firebaseConfig";
 import { ref, set, get, getDatabase } from "firebase/database";
 import { useDispatch } from "react-redux";
-import { setUserData } from "../store/userSlice";
+import { setUser } from "../store/userSlice";
 
 interface LoginEmailProps {
   navigation: NavigationProp<any>;
@@ -57,9 +57,9 @@ const catchError = ({
 };
 
 // 檢查缺少的欄位
-const checkForMissingFields = (userData) => {
+const checkForMissingFields = (user) => {
   const requiredFields = ["name", "address"]; // 假設需要這些欄位
-  return requiredFields.filter((field) => !userData[field]);
+  return requiredFields.filter((field) => !user[field]);
 };
 
 const showAlert = (title, message) => {
@@ -113,7 +113,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
 
       //儲存 會員ID
       dispatch(
-        setUserData({
+        setUser({
           userId: userId,
           email: form.email,
         })
@@ -126,8 +126,6 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       } else {
         navigation.replace("aboutMe");
       }
-
-
     } catch (error) {
       const errorMessage = error.error.message as string;
 

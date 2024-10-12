@@ -4,7 +4,7 @@ import React from "react";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
 import { HeadShot as HeadShotType } from "../../shared/types";
 import { useDispatch } from "react-redux";
-import { setUserData } from "../../store/userSlice";
+import { setUser } from "../../store/userSlice";
 interface HeadShotProps {
   name?: string;
   navigation: NavigationProp<any>;
@@ -23,7 +23,7 @@ const HeadShot: React.FC<HeadShotProps> = ({ name, navigation, headShot }) => {
             //步骤 3.onSave 函数在 HeadShot 页面中执行，接收 newHeadShot 并更新form状态
             onSave: (newHeadShot: HeadShotType) => {
               dispatch(
-                setUserData({
+                setUser({
                   headShot: newHeadShot,
                 })
               );

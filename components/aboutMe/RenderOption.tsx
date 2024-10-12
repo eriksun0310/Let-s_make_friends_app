@@ -5,21 +5,17 @@ import { Tab, SelectedOption, OptionList } from "../../shared/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedOption } from "../../store/userSlice";
 import { optionList } from "../../shared/static";
-
+import { RootState } from "../../store/store";
 
 interface RenderOptionProps {
   currentTab: Tab;
-  selectedOption: SelectedOption;
-  setSelectedOption: React.Dispatch<React.SetStateAction<SelectedOption>>;
 }
 const RenderOption: React.FC<RenderOptionProps> = ({
   currentTab = "interests",
-
-  // setSelectedOption,
 }) => {
-  const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const selectedOption = userData.selectedOption;
+  const selectedOption = user.selectedOption;
 
   const onPress = (v: string) => {
     dispatch(

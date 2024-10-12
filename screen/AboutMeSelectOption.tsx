@@ -1,11 +1,14 @@
 import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 import { Tab, TabView } from "@rneui/themed";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
 import RenderOption from "../components/aboutMe/RenderOption";
 import { OptionList, SelectedOption, Tabs } from "../shared/types";
 import { useSelector } from "react-redux";
-
+import { RootState } from "../store/store";
+import { Tab as TabType } from "../shared/types";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { RouteProp } from "@react-navigation/native";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
@@ -18,26 +21,32 @@ const userDB = {
   favoriteFood: ["chocolate"],
 };
 
-const AboutMeSelectOption = ({ navigation, route }) => {
-  const userData = useSelector((state) => state.user.userData);
-  
-  const { currentTab,
-    //  selectedOption, setSelectedOption
-     } = route.params;
+type RootStackParamList = {
+  aboutMe: undefined;
+  AboutMeSelectOption: { currentTab: string };
+  // 其他 screen 的定義...
+};
+
+type AboutMeSelectOptionRouteProp = RouteProp<
+  RootStackParamList,
+  "AboutMeSelectOption"
+>;
+type AboutMeSelectOptionNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "AboutMeSelectOption"
+>;
+type AboutMeSelectOptionProps = {
+  navigation: AboutMeSelectOptionNavigationProp;
+  route: AboutMeSelectOptionRouteProp;
+};
+
+const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
+  navigation,
+  route,
+}) => {
+  const { currentTab } = route.params;
 
   const [index, setIndex] = useState(0);
-
-  console.log("userData 22222", userData.selectedOption);
-
-  const selectedOption =userData.selectedOption
-
-  // const [selectedOption, setSelectedOption] = useState<SelectedOption>({});
-
-  // useEffect(() => {
-  //   navigation.setParams({
-  //     selectedOption,
-  //   });
-  // }, [selectedOption]);
 
   // 當前選的tab
   useEffect(() => {
@@ -70,7 +79,7 @@ const AboutMeSelectOption = ({ navigation, route }) => {
                   }
             }
           >
-            {tabs[key]}
+            {tabs[key as TabType]}
           </Tab.Item>
         ))}
       </Tab>
@@ -78,12 +87,7 @@ const AboutMeSelectOption = ({ navigation, route }) => {
       <TabView value={index} onChange={setIndex} animationType="spring">
         {Object.keys(tabs)?.map((key) => (
           <TabView.Item>
-            <RenderOption
-              currentTab={key}
-              defaultValue={selectedOption[key]}
-              selectedOption={selectedOption}
-              // setSelectedOption={setSelectedOption}
-            />
+            <RenderOption currentTab={key as TabType} />
           </TabView.Item>
         ))}
       </TabView>

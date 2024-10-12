@@ -4,19 +4,19 @@ import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
 import AllHeadShot, { imageUrls } from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
 import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 interface AvatarCreatorProps {}
 
 const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
   //從 params 中獲取 headShot、setHeadShot
 
- const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state:RootState) => state.user);
 
   const [headShot, setHeadShot] = useState<HeadShot>({
     imageUrl: "",
     imageType: "people",
   });
-
 
   //步骤1.每次用户选择新头像时，useEffect 触发，更新 route.params.headShot
   useEffect(() => {
@@ -25,8 +25,8 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
 
   // 預設選中的大頭貼
   useEffect(() => {
-    setHeadShot(userData.headShot);
-  }, [userData]);
+    setHeadShot(user.headShot);
+  }, [user]);
 
   return (
     <View style={styles.container}>

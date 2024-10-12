@@ -9,7 +9,8 @@ import { Gender } from "../components/ui/types";
 import { HeadShot as HeadShotType } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserData } from "../store/userSlice";
+import { setUser } from "../store/userSlice";
+import { RootState } from "../store/store";
 const interestList = ["看劇", "看電影"];
 const foodList = ["日式", "美式"];
 
@@ -23,7 +24,7 @@ interface From {
 }
 
 const AboutMe = ({ navigation }) => {
-  const userData = useSelector((state) => state.user.userData);
+  const user = useSelector((state:RootState) => state.user);
   const dispatch = useDispatch();
 
   //更新form state
@@ -39,49 +40,49 @@ const AboutMe = ({ navigation }) => {
       const formattedDate = `${year}-${month}-${day}`;
 
       dispatch(
-        setUserData({
+        setUser({
           birthday: formattedDate,
         })
       );
     } else {
       dispatch(
-        setUserData({
+        setUser({
           [name]: value,
         })
       );
     }
   };
 
-  console.log("userData", userData);
+  console.log("user", user);
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot navigation={navigation} headShot={userData.headShot} />
+        <HeadShot navigation={navigation} headShot={user.headShot} />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
           <Input
             label="名稱"
-            value={userData.name}
+            value={user.name}
             setValue={(v) => handleChange("name", v)}
           />
           <Input
             multiline
             label="自我介紹"
-            value={userData.introduce}
+            value={user.introduce}
             setValue={(v) => handleChange("introduce", v)}
           />
           <Text style={styles.label}>性別：</Text>
           <GenderButtons
-            value={userData.gender}
+            value={user.gender}
             getValue={(v) => {
               handleChange("gender", v as Gender);
             }}
           />
 
           <AgeCalculator
-            defaultValue={userData.birthday}
+            defaultValue={user.birthday}
             getValue={(v) => {
               handleChange("birthday", v.birthDate as Date);
             }}

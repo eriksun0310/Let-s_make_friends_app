@@ -43,3 +43,14 @@ export type OptionList = {
 export interface SelectedOption {
   [key: string]: string[];
 }
+
+export type User = {
+  userId: string;
+  name: string;
+  gender: string;
+  introduce: string;
+  headShot: HeadShot;
+  selectedOption: SelectedOption;
+  birthday: string;
+  email: string;
+};
