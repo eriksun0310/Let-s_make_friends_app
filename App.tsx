@@ -86,7 +86,7 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
 const AuthenticatedStack = () => {
-  const user = useSelector((state:RootState) => state.user);
+  const user = useSelector((state:RootState) => state.user.user);
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
   return (
@@ -175,7 +175,7 @@ const AuthenticatedStack = () => {
 const Navigation = () => {
   const authCtx = useContext(AuthContext);
 
-  console.log("authCtx.isAuthenticated", authCtx.isAuthenticated);
+
   return (
     <NavigationContainer>
       {authCtx.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}

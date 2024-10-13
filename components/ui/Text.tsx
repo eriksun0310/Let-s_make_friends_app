@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 const TextLabel = ({ label, value }) => {
-    console.log("value", value);
+ 
   return (
     <Text style={styles.label}>
       {label}：{value}

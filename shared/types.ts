@@ -44,10 +44,12 @@ export interface SelectedOption {
   [key: string]: string[];
 }
 
+export type Gender = "female" | "male";
+
 export type User = {
   userId: string;
   name: string;
-  gender: string;
+  gender: Gender;
   introduce: string;
   headShot: HeadShot;
   selectedOption: SelectedOption;

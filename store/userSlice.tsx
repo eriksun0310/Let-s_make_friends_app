@@ -1,25 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { HeadShot, SelectedOption, User } from "../shared/types";
+import { User } from "../shared/types";
 
+interface InitialStateProps {
+  user: User;
+}
 
-
-const initialState: User = {
-  userId: "",
-  name: "",
-  gender: "female",
-  introduce: "",
-  headShot: {
-    imageUrl: "",
-    imageType: "people",
+const initialState: InitialStateProps = {
+  user: {
+    userId: "",
+    name: "",
+    gender: "female",
+    introduce: "",
+    headShot: {
+      imageUrl: "",
+      imageType: "people",
+    },
+    selectedOption: {
+      interests: [],
+      favoriteFood: [],
+      dislikedFood: [],
+    },
+    birthday: "",
+    email: "",
   },
-  selectedOption: {
-    interests: [],
-    favoriteFood: [],
-    dislikedFood: [],
-  },
-  birthday: "",
-  email: "",
 };
 
 const userSlice = createSlice({
@@ -27,8 +31,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action) {
-      state = {
-        ...state,
+      
+      state.user = {
+        ...state.user,
         ...action.payload,
       };
     },
@@ -36,9 +41,9 @@ const userSlice = createSlice({
     setSelectedOption(state, action) {
       const { currentTab, currentOption } = action.payload;
 
-      const selectedOption = state.selectedOption;
+      const selectedOption = state.user.selectedOption;
       if (!selectedOption[currentTab]) {
-        state.selectedOption[currentTab] = [currentOption];
+        state.user.selectedOption[currentTab] = [currentOption];
 
         // 已經存在 tab
       } else {
@@ -46,8 +51,8 @@ const userSlice = createSlice({
 
         // 已經存在的選項,移除
         if (existingValues.includes(currentOption)) {
-          state.selectedOption = {
-            ...state.selectedOption,
+          state.user.selectedOption = {
+            ...state.user.selectedOption,
             [currentTab]: existingValues.filter(
               (option) => option !== currentOption
             ),
@@ -55,8 +60,8 @@ const userSlice = createSlice({
 
           // 沒有存在的選項，新增
         } else {
-          state.selectedOption = {
-            ...state.selectedOption,
+          state.user.selectedOption = {
+            ...state.user.selectedOption,
             [currentTab]: [...existingValues, currentOption],
           };
         }

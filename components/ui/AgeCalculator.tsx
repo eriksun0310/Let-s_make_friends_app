@@ -67,7 +67,7 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
   }, [value.birthDate]);
 
   useEffect(() => {
-    console.log("value", value);
+
     if (value?.age !== null) {
       getValue(value);
     }

@@ -24,7 +24,7 @@ interface From {
 }
 
 const AboutMe = ({ navigation }) => {
-  const user = useSelector((state:RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
 
   //更新form state
@@ -53,7 +53,7 @@ const AboutMe = ({ navigation }) => {
     }
   };
 
-  console.log("user", user);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>

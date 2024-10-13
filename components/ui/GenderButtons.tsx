@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ButtonGroup } from "@rneui/themed";
-import { Text, StyleSheet, View } from "react-native";
 import { Colors } from "../../constants/style";
-import { Gender } from "./types";
+import { Gender } from "../../shared/types";
+import { gender } from "../../shared/static";
 
-const gender = {
-  female: "女",
-  male: "男",
-};
 
 
 interface GenderButtonsProps {
@@ -26,7 +22,7 @@ const GenderButtons: React.FC<GenderButtonsProps> = ({
   }, [selectedIndex]);
 
   useEffect(() => {
-    console.log("value", value);
+ 
     const index = Object.keys(gender).indexOf(value);
     if (index !== -1) {
       setSelectedIndex(index);

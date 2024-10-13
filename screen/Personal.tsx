@@ -1,9 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
-import BorderButton from "../components/ui/BorderButton";
 import HeadShot from "../components/personal/HeadShot";
-import MultipleText from "../components/ui/MultipleText";
 import Button from "../components/ui/Button";
 import { AuthContext } from "../store/authContext";
 import { useSelector } from "react-redux";
@@ -15,19 +13,12 @@ interface PersonalProps {
   navigation: NavigationProp<any>;
 }
 
-const interestList = ["看劇", "看電影"];
-const foodList = ["日式", "美式"];
-const dataList = {
-  interest: ["看劇", "看電影"],
-  food: ["日式", "美式"],
-};
-
 const Personal: React.FC<PersonalProps> = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
 
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.user);
 
-  console.log("user", user);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>

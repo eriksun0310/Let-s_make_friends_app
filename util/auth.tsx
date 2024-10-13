@@ -54,7 +54,7 @@ export const createUser = async (email: string, password: string) => {
     const token = response.data.idToken;
     return token;
   } catch (error) {
-    console.log(error);
+    error;
   }
 };
 
@@ -100,6 +100,7 @@ const verifyToken = async (token) => {
 
 // 儲存會員資料
 export const saveUserData = async (user: any, token: string) => {
+  console.log("user  auth", user);
   try {
     const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${user.userId}.json`;
 

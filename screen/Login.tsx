@@ -119,7 +119,6 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         })
       );
 
-      console.log("userExists", userExists);
       authCtx.authenticatedToken(token);
       if (userExists) {
         navigation.replace("main");

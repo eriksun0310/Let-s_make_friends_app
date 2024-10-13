@@ -22,7 +22,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
     try {
       const token = await createUser(form.email, form.password);
 
-      console.log("token  signUpHandler ", token);
+      // console.log("token  signUpHandler ", token);
       authCtx.authenticatedToken(token);
 
       // 註冊成功後回到登入頁面

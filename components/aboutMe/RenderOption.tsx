@@ -13,7 +13,7 @@ interface RenderOptionProps {
 const RenderOption: React.FC<RenderOptionProps> = ({
   currentTab = "interests",
 }) => {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
   const selectedOption = user.selectedOption;
 

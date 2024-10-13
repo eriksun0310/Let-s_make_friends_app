@@ -8,7 +8,7 @@ import { tabs } from "../../shared/static";
 
 // 興趣、喜歡的食物、不喜歡的食物
 const SelectedOption = () => {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.user);
 
   return (
     <>

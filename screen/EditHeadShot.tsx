@@ -11,7 +11,7 @@ interface AvatarCreatorProps {}
 const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
   //從 params 中獲取 headShot、setHeadShot
 
-  const user = useSelector((state:RootState) => state.user);
+  const user = useSelector((state:RootState) => state.user.user);
 
   const [headShot, setHeadShot] = useState<HeadShot>({
     imageUrl: "",

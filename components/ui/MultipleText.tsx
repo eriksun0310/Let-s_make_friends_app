@@ -33,7 +33,7 @@ const MultipleText: React.FC<MultipleTextProps> = ({
           style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
         >
           {dataList?.map((item, index) => {
-            console.log("item", item);
+          
             const option = optionList?.[currentTab]?.[item];
             return <ViewBorderButton text={option} key={index} />;
           })}
