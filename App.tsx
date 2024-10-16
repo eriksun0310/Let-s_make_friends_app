@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button } from "react-native";
+import { View, Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -86,7 +86,7 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
 const AuthenticatedStack = () => {
-  const user = useSelector((state:RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.user.user);
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
   return (
@@ -175,6 +175,9 @@ const AuthenticatedStack = () => {
 const Navigation = () => {
   const authCtx = useContext(AuthContext);
 
+  if (authCtx.initialized === false) {
+    return <View />; // Loading Page
+  }
 
   return (
     <NavigationContainer>

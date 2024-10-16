@@ -80,13 +80,13 @@ const AboutMe = ({ navigation }) => {
               handleChange("gender", v as Gender);
             }}
           />
-
+{/* 
           <AgeCalculator
             defaultValue={user.birthday}
             getValue={(v) => {
               handleChange("birthday", v.birthDate as Date);
             }}
-          />
+          /> */}
 
           <SelectedOption />
         </View>

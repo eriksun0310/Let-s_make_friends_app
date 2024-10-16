@@ -1,7 +1,11 @@
 import { initializeApp } from "firebase/app";
+import { getAuth, initializeAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 // import { initializeAuth, getReactNativePersistence } from "firebase/auth"; // 使用 initializeAuth
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// @ts-ignore
+import { getReactNativePersistence } from "firebase/auth";
 
 export const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -15,6 +19,11 @@ export const firebaseConfig = {
 // 初始化 Firebase
 const app = initializeApp(firebaseConfig);
 
+// const auth = getAuth(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
 // 獲取資料庫實例
 const database = getDatabase(app);
 
@@ -23,4 +32,4 @@ const database = getDatabase(app);
 //   persistence: getReactNativePersistence(AsyncStorage), // 確保這裡使用正確的 AsyncStorage
 // });
 
-export { app, database };
+export { app, auth, database };

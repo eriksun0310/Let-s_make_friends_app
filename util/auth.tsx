@@ -4,7 +4,10 @@ import axios from "axios";
 // import "firebase/database";
 
 // import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { database } from "./firebaseConfig";
+import { app, auth, database } from "./firebaseConfig";
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { ref, set } from "firebase/database";
 
 // const firebaseConfig = {
 //   apiKey: process.env.API_KEY,
@@ -60,18 +63,33 @@ export const createUser = async (email: string, password: string) => {
 
 //login:具體的接口,專門處理會員登入的邏輯
 export const login = async (email: string, password: string) => {
-  const response = await authenticate("signInWithPassword", email, password);
+  // const response = await authenticate("signInWithPassword", email, password);
 
-  // console.log('response', response)
+  // // console.log('response', response)
 
-  const token = response.data.idToken;
-  const userId = response.data.localId;
+  // const token = response.data.idToken;
+  // const userId = response.data.localId;
 
-  console.log("login userId", userId);
+  // console.log("login userId", userId);
+
+  // return {
+  //   token,
+  //   userId,
+  // };
+
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+
+  const token = await userCredential.user.getIdToken();
+
+  // userCredential.user.email
 
   return {
-    token,
-    userId,
+    token: token,
+    userId: userCredential.user.uid,
   };
 };
 
@@ -100,22 +118,26 @@ const verifyToken = async (token) => {
 
 // 儲存會員資料
 export const saveUserData = async (user: any, token: string) => {
-  console.log("user  auth", user);
-  try {
-    const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${user.userId}.json`;
+  set(ref(database, "users/" + user.id), {
+    ...user,
+  });
 
-    await axios.put(url, user);
+  // console.log("user  auth", user);
+  // try {
+  //   const url = `https://let-s-make-friends-app-default-rtdb.firebaseio.com/users/${user.userId}.json`;
 
-    // TODO: 20241010 先暫時寫入的時候 不用用auth
-    //   const response = await axios.put(url, user,
-    //     {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   }
-    // );
-    console.log("save user success, response ");
-  } catch (error) {
-    console.log("error save user", error);
-  }
+  //   await axios.put(url, user);
+
+  //   // TODO: 20241010 先暫時寫入的時候 不用用auth
+  //   //   const response = await axios.put(url, user,
+  //   //     {
+  //   //     headers: {
+  //   //       Authorization: `Bearer ${token}`,
+  //   //     },
+  //   //   }
+  //   // );
+  //   console.log("save user success, response ");
+  // } catch (error) {
+  //   console.log("error save user", error);
+  // }
 };
