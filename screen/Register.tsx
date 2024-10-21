@@ -20,11 +20,13 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
   const signUpHandler = async (form: Form) => {
     setLoading(true);
     try {
-      const token = await createUser(form.email, form.password);
+      const userId = await createUser(form.email, form.password);
 
+       console.log("signUpHandler userId", userId); 
       // console.log("token  signUpHandler ", token);
-      authCtx.authenticatedToken(token);
+      // authCtx.authenticatedUserId(userId);
 
+      console.log('login page')
       // 註冊成功後回到登入頁面
       navigation.replace("login");
     } catch (error) {

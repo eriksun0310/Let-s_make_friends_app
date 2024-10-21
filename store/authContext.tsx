@@ -1,21 +1,21 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { auth } from "../util/firebaseConfig";
 
 interface AuthContext {
-  token: string;
+  userId: string;
   initialized: boolean;
   isAuthenticated: boolean;
-  authenticatedToken: (token: string) => void;
+  authenticatedUserId: (userId: string) => void;
   logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContext>({
-  token: "",
+  userId: "",
   initialized: false,
   isAuthenticated: false, //是否登入
-  authenticatedToken: () => {}, //成功登入、註冊
+  authenticatedUserId: () => {}, //成功登入、註冊
   logout: () => Promise.resolve(), //登出
 });
 
@@ -28,7 +28,7 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 }) => {
   const [initialized, setInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState("");
+  const [userId, setUserId] = useState("");
 
   auth.onAuthStateChanged((user) => {
     if (user) {
@@ -40,14 +40,31 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     setInitialized(true);
   });
 
-  //設置認證過的token
-  const authenticatedToken = async (token: string) => {
-    setToken(token);
-    try {
-      await AsyncStorage.setItem("token", token);
-    } catch (error) {
-      console.log(error);
-    }
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // setUserId(user.uid); // 設定使用者 ID
+        setIsAuthenticated(true);
+      } else {
+        // setUserId("");
+        setIsAuthenticated(false);
+      }
+
+      setInitialized(true); // 初始化完成
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 設置認證過的用戶ID
+  const authenticatedUserId = async (userId: string) => {
+    setUserId(userId);
+    // TODO: 20241019 先關 不知道要幹嘛的
+    // try {
+    //   await AsyncStorage.setItem("userId", userId);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   //登出
@@ -56,10 +73,10 @@ const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   };
 
   const value = {
-    token: token,
+    userId: userId,
     initialized: initialized,
     isAuthenticated: isAuthenticated,
-    authenticatedToken: authenticatedToken,
+    authenticatedUserId: authenticatedUserId,
     logout: logout,
   };
 

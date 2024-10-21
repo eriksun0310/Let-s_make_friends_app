@@ -107,7 +107,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const loginHandler = async (form: LoginForm) => {
     setLoading(true);
     try {
-      const { token, userId } = await login(form.email, form.password);
+      const { userId } = await login(form.email, form.password);
 
       const userExists = await checkIfUserExist(userId);
 
@@ -119,7 +119,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         })
       );
 
-      authCtx.authenticatedToken(token);
+      authCtx.authenticatedUserId(userId);
       if (userExists) {
         navigation.replace("main");
       } else {

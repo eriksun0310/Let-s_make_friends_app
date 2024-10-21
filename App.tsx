@@ -21,8 +21,9 @@ import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState } from "./store/store";
 import { saveUserData } from "./util/auth";
+import LoadingOverlay from "./components/ui/LoadingOverlay";
 
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -61,6 +62,7 @@ const MainTabNavigator = () => {
 
 // 註冊頁面(登入、註冊)
 const AuthStack = () => {
+  // console.log("AuthStack AuthStack AuthStack");
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -109,7 +111,7 @@ const AuthenticatedStack = () => {
               onPress={async () => {
                 // 檢查必填項目
                 if (user.name) {
-                  await saveUserData(user, authCtx.token);
+                  await saveUserData(user);
                   // 跳轉到地圖頁面
                   navigation.navigate("main", { screen: "map" });
                 }
@@ -176,8 +178,20 @@ const Navigation = () => {
   const authCtx = useContext(AuthContext);
 
   if (authCtx.initialized === false) {
-    return <View />; // Loading Page
+    return <LoadingOverlay message="loading ..." />; //  TODO:  Loading Page
   }
+
+  // useEffect(()=>{
+  //   const hideSplashScreen = async () => {
+  //     await SplashScreen.hideAsync();
+  //   };
+  //   if(authCtx.initialized){
+  //     hideSplashScreen();
+  //   }
+  // },[authCtx.initialized])
+
+
+  console.log('authCtx.isAuthenticated', authCtx.isAuthenticated)
 
   return (
     <NavigationContainer>
@@ -186,32 +200,37 @@ const Navigation = () => {
   );
 };
 
-const Root = () => {
-  //正在嘗試登錄用戶
-  const [isTryingLogin, setIsTryingLogin] = useState(true);
-  const authCtx = useContext(AuthContext);
-  useEffect(() => {
-    const fetchToken = async () => {
-      // 如果 AsyncStorage 有token 就會自動登入
-      const storedToken = await AsyncStorage.getItem("token");
-      if (storedToken) {
-        authCtx.authenticatedToken(storedToken);
-      }
-      setIsTryingLogin(false);
-    };
-    fetchToken().finally(() => {
-      SplashScreen.hideAsync();
-    });
-  }, []);
+// TODO: 20241019 先關 不知道要幹嘛的, 可能用不到
+// const Root = () => {
+//   //正在嘗試登錄用戶
+//   const [isTryingLogin, setIsTryingLogin] = useState(true);
+//   const authCtx = useContext(AuthContext);
+//   useEffect(() => {
+//     const fetchToken = async () => {
+//       // 如果 AsyncStorage 有token 就會自動登入
+//       const storedToken = await AsyncStorage.getItem("token");
+//       if (storedToken) {
+//         authCtx.authenticatedUserId(storedToken);
+//       }
+//       setIsTryingLogin(false);
+//     };
+//     fetchToken().finally(() => {
+//       SplashScreen.hideAsync();
+//     });
+//     if (authCtx.initialized === true) {
+//       setIsTryingLogin(false);
+//     }
+//   }, []);
 
-  // 正在嘗試登錄用戶
-  if (isTryingLogin) {
-    //確保不要看到 login 閃爍的畫面
-    return null; // 可以加載一個自定義載入畫面
-  }
-
-  return <Navigation />;
-};
+//   // // 正在嘗試登錄用戶
+//   if (isTryingLogin) {
+//     console.log(111111);
+//     //確保不要看到 login 閃爍的畫面
+//     return null; // 可以加載一個自定義載入畫面
+//   }
+//   console.log(222222);
+//   return <Navigation />;
+// };
 
 export default function App() {
   return (
@@ -220,7 +239,7 @@ export default function App() {
 
       <Provider store={store}>
         <AuthContextProvider>
-          <Root />
+          <Navigation />
         </AuthContextProvider>
       </Provider>
     </>
