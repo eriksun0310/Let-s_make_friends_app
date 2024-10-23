@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import LoginContent from "../components/auth/login/LoginContent";
-import { login } from "../util/auth";
+import { getUserData, login } from "../util/auth";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
-import { database } from "../util/firebaseConfig";
-import { ref, get } from "firebase/database";
+
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/userSlice";
 
@@ -58,7 +57,6 @@ const catchError = ({
 const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  // const authCtx = useContext(AuthContext);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -67,40 +65,20 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
     password: { value: false, errorText: "" },
   });
 
-  //
-  const checkIfUserExist = async (userId: string) => {
-    const userRef = ref(database, `users/${userId}`);
-
-    try {
-      const snapshot = await get(userRef);
-      return snapshot.exists();
-    } catch (error) {
-      console.log("error");
-      return false;
-    }
-  };
-
   //處理登入的事件
   const loginHandler = async (form: LoginForm) => {
     setLoading(true);
     try {
       const { userId } = await login(form.email, form.password);
 
-      const userExists = await checkIfUserExist(userId);
+      // 取得用戶資料
+      const userData = await getUserData(userId);
 
-      //儲存 會員ID
-      dispatch(
-        setUser({
-          userId: userId,
-          email: form.email,
-        })
-      );
-
-      // authCtx.authenticatedUserId(userId);
-      if (userExists) {
-        navigation.replace("main");
+      if (userData) {
+        dispatch(setUser(userData));
+        navigation.navigate("main", { screen: "chat" }); // 如果用戶資料存在，可以選擇跳轉 聊天室
       } else {
-        navigation.replace("aboutMe");
+        navigation.navigate("aboutMe"); // 如果用戶資料不存在，導航到 aboutMe
       }
     } catch (error) {
       const errorMessage = error.error.message as string;
@@ -114,7 +92,6 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       setLoading(false);
     }
   };
-
   if (isLoading) {
     return <LoadingOverlay message="登入中 ..." />;
   }

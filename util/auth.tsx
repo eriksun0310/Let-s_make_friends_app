@@ -3,7 +3,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { ref, set } from "firebase/database";
+import { get, ref, set } from "firebase/database";
+import { User } from "../shared/types";
 
 export const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -38,10 +39,22 @@ export const login = async (email: string, password: string) => {
   };
 };
 
-// 儲存會員資料
-export const saveUserData = async (user: any) => {
+
+// 取得用戶資料
+export const getUserData = async (userId: string) => {
+  const userRef = ref(database, `users/${userId}`);
+  const snapshot = await get(userRef);
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    return null;
+  }
+};
+
+// 儲存用戶資料
+export const saveUserData = async (user: User) => {
   console.log("user", user);
-  set(ref(database, "users/" + user.id), {
+  set(ref(database, "users/" + user.userId), {
     ...user,
   });
 };

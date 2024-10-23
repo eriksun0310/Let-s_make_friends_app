@@ -5,8 +5,7 @@ import Input from "../components/ui/Input";
 
 import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";
-import { Gender } from "../components/ui/types";
-import { HeadShot as HeadShotType } from "../shared/types";
+import { Gender, HeadShot as HeadShotType } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";

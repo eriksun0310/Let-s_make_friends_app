@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { auth } from "../util/firebaseConfig";
+import { getUserData } from "../util/auth";
+import { useNavigation } from "@react-navigation/native";
 
 interface InitialStateProps {
   user: User;
@@ -89,6 +91,7 @@ export const logout = (): AppThunk => async (dispatch) => {
     await auth.signOut(); // 登出
     dispatch(userSlice.actions.setUser(initialState.user)); // 清除用戶信息
     dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置為未認證
+
     return Promise.resolve();
   } catch (error) {
     console.log("error", error);
@@ -97,16 +100,23 @@ export const logout = (): AppThunk => async (dispatch) => {
 };
 
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Firebase 認證狀態
-export const initializeAuth = (): AppThunk => (dispatch) => {
-  auth.onAuthStateChanged((user) => {
+export const initializeAuth = (): AppThunk => async (dispatch) => {
+  auth.onAuthStateChanged(async (user) => {
     if (user) {
+      const userData = await getUserData(user.uid);
+
+      if (userData) {
+        dispatch(userSlice.actions.setUser(userData));
+      } else {
+        dispatch(
+          userSlice.actions.setUser({ userId: user.uid, email: user.email })
+        );
+      }
+
       // 如果有用戶已登入，更新用戶信息並設置為已認證
-      dispatch(
-        userSlice.actions.setUser({ userId: user.uid, email: user.email })
-      );
       dispatch(userSlice.actions.setIsAuthenticated(true));
     } else {
-      // 如果沒有用戶已登入，設置為未認證
+      // 如果用戶沒有登入，設置為未認證
       dispatch(userSlice.actions.setIsAuthenticated(false));
     }
     // 無論有無用戶，初始化流程完成

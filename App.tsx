@@ -1,5 +1,5 @@
-import React, {  useEffect } from "react";
-import {  Button } from "react-native";
+import React, { useEffect } from "react";
+import { Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -20,7 +20,6 @@ import { saveUserData } from "./util/auth";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
 
-
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
 
@@ -30,9 +29,10 @@ const Stack = createStackNavigator();
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="map"
+      // initialRouteName="map"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
+          console.log("route", route.name);
           if (route.name === "chat") {
             return <MessageCircle color={color} size={size} />;
           } else if (route.name === "map") {
@@ -58,7 +58,6 @@ const MainTabNavigator = () => {
 
 // 註冊頁面(登入、註冊)
 const AuthStack = () => {
-
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -82,10 +81,24 @@ const AuthStack = () => {
   );
 };
 
-// 已登入後的頁面(有驗證) 
+// 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
   const user = useSelector((state: RootState) => state.user.user);
+  const isUserExists = useSelector(
+    (state: RootState) => state.user.isUserExists
+  );
+
   const navigation = useNavigation();
+
+  // useEffect(() => {
+  //   if (isUserExists) {
+  //     // 如果用戶資料存在，可以選擇跳轉
+  //     navigation.navigate("main");
+  //   } else {
+  //     // 如果用戶資料不存在，導航到 aboutMe
+  //     navigation.navigate("aboutMe");
+  //   }
+  // }, [isUserExists, navigation]);
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -108,7 +121,7 @@ const AuthenticatedStack = () => {
                 if (user.name) {
                   await saveUserData(user);
                   // 跳轉到地圖頁面
-                  navigation.navigate("main", { screen: "map" });
+                  navigation.navigate("main", { screen: "chat" });
                 }
               }}
             />
@@ -182,19 +195,17 @@ const Navigation = () => {
     (state: RootState) => state.user.isAuthenticated
   );
 
-
   if (!initialized) {
     return <LoadingOverlay message="loading ..." />; // 顯示載入頁面直到初始化完成
   }
 
-
   return (
     <NavigationContainer>
+      {/* <AuthenticatedStack /> */}
       {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };
-
 
 export default function App() {
   return (
