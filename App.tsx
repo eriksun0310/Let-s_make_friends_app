@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Button } from "react-native";
+import React, {  useEffect } from "react";
+import {  Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -11,19 +11,15 @@ import Map from "./screen/Map";
 import Personal from "./screen/Personal";
 import Login from "./screen/Login";
 import Register from "./screen/Register";
-// import LoginPassword from "./screen/LoginPassword";
-import AuthContextProvider, { AuthContext } from "./store/authContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SplashScreen from "expo-splash-screen";
 import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider, useSelector } from "react-redux";
-import store, { RootState } from "./store/store";
+import store, { RootState, useDispatch } from "./store/store";
 import { saveUserData } from "./util/auth";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
+import { initializeAuth } from "./store/userSlice";
 
-// SplashScreen.preventAutoHideAsync();
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -62,7 +58,7 @@ const MainTabNavigator = () => {
 
 // 註冊頁面(登入、註冊)
 const AuthStack = () => {
-  // console.log("AuthStack AuthStack AuthStack");
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -86,10 +82,9 @@ const AuthStack = () => {
   );
 };
 
-// 已登入後的頁面(有驗證) AuthenticatedStack->AllStack
+// 已登入後的頁面(有驗證) 
 const AuthenticatedStack = () => {
   const user = useSelector((state: RootState) => state.user.user);
-  const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
@@ -175,72 +170,38 @@ const AuthenticatedStack = () => {
 };
 
 const Navigation = () => {
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
+  }, [dispatch]);
 
-  if (authCtx.initialized === false) {
-    return <LoadingOverlay message="loading ..." />; //  TODO:  Loading Page
+  // 應用程式初始化
+  const initialized = useSelector((state: RootState) => state.user.initialized);
+  // 是否已經登入
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.user.isAuthenticated
+  );
+
+
+  if (!initialized) {
+    return <LoadingOverlay message="loading ..." />; // 顯示載入頁面直到初始化完成
   }
 
-  // useEffect(()=>{
-  //   const hideSplashScreen = async () => {
-  //     await SplashScreen.hideAsync();
-  //   };
-  //   if(authCtx.initialized){
-  //     hideSplashScreen();
-  //   }
-  // },[authCtx.initialized])
-
-
-  console.log('authCtx.isAuthenticated', authCtx.isAuthenticated)
 
   return (
     <NavigationContainer>
-      {authCtx.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
+      {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };
 
-// TODO: 20241019 先關 不知道要幹嘛的, 可能用不到
-// const Root = () => {
-//   //正在嘗試登錄用戶
-//   const [isTryingLogin, setIsTryingLogin] = useState(true);
-//   const authCtx = useContext(AuthContext);
-//   useEffect(() => {
-//     const fetchToken = async () => {
-//       // 如果 AsyncStorage 有token 就會自動登入
-//       const storedToken = await AsyncStorage.getItem("token");
-//       if (storedToken) {
-//         authCtx.authenticatedUserId(storedToken);
-//       }
-//       setIsTryingLogin(false);
-//     };
-//     fetchToken().finally(() => {
-//       SplashScreen.hideAsync();
-//     });
-//     if (authCtx.initialized === true) {
-//       setIsTryingLogin(false);
-//     }
-//   }, []);
-
-//   // // 正在嘗試登錄用戶
-//   if (isTryingLogin) {
-//     console.log(111111);
-//     //確保不要看到 login 閃爍的畫面
-//     return null; // 可以加載一個自定義載入畫面
-//   }
-//   console.log(222222);
-//   return <Navigation />;
-// };
 
 export default function App() {
   return (
     <>
       <StatusBar style="light"></StatusBar>
-
       <Provider store={store}>
-        <AuthContextProvider>
-          <Navigation />
-        </AuthContextProvider>
+        <Navigation />
       </Provider>
     </>
   );

@@ -1,24 +1,21 @@
-import React, { useContext } from "react";
+import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/personal/HeadShot";
 import Button from "../components/ui/Button";
-import { AuthContext } from "../store/authContext";
-import { useSelector } from "react-redux";
 import TextLabel from "../components/ui/Text";
-import { RootState } from "../store/store";
+import { RootState, useDispatch } from "../store/store";
 import SelectedOption from "../components/aboutMe/SelectedOption";
+import { logout } from "../store/userSlice";
+import { useSelector } from "react-redux";
 
 interface PersonalProps {
   navigation: NavigationProp<any>;
 }
 
 const Personal: React.FC<PersonalProps> = ({ navigation }) => {
-  const authCtx = useContext(AuthContext);
-
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
-
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -41,7 +38,7 @@ const Personal: React.FC<PersonalProps> = ({ navigation }) => {
             text="登出"
             onPress={() => {
               // 確保isAuthenticated:false才跳轉login頁面
-              authCtx.logout().then(() => {
+              dispatch(logout()).then(() => {
                 navigation.navigate("login");
               });
             }}

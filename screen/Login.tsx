@@ -1,13 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import LoginContent from "../components/auth/login/LoginContent";
 import { login } from "../util/auth";
-import { AuthContext } from "../store/authContext";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { Text, Alert } from "react-native";
+import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
-import { database, auth } from "../util/firebaseConfig";
-import { ref, set, get, getDatabase } from "firebase/database";
+import { database } from "../util/firebaseConfig";
+import { ref, get } from "firebase/database";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/userSlice";
 
@@ -56,32 +55,10 @@ const catchError = ({
   }
 };
 
-// 檢查缺少的欄位
-const checkForMissingFields = (user) => {
-  const requiredFields = ["name", "address"]; // 假設需要這些欄位
-  return requiredFields.filter((field) => !user[field]);
-};
-
-const showAlert = (title, message) => {
-  return new Promise((resolve) => {
-    Alert.alert(title, message, [
-      {
-        text: "否",
-        onPress: () => resolve(false), // 點擊"否"的時候返回 false
-        style: "cancel",
-      },
-      {
-        text: "是",
-        onPress: () => resolve(true), // 點擊"是"的時候返回 true
-      },
-    ]);
-  });
-};
-
 const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const authCtx = useContext(AuthContext);
+  // const authCtx = useContext(AuthContext);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -119,7 +96,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         })
       );
 
-      authCtx.authenticatedUserId(userId);
+      // authCtx.authenticatedUserId(userId);
       if (userExists) {
         navigation.replace("main");
       } else {

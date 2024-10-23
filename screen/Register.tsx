@@ -1,10 +1,9 @@
-import React, { useContext, useState } from "react";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { NavigationProp } from "@react-navigation/native";
 import { Text } from "react-native";
 import RegisterContent from "../components/auth/register/RegisterContent";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { createUser } from "../util/auth";
-import { AuthContext } from "../store/authContext";
 import type { Form } from "../shared/types";
 
 interface RegisterProps {
@@ -12,7 +11,6 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
-  const authCtx = useContext(AuthContext);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,13 +18,8 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
   const signUpHandler = async (form: Form) => {
     setLoading(true);
     try {
-      const userId = await createUser(form.email, form.password);
+      await createUser(form.email, form.password);
 
-       console.log("signUpHandler userId", userId); 
-      // console.log("token  signUpHandler ", token);
-      // authCtx.authenticatedUserId(userId);
-
-      console.log('login page')
       // 註冊成功後回到登入頁面
       navigation.replace("login");
     } catch (error) {

@@ -1,10 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import RegisterForm from "./RegisterForm";
-import { AuthContext } from "../../../store/authContext";
 import type { Form, RegisterIsValid } from "../../../shared/types";
+import { logout } from "../../../store/userSlice";
+import { useDispatch } from "../../../store/store";
 
 const initIsValid = {
   email: { value: false, errorText: "" },
@@ -16,9 +17,8 @@ interface RegisterContentProps {
 }
 
 const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const authCtx = useContext(AuthContext);
-
   // 檢查輸入資訊,是否有符合規則
   const [isValid, setIsValid] = useState<RegisterIsValid>(initIsValid);
 
@@ -53,8 +53,10 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
 
   // 回到登入頁面
   const backToLogin = () => {
-    authCtx.logout();
-    navigation.navigate("login");
+    // authCtx.logout();
+    dispatch(logout()).then(() => {
+      navigation.navigate("login");
+    });
   };
 
   return (

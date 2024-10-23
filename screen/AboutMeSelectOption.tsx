@@ -3,11 +3,9 @@ import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
 import RenderOption from "../components/aboutMe/RenderOption";
-import { OptionList, SelectedOption, Tabs } from "../shared/types";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
+import { Tabs } from "../shared/types";
 import { Tab as TabType } from "../shared/types";
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 const tabs: Tabs = {
   interests: "興趣",
@@ -69,6 +67,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
       >
         {Object.keys(tabs)?.map((key) => (
           <Tab.Item
+            key={key}
             titleStyle={(active) =>
               active
                 ? {
@@ -86,7 +85,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
 
       <TabView value={index} onChange={setIndex} animationType="spring">
         {Object.keys(tabs)?.map((key) => (
-          <TabView.Item>
+          <TabView.Item key={key}>
             <RenderOption currentTab={key as TabType} />
           </TabView.Item>
         ))}

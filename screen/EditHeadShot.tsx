@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
-import AllHeadShot, { imageUrls } from "../components/editHeadShot/AllHeadShot";
+import AllHeadShot from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
