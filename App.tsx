@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button } from "react-native";
+import { Alert, Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -86,6 +86,17 @@ const AuthenticatedStack = () => {
 
   const navigation = useNavigation();
 
+  let isRequired = false;
+
+  // 檢查必填項目
+  const checkRequired = () => {
+    let isRequired = false;
+    if (user.name && user.birthday && user.gender && user.headShot) {
+      isRequired = true;
+    }
+    return isRequired;
+  };
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -104,12 +115,22 @@ const AuthenticatedStack = () => {
             <Button
               title="儲存"
               onPress={async () => {
-                // 檢查必填項目
-                if (user.name) {
+                const isRequired = checkRequired();
+                // 已必填
+                if (isRequired) {
                   await saveUserData(user);
                   // 跳轉到地圖頁面
                   navigation.navigate("main", { screen: "chat" });
+                } else {
+                  Alert.alert("請填寫必填項目");
                 }
+
+                // 檢查必填項目
+                // if (user.name) {
+                //   await saveUserData(user);
+                //   // 跳轉到地圖頁面
+                //   navigation.navigate("main", { screen: "chat" });
+                // }
               }}
             />
           ),
