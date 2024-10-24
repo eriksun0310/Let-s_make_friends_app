@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 interface InputProps {
+  required?: boolean;
   style?: StyleProp<TextStyle>;
   label: string;
   multiline?: boolean;
@@ -17,6 +18,7 @@ interface InputProps {
   setValue?: (value: string) => void;
 }
 const Input: React.FC<InputProps> = ({
+  required = false,
   style,
   label,
   multiline = false,
@@ -25,6 +27,7 @@ const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <View style={styles.inputContainer}>
+      <Text style={[required ? styles.required : styles.requiredNone]}>*</Text>
       <Text style={styles.label}>{label}：</Text>
       <TextInput
         style={[styles.input, multiline && styles.textArea, style]}
@@ -53,12 +56,21 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    margin: 12,
+    margin: 13,
     borderWidth: 3,
     padding: 10,
     width: "70%",
     borderRadius: 8,
     borderColor: Colors.button,
+  },
+  required: {
+    color: "#f00", // 紅色
+    marginRight: 4, // 與標籤間距
+  },
+  requiredNone: {
+    opacity: 0,
+
+    marginRight: 4, // 與標籤間距
   },
 });
 

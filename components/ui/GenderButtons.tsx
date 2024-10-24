@@ -3,18 +3,14 @@ import { ButtonGroup } from "@rneui/themed";
 import { Colors } from "../../constants/style";
 import { Gender } from "../../shared/types";
 import { gender } from "../../shared/static";
-
-
+import { Text, StyleSheet } from "react-native";
 
 interface GenderButtonsProps {
   value: Gender;
   getValue: (v: Gender) => void;
 }
 
-const GenderButtons: React.FC<GenderButtonsProps> = ({
-  value,
-  getValue,
-}) => {
+const GenderButtons: React.FC<GenderButtonsProps> = ({ value, getValue }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
@@ -22,24 +18,38 @@ const GenderButtons: React.FC<GenderButtonsProps> = ({
   }, [selectedIndex]);
 
   useEffect(() => {
- 
     const index = Object.keys(gender).indexOf(value);
     if (index !== -1) {
       setSelectedIndex(index);
     }
   }, []);
 
-
   return (
-    <ButtonGroup
-      buttons={[gender.female, gender.male]}
-      selectedIndex={selectedIndex}
-      onPress={(value) => {
-        setSelectedIndex(value);
-      }}
-      selectedButtonStyle={{ backgroundColor: Colors.button }}
-    />
+    <>
+      <Text style={styles.label}>性別：</Text>
+      <ButtonGroup
+        buttons={[gender.female, gender.male]}
+        selectedIndex={selectedIndex}
+        onPress={(value) => {
+          setSelectedIndex(value);
+        }}
+        selectedButtonStyle={{ backgroundColor: Colors.button }}
+      />
+    </>
   );
 };
-
+const styles = StyleSheet.create({
+  label: {
+    fontSize: 23,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+    marginLeft: 8,
+  },
+  requiredNone: {
+    opacity: 0,
+    color: "red",
+    marginRight: 4, // 與標籤間距
+  },
+});
 export default GenderButtons;

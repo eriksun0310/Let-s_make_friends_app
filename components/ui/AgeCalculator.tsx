@@ -74,12 +74,11 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
 
   return (
     <>
-      <View
-        style={{
-          flexDirection: "row",
-        }}
-      >
-        <Text style={styles.label}>生日：</Text>
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <Text style={styles.required}>*</Text>
+          <Text style={styles.label}>生日：</Text>
+        </View>
 
         {Platform.OS === "android" ? (
           <TouchableOpacity
@@ -118,9 +117,11 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
+    flexDirection: "row",
+  },
+  textContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   label: {
     fontSize: 23,
@@ -128,6 +129,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     width: 100,
+  },
+  required: {
+    color: "#f00", // 紅色
+    marginRight: 4, // 與標籤間距
   },
   input: {
     height: 40,
@@ -137,10 +142,6 @@ const styles = StyleSheet.create({
     width: "40%",
     borderRadius: 8,
     borderColor: Colors.button,
-  },
-  text: {
-    fontSize: 18,
-    marginVertical: 10,
   },
 });
 

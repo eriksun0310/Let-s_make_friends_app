@@ -52,7 +52,6 @@ const AboutMe = ({ navigation }) => {
     }
   };
 
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -62,6 +61,7 @@ const AboutMe = ({ navigation }) => {
         {/* 性別 */}
         <View style={styles.formContainer}>
           <Input
+            required
             label="名稱"
             value={user.name}
             setValue={(v) => handleChange("name", v)}
@@ -72,7 +72,7 @@ const AboutMe = ({ navigation }) => {
             value={user.introduce}
             setValue={(v) => handleChange("introduce", v)}
           />
-          <Text style={styles.label}>性別：</Text>
+
           <GenderButtons
             value={user.gender}
             getValue={(v) => {
