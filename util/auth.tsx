@@ -3,7 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { get, ref, set } from "firebase/database";
+import { get, ref, set, update } from "firebase/database";
 import { User } from "../shared/types";
 
 export const firebaseConfig = {
@@ -39,7 +39,6 @@ export const login = async (email: string, password: string) => {
   };
 };
 
-
 // 取得用戶資料
 export const getUserData = async (userId: string) => {
   const userRef = ref(database, `users/${userId}`);
@@ -57,4 +56,22 @@ export const saveUserData = async (user: User) => {
   set(ref(database, "users/" + user.userId), {
     ...user,
   });
+};
+
+// 編輯用戶資料
+// 編輯用戶資料
+export const editUserData = async (
+  userId: string,
+  fieldName: string,
+  fieldValue: any
+) => {
+  try {
+    const updates: Record<string, any> = {};
+    updates[fieldName] = fieldValue;
+
+    await update(ref(database, "users/" + userId), updates);
+    console.log("User data updated successfully");
+  } catch (error) {
+    console.error("Error updating user data:", error);
+  }
 };
