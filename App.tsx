@@ -32,7 +32,6 @@ const MainTabNavigator = () => {
       // initialRouteName="map"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          console.log("route", route.name);
           if (route.name === "chat") {
             return <MessageCircle color={color} size={size} />;
           } else if (route.name === "map") {
@@ -84,21 +83,9 @@ const AuthStack = () => {
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
   const user = useSelector((state: RootState) => state.user.user);
-  const isUserExists = useSelector(
-    (state: RootState) => state.user.isUserExists
-  );
 
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   if (isUserExists) {
-  //     // 如果用戶資料存在，可以選擇跳轉
-  //     navigation.navigate("main");
-  //   } else {
-  //     // 如果用戶資料不存在，導航到 aboutMe
-  //     navigation.navigate("aboutMe");
-  //   }
-  // }, [isUserExists, navigation]);
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -210,7 +197,7 @@ const Navigation = () => {
 export default function App() {
   return (
     <>
-      <StatusBar style="light"></StatusBar>
+      <StatusBar style="dark"></StatusBar>
       <Provider store={store}>
         <Navigation />
       </Provider>

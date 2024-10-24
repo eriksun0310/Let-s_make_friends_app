@@ -8,6 +8,7 @@ import { RootState, useDispatch } from "../store/store";
 import SelectedOption from "../components/aboutMe/SelectedOption";
 import { logout } from "../store/userSlice";
 import { useSelector } from "react-redux";
+import { calculateAge } from "../shared/funcs";
 
 interface PersonalProps {
   navigation: NavigationProp<any>;
@@ -31,7 +32,8 @@ const Personal: React.FC<PersonalProps> = ({ navigation }) => {
           <TextLabel label="自我介紹" value={user.introduce} />
           <TextLabel label="性別" value={user.gender} />
           <TextLabel label="生日" value={user.birthday} />
-          <Text style={styles.label}>年齡：</Text>
+          <TextLabel label="年齡" value={calculateAge(user.birthday)} />
+          {/* <Text style={styles.label}>年齡：</Text> */}
 
           <SelectedOption />
           <Button

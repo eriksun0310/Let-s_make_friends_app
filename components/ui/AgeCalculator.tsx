@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { Colors } from "../../constants/style";
 import Input from "./Input";
+import { calculateAge } from "../../shared/funcs";
+import CustomDateTimePicker from "./DateTimePicker";
 
 interface AgeCalculatorValue {
   birthDate: Date | null;
@@ -18,37 +25,22 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
   defaultValue,
   getValue,
 }) => {
-  //
   const initialDate = defaultValue ? new Date(defaultValue) : new Date();
+
+  // 用來控制 android 上的 DateTimePicker 開關
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [value, setValue] = useState<AgeCalculatorValue>({
     birthDate: initialDate,
     age: null,
   });
 
-  // 計算年齡的函數
-  const calculateAge = (date: Date) => {
-    const today = new Date();
-    const birthDate = new Date(date);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDifference < 0 ||
-      (monthDifference === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--; // 如果生日還沒到，年齡減一
-    }
-
-    // setAge(age);
-    setValue((prev) => ({
-      ...prev,
-      age: age,
-    }));
-  };
-
   // 日期選擇處理
   const onChange = (event: any, selectedDate: Date) => {
+    if (Platform.OS === "android") {
+      setShowDatePicker(false);
+    }
+
     if (selectedDate) {
       setValue((prev) => ({
         ...prev,
@@ -56,18 +48,25 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
       }));
 
       // 設置生日
-      calculateAge(selectedDate); // 計算年齡
+      const age = calculateAge(selectedDate); // 計算年齡
+      setValue((prev) => ({
+        ...prev,
+        age: age,
+      }));
     }
   };
 
   useEffect(() => {
     if (value.birthDate) {
-      calculateAge(value.birthDate);
+      const age = calculateAge(value.birthDate);
+      setValue((prev) => ({
+        ...prev,
+        age: age,
+      }));
     }
   }, [value.birthDate]);
 
   useEffect(() => {
-
     if (value?.age !== null) {
       getValue(value);
     }
@@ -82,19 +81,36 @@ const AgeCalculator: React.FC<AgeCalculatorProps> = ({
       >
         <Text style={styles.label}>生日：</Text>
 
-        <DateTimePicker
-          value={value?.birthDate || new Date()} // 如果沒有選擇生日，預設為當前日期
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) =>
-            onChange(event, selectedDate as Date)
-          } // 當選擇日期時觸發
-          maximumDate={new Date()} // 最大日期為今天，防止選擇未來的日期
-        />
+        {Platform.OS === "android" ? (
+          <TouchableOpacity
+            style={{
+              paddingLeft: 10,
+              width: "100%",
+            }}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.input}>
+              {value?.birthDate?.toLocaleDateString()}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <CustomDateTimePicker value={value?.birthDate} onChange={onChange} />
+        )}
+
+        {/* Android 平台的 DateTimePicker 顯示 */}
+        {Platform.OS === "android" && showDatePicker && (
+          <CustomDateTimePicker value={value?.birthDate} onChange={onChange} />
+        )}
       </View>
 
       {value.age !== null && (
-        <Input label="年齡" value={value.age?.toString()} />
+        <Input
+          style={{
+            width: "40%",
+          }}
+          label="年齡"
+          value={value.age?.toString()}
+        />
       )}
     </>
   );
@@ -118,7 +134,7 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 3,
     padding: 10,
-    width: "70%",
+    width: "40%",
     borderRadius: 8,
     borderColor: Colors.button,
   },
