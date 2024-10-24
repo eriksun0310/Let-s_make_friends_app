@@ -91,10 +91,21 @@ const AuthenticatedStack = () => {
   // 檢查必填項目
   const checkRequired = () => {
     let isRequired = false;
-    if (user.name && user.birthday && user.gender && user.headShot) {
-      isRequired = true;
+    if (user.name && user.birthday && user.gender && user.headShot.imageUrl) {
+      return {
+        isRequired: true,
+        requiredText: "",
+      };
+    } else if (!user.headShot.imageUrl) {
+      return {
+        isRequired: false,
+        requiredText: "請填寫大頭貼",
+      };
     }
-    return isRequired;
+    return {
+      isRequired: isRequired,
+      requiredText: "請填寫必填項目",
+    };
   };
 
   return (
@@ -115,22 +126,17 @@ const AuthenticatedStack = () => {
             <Button
               title="儲存"
               onPress={async () => {
-                const isRequired = checkRequired();
+                const required = checkRequired();
                 // 已必填
-                if (isRequired) {
+                if (required.isRequired) {
                   await saveUserData(user);
                   // 跳轉到地圖頁面
                   navigation.navigate("main", { screen: "chat" });
                 } else {
-                  Alert.alert("請填寫必填項目");
+                  Alert.alert(required.requiredText);
                 }
 
-                // 檢查必填項目
-                // if (user.name) {
-                //   await saveUserData(user);
-                //   // 跳轉到地圖頁面
-                //   navigation.navigate("main", { screen: "chat" });
-                // }
+               
               }}
             />
           ),
