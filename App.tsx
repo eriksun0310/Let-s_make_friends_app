@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -102,21 +101,6 @@ const AuthenticatedStack = () => {
 
       <Stack.Screen
         name="aboutMeSelectOption"
-        options={({ navigation, route }) => ({
-          title: "更多關於我的設定",
-          headerRight: () => (
-            <Button
-              title="儲存"
-              onPress={() => {
-                //步骤 2.点击保存按钮时，route.params?.onSave 被调用，并传递最新的 headShot。
-                if (route.params?.onSave) {
-                  route.params?.onSave(route.params?.selectedOption);
-                }
-                navigation.goBack();
-              }}
-            />
-          ),
-        })}
         component={AboutMeSelectOption}
       />
 

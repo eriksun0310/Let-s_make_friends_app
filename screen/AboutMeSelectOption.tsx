@@ -17,7 +17,6 @@ const tabs: Tabs = {
   dislikedFood: "不喜歡的食物",
 };
 
-
 type RootStackParamList = {
   aboutMe: undefined;
   AboutMeSelectOption: { currentTab: string };
@@ -100,6 +99,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
 
   useEffect(() => {
     navigation.setOptions({
+      title: "更多關於我的設定",
       headerRight: () => <Button title="儲存" onPress={handleSave} />,
     });
   }, [navigation, selectedOption]);
