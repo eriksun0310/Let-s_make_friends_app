@@ -9,7 +9,6 @@ interface SelectedHeadShotProps {
 
 //  編輯大頭貼 上面已選的 大頭貼
 const SelectedHeadShot: React.FC<SelectedHeadShotProps> = ({ headShot }) => {
-  // console.log("headShot", headShot);
   return (
     <View style={styles.avatarContainer}>
       <View style={[styles.avatar]}>

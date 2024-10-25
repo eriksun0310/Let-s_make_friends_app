@@ -14,7 +14,6 @@ const TextLabel: React.FC<TextLabelProps> = ({
   value,
   name,
 }) => {
-  console.log("isEdit", isEdit);
   const navigation = useNavigation();
 
   const [visible, setVisible] = useState(false);

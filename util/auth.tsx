@@ -52,7 +52,6 @@ export const getUserData = async (userId: string) => {
 
 // 儲存用戶資料
 export const saveUserData = async (user: User) => {
-  console.log("saveUserData   user", user);
   set(ref(database, "users/" + user.userId), {
     ...user,
   });
@@ -72,10 +71,7 @@ export const editUserData = async ({
     const updates: Record<string, any> = {};
     updates[fieldName] = fieldValue;
 
-    console.log("updates", updates);
-
     await update(ref(database, "users/" + userId), updates);
-    console.log("User data updated successfully");
   } catch (error) {
     console.error("Error updating user data:", error);
   }
