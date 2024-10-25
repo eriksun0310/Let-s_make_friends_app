@@ -1,0 +1,50 @@
+
+{
+  "12345": {
+    "user": {
+      "userId": "",
+      "name": "",
+      "gender": "female",
+      "introduce": "",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": ""
+    },
+    "post": {
+      "postId1":{
+        "content": "這是第二篇文章內容",
+        "timestamp": "2024-10-25T15:00:00Z",
+        "likes": 0, // 初始的案讚數
+        "comments": {    // 留言資料
+          "commentId1": {
+            "userId": "user678",
+            "content": "這是第一條留言",
+            "timestamp": "2024-10-25T15:10:00Z"
+          },
+          "commentId2": {
+            "userId": "user123",
+            "content": "這是第二條留言",
+            "timestamp": "2024-10-25T15:12:00Z"
+          }
+        },
+        // 發文的圖片(上限10張)
+        "media": [
+          "https://firebasestorage.googleapis.com/path/to/photo1.jpg",
+          "https://firebasestorage.googleapis.com/path/to/photo2.jpg"
+        ]
+      },
+      "postId2": {
+        "content": "這是第二篇文章內容",
+        "timestamp": "2024-10-25T15:00:00Z"
+      }
+    }
+  }
+}

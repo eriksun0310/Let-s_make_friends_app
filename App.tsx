@@ -4,7 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import EditHeadShot from "./screen/EditHeadShot";
-import { MessageCircle, User, Map as MapIcon } from "lucide-react-native";
+import {
+  MessageCircle,
+  User,
+  Map as MapIcon,
+  House,
+} from "lucide-react-native";
 import Chat from "./screen/Chat";
 import Map from "./screen/Map";
 import Personal from "./screen/Personal";
@@ -18,6 +23,7 @@ import store, { RootState, useDispatch } from "./store/store";
 
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
+import Home from "./screen/Home";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -37,17 +43,32 @@ const MainTabNavigator = () => {
             return <MapIcon color={color} size={size} />;
           } else if (route.name === "personal") {
             return <User color={color} size={size} />;
+          } else if (route.name === "home") {
+            return <House color={color} size={size} />;
           }
         },
         tabBarActiveTintColor: "#3D74DB",
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="chat" options={{ title: "聊天室" }} component={Chat} />
-      <Tab.Screen name="map" options={{ title: "地圖" }} component={Map} />
+      <Tab.Screen
+        name="chat"
+        options={{ title: "聊天室", headerTitleAlign: "center" }}
+        component={Chat}
+      />
+      <Tab.Screen
+        name="home"
+        options={{ title: "首頁", headerTitleAlign: "center" }}
+        component={Home}
+      />
+      <Tab.Screen
+        name="map"
+        options={{ title: "地圖", headerTitleAlign: "center" }}
+        component={Map}
+      />
       <Tab.Screen
         name="personal"
-        options={{ title: "個人資料" }}
+        options={{ title: "個人資料", headerTitleAlign: "center" }}
         component={Personal}
       />
     </Tab.Navigator>

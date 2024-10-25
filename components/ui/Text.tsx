@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Snackbar } from "react-native-paper";
+import { Colors } from "../../constants/style";
 interface TextLabelProps {
   isEdit?: boolean;
   label: string;
@@ -38,15 +39,28 @@ const TextLabel: React.FC<TextLabelProps> = ({
       </TouchableOpacity>
 
       <Snackbar
-        style={{ position: "relative", zIndex: 9999, bottom: 100 }}
+        style={{
+          position: "relative",
+          zIndex: 9999,
+          backgroundColor: Colors.snackbar,
+          width: 300,
+          borderRadius: 10,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "auto",
+        }}
         visible={visible}
         onDismiss={() => setVisible(false)}
-        duration={3000}
-        action={{
-          label: "X",
-          onPress: () => setVisible(false),
-        }}
-      >{`${label} 這個項目不能修改!`}</Snackbar>
+        duration={1000}
+        // action={{
+        //   // label: "X",
+        //   textColor:'#fff',
+        //   // onPress: () => setVisible(false),
+        // }}
+      >
+        {`${label} 這個項目不能修改!`}
+      </Snackbar>
     </>
   );
 };
