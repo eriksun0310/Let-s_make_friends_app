@@ -1,6 +1,13 @@
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 
-const Chat = () => {
+const Chat = ({ navigation }) => {
   const chatData = [
     {
       id: "1",
@@ -35,13 +42,22 @@ const Chat = () => {
   ];
 
   const renderChatItem = ({ item }) => (
-    <View style={styles.chatItem}>
+    <TouchableOpacity
+      style={styles.chatItem}
+      onPress={() => {
+        console.log("click ");
+        console.log("item", item);
+        navigation.navigate("chatDetail", { item: item });
+      }}
+    >
+      {/* <View style={styles.chatItem}> */}
       <Image source={{ uri: item.icon }} style={styles.chatIcon} />
       <View style={styles.chatInfo}>
         <Text style={styles.chatName}>{item.name}</Text>
         <Text style={styles.chatMessage}>{item.message}</Text>
       </View>
-    </View>
+      {/* </View> */}
+    </TouchableOpacity>
   );
 
   return (

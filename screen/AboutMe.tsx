@@ -14,7 +14,6 @@ import { checkRequired } from "../shared/funcs";
 import { saveUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
 
-
 interface AboutMeProps {
   navigation: NavigationProp<any>;
 }
@@ -103,6 +102,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
         {/* 性別 */}
         <View style={styles.formContainer}>
           <Input
+            maxLength={10}
             required
             label="名稱"
             value={form.name}

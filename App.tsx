@@ -24,6 +24,7 @@ import store, { RootState, useDispatch } from "./store/store";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
 import Home from "./screen/Home";
+import ChatDetail from "./screen/ChatDetail";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -116,10 +117,19 @@ const AuthenticatedStack = () => {
         name="aboutMe"
         options={{
           title: "關於我",
+          headerLeft: () => null, // 隱藏返回按鈕
         }}
         component={AboutMe}
       />
 
+      <Stack.Screen
+        name="chatDetail"
+        options={{
+          // title: "主畫面",
+          headerShown: false,
+        }}
+        component={ChatDetail}
+      />
       <Stack.Screen
         name="aboutMeSelectOption"
         component={AboutMeSelectOption}

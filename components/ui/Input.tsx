@@ -16,12 +16,14 @@ interface InputProps {
   multiline?: boolean;
   value: string;
   setValue?: (value: string) => void;
+  maxLength?: number;
 }
 const Input: React.FC<InputProps> = ({
   required = false,
+  multiline = false,
   style,
   label,
-  multiline = false,
+  maxLength,
   value,
   setValue,
 }) => {
@@ -38,6 +40,7 @@ const Input: React.FC<InputProps> = ({
         textAlignVertical="top" // 讓文字從頂部開始輸入
         scrollEnabled={true} // 啟用捲動
         numberOfLines={4} // 可以根據需要設置行數，確保能夠捲動
+        maxLength={maxLength}
       />
     </View>
   );
