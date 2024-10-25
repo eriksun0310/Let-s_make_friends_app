@@ -52,21 +52,27 @@ export const getUserData = async (userId: string) => {
 
 // 儲存用戶資料
 export const saveUserData = async (user: User) => {
-  console.log("user", user);
+  console.log("saveUserData   user", user);
   set(ref(database, "users/" + user.userId), {
     ...user,
   });
 };
 
-// 編輯用戶資料
-export const editUserData = async (
-  userId: string,
-  fieldName: string,
-  fieldValue: any
-) => {
+// 編輯用戶資料(for:單一欄位)
+export const editUserData = async ({
+  userId,
+  fieldName,
+  fieldValue,
+}: {
+  userId: string;
+  fieldName: string;
+  fieldValue: any;
+}) => {
   try {
     const updates: Record<string, any> = {};
     updates[fieldName] = fieldValue;
+
+    console.log("updates", updates);
 
     await update(ref(database, "users/" + userId), updates);
     console.log("User data updated successfully");

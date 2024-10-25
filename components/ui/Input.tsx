@@ -12,7 +12,7 @@ import {
 interface InputProps {
   required?: boolean;
   style?: StyleProp<TextStyle>;
-  label: string;
+  label?: string;
   multiline?: boolean;
   value: string;
   setValue?: (value: string) => void;
@@ -28,13 +28,16 @@ const Input: React.FC<InputProps> = ({
   return (
     <View style={styles.inputContainer}>
       <Text style={[required ? styles.required : styles.requiredNone]}>*</Text>
-      <Text style={styles.label}>{label}：</Text>
+      {label && <Text style={styles.label}>{label}：</Text>}
+
       <TextInput
         style={[styles.input, multiline && styles.textArea, style]}
         onChangeText={setValue}
         value={value}
         multiline={multiline} //啟用多行輸入
         textAlignVertical="top" // 讓文字從頂部開始輸入
+        scrollEnabled={true} // 啟用捲動
+        numberOfLines={4} // 可以根據需要設置行數，確保能夠捲動
       />
     </View>
   );
@@ -51,12 +54,14 @@ const styles = StyleSheet.create({
     width: 110,
   },
   textArea: {
-    minHeight: 40,
+    minHeight: 100,
     maxHeight: 120,
+    justifyContent: "flex-start", // 讓文字從頂部開始輸入
   },
   input: {
     height: 40,
-    margin: 13,
+    marginTop: 13,
+    // margin: 13,
     borderWidth: 3,
     padding: 10,
     width: "70%",

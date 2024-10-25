@@ -1,32 +1,52 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Button } from "react-native";
 import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
 import AllHeadShot from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { setUser } from "../store/userSlice";
+import { editUserData } from "../util/auth";
+import { NavigationProp } from "@react-navigation/native";
 
-interface AvatarCreatorProps {}
+interface AvatarCreatorProps {
+  navigation: NavigationProp<any>;
+}
 
 const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
+  const dispatch = useDispatch();
   //從 params 中獲取 headShot、setHeadShot
 
-  const user = useSelector((state:RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.user.user);
 
   const [headShot, setHeadShot] = useState<HeadShot>({
     imageUrl: "",
     imageType: "people",
   });
 
-  //步骤1.每次用户选择新头像时，useEffect 触发，更新 route.params.headShot
-  useEffect(() => {
-    navigation.setParams({ headShot });
-  }, [headShot]);
-
   // 預設選中的大頭貼
   useEffect(() => {
     setHeadShot(user.headShot);
   }, [user]);
+
+  const handleSave = async () => {
+    // 更新回redux
+    dispatch(setUser({ ...user, headShot }));
+    // 更新firebase
+    await editUserData({
+      userId: user.userId,
+      fieldName: "headShot",
+      fieldValue: headShot,
+    });
+    navigation.goBack();
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "編輯大頭貼",
+      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+    });
+  }, [navigation, headShot]);
 
   return (
     <View style={styles.container}>

@@ -1,30 +1,45 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Alert, Button } from "react-native";
 import { Colors } from "../constants/style";
 import HeadShot from "../components/personal/HeadShot";
 import Input from "../components/ui/Input";
-
 import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";
-import { Gender, HeadShot as HeadShotType } from "../shared/types";
+import { Gender, HeadShot as HeadShotType, User } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
-const interestList = ["看劇", "看電影"];
-const foodList = ["日式", "美式"];
+import { useEffect, useState } from "react";
+import { checkRequired } from "../shared/funcs";
+import { saveUserData } from "../util/auth";
+import { NavigationProp } from "@react-navigation/native";
 
-interface From {
-  headShot: HeadShotType;
-  name: string;
-  introduce: string;
-  gender: Gender;
-  birthday: string;
-  age: number;
+
+interface AboutMeProps {
+  navigation: NavigationProp<any>;
 }
 
-const AboutMe = ({ navigation }) => {
+const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
+
+  const [form, setForm] = useState<User>({
+    userId: "",
+    name: "",
+    gender: "female",
+    introduce: "",
+    headShot: {
+      imageUrl: "",
+      imageType: "people",
+    },
+    selectedOption: {
+      interests: [],
+      favoriteFood: [],
+      dislikedFood: [],
+    },
+    birthday: "",
+    email: "",
+  });
 
   //更新form state
   const handleChange = (
@@ -38,50 +53,77 @@ const AboutMe = ({ navigation }) => {
 
       const formattedDate = `${year}-${month}-${day}`;
 
-      dispatch(
-        setUser({
-          birthday: formattedDate,
-        })
-      );
+      setForm((prev) => ({
+        ...prev,
+        birthday: formattedDate,
+      }));
     } else {
-      dispatch(
-        setUser({
-          [name]: value,
-        })
-      );
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
+
+  // 點下 關於我 的儲存 事件
+  const handleSave = async () => {
+    const required = checkRequired(form);
+    if (required.isRequired) {
+      dispatch(setUser(form)); // 更新redux
+      await saveUserData(form); // 更新 firebase
+      navigation.navigate("main", { screen: "chat" });
+    } else {
+      Alert.alert(required.requiredText);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+    });
+  }, [navigation, form]);
+
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        userId: user.userId,
+        selectedOption: user.selectedOption,
+        headShot: user.headShot,
+      }));
+    }
+  }, [user]);
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot navigation={navigation} headShot={user.headShot} />
+        <HeadShot navigation={navigation} headShot={form.headShot} />
 
         {/* 性別 */}
         <View style={styles.formContainer}>
           <Input
             required
             label="名稱"
-            value={user.name}
+            value={form.name}
             setValue={(v) => handleChange("name", v)}
           />
           <Input
             multiline
             label="自我介紹"
-            value={user.introduce}
+            value={form.introduce}
             setValue={(v) => handleChange("introduce", v)}
           />
 
           <GenderButtons
-            value={user.gender}
+            value={form.gender}
             getValue={(v) => {
               handleChange("gender", v as Gender);
             }}
           />
 
           <AgeCalculator
-            defaultValue={user.birthday}
+            defaultValue={form.birthday}
             getValue={(v) => {
               handleChange("birthday", v.birthDate as Date);
             }}
@@ -106,7 +148,6 @@ const styles = StyleSheet.create({
   formContainer: {
     paddingHorizontal: 16,
     display: "flex",
-    // flexDirection: "column",
     justifyContent: "center",
   },
   label: {

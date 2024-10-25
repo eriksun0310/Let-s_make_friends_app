@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Alert, Button } from "react-native";
+import { Button } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import EditHeadShot from "./screen/EditHeadShot";
@@ -16,7 +16,7 @@ import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState, useDispatch } from "./store/store";
-import { saveUserData } from "./util/auth";
+
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
 
@@ -82,32 +82,6 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
-  const user = useSelector((state: RootState) => state.user.user);
-
-  const navigation = useNavigation();
-
-  let isRequired = false;
-
-  // 檢查必填項目
-  const checkRequired = () => {
-    let isRequired = false;
-    if (user.name && user.birthday && user.gender && user.headShot.imageUrl) {
-      return {
-        isRequired: true,
-        requiredText: "",
-      };
-    } else if (!user.headShot.imageUrl) {
-      return {
-        isRequired: false,
-        requiredText: "請填寫大頭貼",
-      };
-    }
-    return {
-      isRequired: isRequired,
-      requiredText: "請填寫必填項目",
-    };
-  };
-
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -122,24 +96,6 @@ const AuthenticatedStack = () => {
         name="aboutMe"
         options={{
           title: "關於我",
-          headerRight: () => (
-            <Button
-              title="儲存"
-              onPress={async () => {
-                const required = checkRequired();
-                // 已必填
-                if (required.isRequired) {
-                  await saveUserData(user);
-                  // 跳轉到地圖頁面
-                  navigation.navigate("main", { screen: "chat" });
-                } else {
-                  Alert.alert(required.requiredText);
-                }
-
-               
-              }}
-            />
-          ),
         }}
         component={AboutMe}
       />
@@ -147,7 +103,7 @@ const AuthenticatedStack = () => {
       <Stack.Screen
         name="aboutMeSelectOption"
         options={({ navigation, route }) => ({
-          title: "關於我興趣的選項",
+          title: "更多關於我的設定",
           headerRight: () => (
             <Button
               title="儲存"
@@ -164,34 +120,9 @@ const AuthenticatedStack = () => {
         component={AboutMeSelectOption}
       />
 
-      <Stack.Screen
-        name="editPersonal"
-        options={{
-          title: "編輯 個人資料",
-          headerShown: false,
-        }}
-        component={EditPersonal}
-      />
+      <Stack.Screen name="editPersonal" component={EditPersonal} />
 
-      <Stack.Screen
-        name="editHeadShot"
-        options={({ navigation, route }) => ({
-          title: "編輯大頭貼",
-          headerRight: () => (
-            <Button
-              title="儲存"
-              onPress={() => {
-                //步骤 2.点击保存按钮时，route.params?.onSave 被调用，并传递最新的 headShot。
-                if (route.params?.onSave) {
-                  route.params?.onSave(route.params?.headShot);
-                }
-                navigation.goBack();
-              }}
-            />
-          ),
-        })}
-        component={EditHeadShot}
-      />
+      <Stack.Screen name="editHeadShot" component={EditHeadShot} />
     </Stack.Navigator>
   );
 };

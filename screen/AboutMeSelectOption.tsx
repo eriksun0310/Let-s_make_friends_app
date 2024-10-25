@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, FlatList, Image, Button } from "react-native";
 import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
@@ -53,6 +53,18 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
       setIndex(index);
     }
   }, [currentTab]);
+
+  const handleSave = async() => {
+    
+  }
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <Button title="儲存" onPress={()=>{
+
+      }} />,
+    });
+  }, [navigation]);
 
   return (
     <View style={styles.screen}>

@@ -2,40 +2,43 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import React from "react";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
-import { HeadShot as HeadShotType } from "../../shared/types";
+import { HeadShot as HeadShotType, User } from "../../shared/types";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/userSlice";
 interface HeadShotProps {
-  name?: string;
+  nameValue?: string;
   navigation: NavigationProp<any>;
   headShot: HeadShotType;
 }
 
-const HeadShot: React.FC<HeadShotProps> = ({ name, navigation, headShot }) => {
-  const dispatch = useDispatch();
-
+const HeadShot: React.FC<HeadShotProps> = ({
+  nameValue,
+  navigation,
+  headShot,
+}) => {
   return (
     <View style={styles.avatarContainer}>
       <TouchableOpacity
         style={styles.option}
-        onPress={() =>
-          navigation.navigate("editHeadShot", {
-            //步骤 3.onSave 函数在 HeadShot 页面中执行，接收 newHeadShot 并更新form状态
-            onSave: (newHeadShot: HeadShotType) => {
-              dispatch(
-                setUser({
-                  headShot: newHeadShot,
-                })
-              );
-            },
-          })
-        }
+        onPress={() => navigation.navigate("editHeadShot")}
       >
         <ShowHeadShot imageUrl={headShot?.imageUrl} />
       </TouchableOpacity>
 
       {/* 名稱 */}
-      {name && <Text style={styles.label}>{name}</Text>}
+      {nameValue && (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("editPersonal", {
+              label: "名稱",
+              defaultValue: nameValue,
+              name: "name",
+            });
+          }}
+        >
+          <Text style={styles.label}>{nameValue}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
