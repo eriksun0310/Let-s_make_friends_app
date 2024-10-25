@@ -1,19 +1,21 @@
 import React from "react";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import { Tab } from "../../shared/types";
 
 interface BorderButtonProps {
+  currentTab: Tab;
   text: string;
   value: string;
   selectedOption: string[];
-  onPress: (v: string) => void;
+  onPress: (v: string, currentTab: Tab) => void;
 }
 
 const BorderButton: React.FC<BorderButtonProps> = ({
+  currentTab,
   text,
   value,
   selectedOption,
   onPress,
-  
 }) => {
   return (
     <View style={styles.container}>
@@ -23,7 +25,7 @@ const BorderButton: React.FC<BorderButtonProps> = ({
           selectedOption?.includes(value) ? styles.active : null,
         ]}
         onPress={() => {
-          onPress(value);
+          onPress(value, currentTab);
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 2, // 外框線
     borderColor: "#ADD8E6", // 黑色的外框線
-    // backgroundColor:'#ADD8E6'
+    
   },
   active: {
     backgroundColor: "#ADD8E6",

@@ -1,23 +1,22 @@
-import { View, Text, StyleSheet, FlatList, Image, Button } from "react-native";
+import { View, StyleSheet, Button } from "react-native";
 import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
 import RenderOption from "../components/aboutMe/RenderOption";
-import { Tabs } from "../shared/types";
+import { SelectedOption, Tabs } from "../shared/types";
 import { Tab as TabType } from "../shared/types";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
+import { setUser } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { editUserData } from "../util/auth";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
   dislikedFood: "不喜歡的食物",
 };
 
-// 假設這是從db拿
-const userDB = {
-  interests: ["reading"],
-  favoriteFood: ["chocolate"],
-};
 
 type RootStackParamList = {
   aboutMe: undefined;
@@ -42,9 +41,42 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   navigation,
   route,
 }) => {
+  const user = useSelector((state: RootState) => state.user.user);
+  const dispatch = useDispatch();
   const { currentTab } = route.params;
 
+  const [selectedOption, setSelectedOption] = useState<SelectedOption>({});
+
   const [index, setIndex] = useState(0);
+
+  // 點擊每個選項的事件
+  const onPress = (v: string, currentTab: TabType) => {
+    if (!selectedOption[currentTab]) {
+      setSelectedOption((prev) => ({
+        ...prev,
+        [currentTab]: [v],
+      }));
+
+      // 已經存在 tab
+    } else {
+      const existingValues = selectedOption[currentTab];
+
+      // 已經存在的選項,移除
+      if (existingValues.includes(v)) {
+        setSelectedOption((prev) => ({
+          ...prev,
+          [currentTab]: existingValues.filter((option) => option !== v),
+        }));
+
+        // 沒有存在的選項，新增
+      } else {
+        setSelectedOption((prev) => ({
+          ...prev,
+          [currentTab]: [...existingValues, v],
+        }));
+      }
+    }
+  };
 
   // 當前選的tab
   useEffect(() => {
@@ -54,17 +86,31 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
     }
   }, [currentTab]);
 
-  const handleSave = async() => {
-    
-  }
+  const handleSave = async () => {
+    // 更新回redux
+    dispatch(setUser({ ...user, selectedOption }));
+    // 更新firebase
+    await editUserData({
+      userId: user.userId,
+      fieldName: "selectedOption",
+      fieldValue: selectedOption,
+    });
+    navigation.goBack();
+  };
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button title="儲存" onPress={()=>{
-
-      }} />,
+      headerRight: () => <Button title="儲存" onPress={handleSave} />,
     });
-  }, [navigation]);
+  }, [navigation, selectedOption]);
+
+  // 預設值
+  useEffect(() => {
+    setSelectedOption((prev) => ({
+      ...prev,
+      ...user.selectedOption,
+    }));
+  }, [user]);
 
   return (
     <View style={styles.screen}>
@@ -98,7 +144,11 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
       <TabView value={index} onChange={setIndex} animationType="spring">
         {Object.keys(tabs)?.map((key) => (
           <TabView.Item key={key}>
-            <RenderOption currentTab={key as TabType} />
+            <RenderOption
+              currentTab={key as TabType}
+              selectedOption={selectedOption}
+              onPress={onPress}
+            />
           </TabView.Item>
         ))}
       </TabView>

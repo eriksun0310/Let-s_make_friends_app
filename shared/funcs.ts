@@ -1,5 +1,4 @@
 import { User } from "./types";
-
 // 計算年齡的函數
 export const calculateAge = (date: Date | string) => {
   const today = new Date();
