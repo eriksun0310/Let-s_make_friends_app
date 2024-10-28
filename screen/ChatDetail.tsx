@@ -49,12 +49,12 @@ const ChatDetail = ({ route, navigation }) => {
           </TouchableOpacity>
           <Image source={{ uri: item.icon }} style={styles.avatar} />
           <Text style={styles.headerTitle}>{item.name}</Text>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Ionicons name="call" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </TouchableOpacity> */}
+          {/* <TouchableOpacity>
             <Ionicons name="menu" size={24} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <FlatList
           data={messages}
@@ -72,12 +72,12 @@ const ChatDetail = ({ route, navigation }) => {
             onChangeText={setInputText}
             placeholder="輸入訊息..."
           />
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Ionicons name="happy" size={24} color="gray" />
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </TouchableOpacity> */}
+          {/* <TouchableOpacity>
             <Ionicons name="mic" size={24} color="gray" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
