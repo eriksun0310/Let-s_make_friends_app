@@ -9,9 +9,10 @@ import {
   User,
   Map as MapIcon,
   House,
+  UserRound,
+  UserRoundPlus,
 } from "lucide-react-native";
 import Chat from "./screen/Chat";
-import Map from "./screen/Map";
 import Personal from "./screen/Personal";
 import Login from "./screen/Login";
 import Register from "./screen/Register";
@@ -25,6 +26,7 @@ import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
 import Home from "./screen/Home";
 import ChatDetail from "./screen/ChatDetail";
+import AddFriend from "./screen/AddFriend";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -40,10 +42,10 @@ const MainTabNavigator = () => {
         tabBarIcon: ({ color, size }) => {
           if (route.name === "chat") {
             return <MessageCircle color={color} size={size} />;
-          } else if (route.name === "map") {
-            return <MapIcon color={color} size={size} />;
+          } else if (route.name === "addFriend") {
+            return <UserRoundPlus color={color} size={size} />;
           } else if (route.name === "personal") {
-            return <User color={color} size={size} />;
+            return <UserRound color={color} size={size} />;
           } else if (route.name === "home") {
             return <House color={color} size={size} />;
           }
@@ -63,9 +65,9 @@ const MainTabNavigator = () => {
         component={Home}
       />
       <Tab.Screen
-        name="map"
-        options={{ title: "地圖", headerTitleAlign: "center" }}
-        component={Map}
+        name="addFriend"
+        options={{ title: "加好友", headerTitleAlign: "center" }}
+        component={AddFriend}
       />
       <Tab.Screen
         name="personal"

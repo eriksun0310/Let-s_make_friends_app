@@ -1,0 +1,84 @@
+{
+  "users": {
+    "123": {
+      "user": {
+        "userId": "123",
+        "name": "",
+        "gender": "female",
+        "introduce": "",
+        "headShot": {
+          "imageUrl": "",
+          "imageType": "people"
+        },
+        "selectedOption": {
+          "interests": [],
+          "favoriteFood": [],
+          "dislikedFood": []
+        },
+        "birthday": "",
+        "email": ""
+      }
+    }
+  },
+  "posts": {
+    "$postId": {
+      "authorId": "123",
+      "content": "貼文內容",
+      "createdAt": 1635724800000,
+      "updatedAt": 1635724800000,
+      "privacy": "public", // "public" or "friends-only"
+      "images": {
+        "image1": {
+          "url": "image_url_1",
+          "order": 1
+        }
+        // 最多6張圖片
+      },
+      "likeCount": 0,
+      "commentCount": 0
+    }
+  },
+  //用於快速查詢特定隱私級別的貼文
+  "post-privacy": {
+    "public": {
+      "$postId": true
+    },
+    "friends-only": {
+      "$postId": true
+    }
+  },
+  // 用於快速查詢特定用戶的所有貼文
+  "user-posts": {
+    "123": {
+      "$postId": true
+    }
+  },
+  //記錄每個貼文的讚
+  "post-likes": {
+    "$postId": {
+      "$userId": true
+    }
+  },
+  // 記錄用戶按過讚的貼文
+  "user-likes": {
+    "123": {
+      "$postId": true
+    }
+  },
+  //存儲貼文的留言
+  "post-comments": {
+    "$postId": {
+      "$commentId": {
+        "authorId": "123",
+        "content": "留言內容",
+        "createdAt": 1635724800000,
+        "updatedAt": 1635724800000
+      }
+    }
+  },
+  "user-friends": {
+    "123": {
+      "$friendId": true
+    }
+  }
+}

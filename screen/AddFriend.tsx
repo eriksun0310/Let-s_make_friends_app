@@ -1,17 +1,17 @@
 import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 
-const Map = () => {
+const AddFriend = () => {
   return (
     <View style={styles.screen}>
-      <Text>地圖</Text>
+      <Text></Text>
     </View>
   );
 };
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
   },
 });
 
-export default Map;
+export default AddFriend;
