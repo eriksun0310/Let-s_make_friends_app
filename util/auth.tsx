@@ -10,16 +10,7 @@ import {
   ref as storageRef,
   uploadBytes,
 } from "firebase/storage";
-export const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASEURL,
-  projectId: process.env.PROJECTID,
-  storageBucket: process.env.STORAGEBUCKET,
-  messagingSenderId: process.env.MESSAGINGSENDERID,
-};
 
-const API_KEY = process.env.API_KEY;
 
 // 會員註冊
 export const createUser = async (email: string, password: string) => {

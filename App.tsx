@@ -164,6 +164,7 @@ const Navigation = () => {
   return (
     <NavigationContainer>
       {/* <AuthenticatedStack /> */}
+      {/* <></> */}
       {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
     </NavigationContainer>
   );
