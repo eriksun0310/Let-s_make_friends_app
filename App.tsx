@@ -27,6 +27,8 @@ import { initializeAuth } from "./store/userSlice";
 import Home from "./screen/Home";
 import ChatDetail from "./screen/ChatDetail";
 import AddFriend from "./screen/AddFriend";
+import FriendList from "./screen/FriendList";
+import FriendInvitation from "./screen/FriendInvitation";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -140,6 +142,10 @@ const AuthenticatedStack = () => {
       <Stack.Screen name="editPersonal" component={EditPersonal} />
 
       <Stack.Screen name="editHeadShot" component={EditHeadShot} />
+      {/* 好友列表*/}
+      <Stack.Screen name="FriendList" component={FriendList} />
+      {/* 交友邀請*/}
+      <Stack.Screen name="friendInvitation" component={FriendInvitation} />
     </Stack.Navigator>
   );
 };

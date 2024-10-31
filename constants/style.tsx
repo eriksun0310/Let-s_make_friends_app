@@ -6,4 +6,5 @@ export const Colors = {
   snackbar: "#ee6565",
   textBlue: "#3D74DB",
   text: "#000",
+  icon: "#939393",
 };
