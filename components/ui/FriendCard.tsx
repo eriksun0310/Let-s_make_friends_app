@@ -3,6 +3,7 @@ import React from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Card, Text, Avatar, Icon } from "react-native-elements";
 import { Colors } from "../../constants/style";
+import { calculateAge, getZodiacSign } from "../../shared/funcs";
 
 interface FriendCardProps {
   mode: "add" | "confirm";
@@ -16,7 +17,10 @@ interface FriendCardProps {
 const FriendCard: React.FC<FriendCardProps> = ({ mode, index, friend }) => {
   return (
     <Card key={index} containerStyle={styles.card}>
-      <TouchableOpacity style={styles.closeButton}>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => console.log("close")}
+      >
         <X color={Colors.icon} />
       </TouchableOpacity>
 
@@ -28,11 +32,10 @@ const FriendCard: React.FC<FriendCardProps> = ({ mode, index, friend }) => {
       />
 
       <Card.Title>{friend.name}</Card.Title>
-      <Text style={styles.info}>自我介紹</Text>
-      <Text style={styles.info}>生日: {friend.birthDate}</Text>
-      <Text style={styles.info}>年齡: {friend.age}</Text>
-      <Text style={styles.info}>興趣</Text>
 
+      <Text style={styles.info}>年齡: {calculateAge(friend.birthDate)}</Text>
+      <Text style={styles.info}>星座: {getZodiacSign(friend.birthDate)}</Text>
+      {/* <Text style={styles.info}>生日: {friend.birthDate}</Text> */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.actionButton}>
           <Search color={Colors.icon} />
@@ -58,8 +61,8 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: "absolute",
-    right: 8,
-    top: 8,
+    right: -8,
+    top: -8,
     zIndex: 1,
   },
   closeButtonText: {
@@ -84,9 +87,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   actionButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 8,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
+    width: "50%",
   },
 });
 export default FriendCard;

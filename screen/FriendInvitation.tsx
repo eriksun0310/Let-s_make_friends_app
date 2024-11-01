@@ -10,8 +10,14 @@ const FriendInvitation = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "交友邀請",
+      headerTitleAlign: "center",
       headerLeft: () => (
-        <ChevronLeft color={Colors.icon} onPress={() => navigation.goBack()} />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.headerIcon}
+        >
+          <ChevronLeft size={30} color={Colors.icon} />
+        </TouchableOpacity>
       ),
     });
   }, [navigation]);
@@ -33,13 +39,16 @@ const FriendInvitation = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#e6f3ff",
+    backgroundColor: Colors.background,
   },
   scrollContainer: {
     padding: 8,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+  },
+  headerIcon: {
+    marginHorizontal: 10,
   },
 });
 

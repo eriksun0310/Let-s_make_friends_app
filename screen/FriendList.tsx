@@ -1,16 +1,9 @@
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 import { useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Colors } from "../constants/style";
-import { Avatar } from "react-native-elements";
+
+import FriendItem from "../components/ui/FriendItem";
 // 堆疊頁面
 
 export const friendList = Array(34).fill({
@@ -21,8 +14,15 @@ const FriendList = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "好友列表",
+      headerTitleAlign: "center",
+
       headerLeft: () => (
-        <ChevronLeft color={Colors.icon} onPress={() => navigation.goBack()} />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.headerIcon}
+        >
+          <ChevronLeft size={30} color={Colors.icon} />
+        </TouchableOpacity>
       ),
     });
   }, [navigation]);
@@ -30,46 +30,7 @@ const FriendList = ({ navigation }) => {
     <View style={styles.screen}>
       <ScrollView>
         {friendList?.map((friend, index) => (
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: "#fff",
-              margin: 8,
-              height: 100,
-              padding: 12,
-            }}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Avatar
-                rounded
-                size="medium"
-                source={require("../assets/animal/ostrich.png")}
-              />
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 20,
-                  paddingLeft: 10,
-                  color: "#666",
-                }}
-              >
-                {friend.name}
-              </Text>
-            </View>
-
-            <TouchableOpacity style={styles.icon}>
-              <ChevronRight color={Colors.icon} />
-            </TouchableOpacity>
-          </View>
+          <FriendItem key={index} friend={friend} />
         ))}
       </ScrollView>
     </View>
@@ -78,11 +39,10 @@ const FriendList = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#e6f3ff",
+    backgroundColor: Colors.background,
   },
-  icon: {
-    fontSize: 24,
-    color: "#666",
+  headerIcon: {
+    marginHorizontal: 10,
   },
 });
 

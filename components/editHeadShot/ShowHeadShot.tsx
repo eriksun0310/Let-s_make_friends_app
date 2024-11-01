@@ -1,6 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { NavigationProp } from "@react-navigation/native";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { View, StyleSheet, Image } from "react-native";
 import React from "react";
 import Feather from "@expo/vector-icons/Feather";
 const ShowHeadShot = ({ imageUrl }: { imageUrl: any }) => {

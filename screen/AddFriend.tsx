@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { Card, Text, Avatar, Icon } from "react-native-elements";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { BellRing, Search, UserRoundPlus, Users, X } from "lucide-react-native";
+import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 
-export const friendCards = Array(4).fill({
+export const friendCards = Array(14).fill({
   name: "海鴨",
-  birthDate: "2000-01-01",
+  birthDate: "2000-03-10",
   age: 24,
 });
 //加好友
@@ -17,18 +14,20 @@ const AddFriend = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <Users
-          style={styles.headerIcon}
-          color={Colors.icon}
+        <TouchableOpacity
           onPress={() => navigation.navigate("FriendList")}
-        />
+          style={styles.headerIcon}
+        >
+          <Users color={Colors.icon} size={25} />
+        </TouchableOpacity>
       ),
       headerRight: () => (
-        <BellRing
-          style={styles.headerIcon}
-          color={Colors.icon}
+        <TouchableOpacity
           onPress={() => navigation.navigate("friendInvitation")}
-        />
+          style={styles.headerIcon}
+        >
+          <BellRing color={Colors.icon} size={25} />
+        </TouchableOpacity>
       ),
     });
   }, [navigation]);
@@ -46,7 +45,7 @@ const AddFriend = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#e6f3ff",
+    backgroundColor: Colors.background,
   },
   scrollContainer: {
     padding: 8,
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerIcon: {
-    marginHorizontal: 10,
+    marginHorizontal: 15,
   },
 });
 

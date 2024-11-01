@@ -121,6 +121,7 @@ const AuthenticatedStack = () => {
         name="aboutMe"
         options={{
           title: "關於我",
+
           headerLeft: () => null, // 隱藏返回按鈕
         }}
         component={AboutMe}
