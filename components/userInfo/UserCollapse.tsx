@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
 
 //TODO: 要傳入user value 個人資料清單
-const ProfileList = () => {
+const UserCollapse = () => {
   const [expanded, setExpanded] = useState(false);
   return (
     <ListItem.Accordion
@@ -54,4 +54,4 @@ const ProfileList = () => {
   );
 };
 
-export default ProfileList;
+export default UserCollapse;

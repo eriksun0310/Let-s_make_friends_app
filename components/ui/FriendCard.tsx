@@ -1,20 +1,36 @@
 import { Search, UserRoundCheck, UserRoundPlus, X } from "lucide-react-native";
 import React from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { Card, Text, Avatar, Icon } from "react-native-elements";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { Card, Text, Avatar } from "react-native-elements";
 import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
+import { NavigationProp } from "@react-navigation/native";
+import { FriendState } from "../../shared/types";
 
 interface FriendCardProps {
-  mode: "add" | "confirm";
+  friendState: FriendState;
   index: number;
   friend: {
     name: string;
     birthDate: string;
     age: number;
   };
+  navigation: NavigationProp<any>;
 }
-const FriendCard: React.FC<FriendCardProps> = ({ mode, index, friend }) => {
+const FriendCard: React.FC<FriendCardProps> = ({
+  friendState,
+  index,
+  friend,
+  navigation,
+}) => {
+  // 點擊 好友資訊
+  const clickSearch = () => {
+    navigation.navigate?.("userInfoFriend", { mode: "friend" });
+  };
+  //點擊 加好友
+  const clickAddFriend = () => {};
+  //點擊 好友確認
+  const clickCheckFriend = () => {};
   return (
     <Card key={index} containerStyle={styles.card}>
       <TouchableOpacity
@@ -35,13 +51,21 @@ const FriendCard: React.FC<FriendCardProps> = ({ mode, index, friend }) => {
 
       <Text style={styles.info}>年齡: {calculateAge(friend.birthDate)}</Text>
       <Text style={styles.info}>星座: {getZodiacSign(friend.birthDate)}</Text>
-      {/* <Text style={styles.info}>生日: {friend.birthDate}</Text> */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={clickSearch}>
           <Search color={Colors.icon} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          {mode === "add" ? (
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            if (friendState === "add") {
+              clickAddFriend();
+            } else {
+              clickCheckFriend();
+            }
+          }}
+        >
+          {friendState === "add" ? (
             <UserRoundPlus color={Colors.icon} />
           ) : (
             <UserRoundCheck color={Colors.icon} />

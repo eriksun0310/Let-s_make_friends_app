@@ -28,7 +28,7 @@ const Home = () => {
   return (
     <View style={styles.screen}>
       <PaperProvider>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView>
           {postList?.map((post) => (
             <Post date={post.date} user={user} />
           ))}
@@ -61,11 +61,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  scrollContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
   },
 });
 

@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView, Alert, Button } from "react-native";
 import { Colors } from "../constants/style";
-import HeadShot from "../components/personal/HeadShot";
+import HeadShot from "../components/userInfo/HeadShot";
 import Input from "../components/ui/Input";
 import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";

@@ -4,13 +4,18 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Colors } from "../constants/style";
 
 import FriendItem from "../components/ui/FriendItem";
+import { NavigationProp } from "@react-navigation/native";
 // 堆疊頁面
 
 export const friendList = Array(34).fill({
   name: "海鴨",
 });
+
+interface FriendListProps {
+  navigation: NavigationProp<any>;
+}
 //好友列表
-const FriendList = ({ navigation }) => {
+const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "好友列表",
@@ -30,7 +35,7 @@ const FriendList = ({ navigation }) => {
     <View style={styles.screen}>
       <ScrollView>
         {friendList?.map((friend, index) => (
-          <FriendItem key={index} friend={friend} />
+          <FriendItem key={index} friend={friend} navigation={navigation} />
         ))}
       </ScrollView>
     </View>

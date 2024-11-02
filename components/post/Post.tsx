@@ -6,12 +6,26 @@ import {
   TouchableOpacity,
   Text,
   Image,
+  Button,
 } from "react-native";
 
 import { Menu } from "react-native-paper";
 import { EllipsisVertical } from "lucide-react-native";
 import { Colors } from "../../constants/style";
-const Post = ({ date, user }) => {
+import { UserInfoMode } from "../../shared/types";
+
+interface PostProps {
+  mode: UserInfoMode;
+  date: string;
+  user: {
+    name: string;
+    headShot: {
+      imageUrl: any;
+    };
+  };
+}
+const Post: React.FC<PostProps> = ({ mode, date, user }) => {
+  // 點擊...選單
   const [menuVisible, setMenuVisible] = useState(false);
   return (
     <View style={styles.articleContainer}>
@@ -24,19 +38,21 @@ const Post = ({ date, user }) => {
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.articleDate}>{date}</Text>
         </View>
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          // anchor={<Button onPress={() => setMenuVisible(true)}>⋮</Button>}
-          anchor={
-            <TouchableOpacity>
-              <EllipsisVertical color={Colors.icon} />
-            </TouchableOpacity>
-          }
-        >
-          <Menu.Item onPress={() => {}} title="編輯" />
-          <Menu.Item onPress={() => {}} title="刪除" />
-        </Menu>
+        {mode === "personal" && (
+          <Menu
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            // anchor={<Button onPress={() => setMenuVisible(true)}>⋮</Button>}
+            anchor={
+              <TouchableOpacity onPress={() => setMenuVisible(true)}>
+                <EllipsisVertical color={Colors.icon} />
+              </TouchableOpacity>
+            }
+          >
+            <Menu.Item onPress={() => {}} title="編輯" />
+            <Menu.Item onPress={() => {}} title="刪除" />
+          </Menu>
+        )}
       </View>
       <Text style={styles.articleContent}>這是我的第一篇文章</Text>
     </View>

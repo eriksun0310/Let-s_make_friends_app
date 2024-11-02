@@ -56,3 +56,7 @@ export type User = {
   birthday: string;
   email: string;
 };
+
+export type UserInfoMode = "personal" | "friend";
+
+export type FriendState = "add" | "confirm";

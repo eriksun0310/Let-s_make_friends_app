@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
-import HeadShot from "../components/personal/HeadShot";
+import HeadShot from "../components/userInfo/HeadShot";
 import Button from "../components/ui/Button";
 import TextLabel from "../components/ui/Text";
 import { RootState, useDispatch } from "../store/store";

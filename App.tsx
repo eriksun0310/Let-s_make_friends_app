@@ -6,14 +6,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import EditHeadShot from "./screen/EditHeadShot";
 import {
   MessageCircle,
-  User,
-  Map as MapIcon,
   House,
   UserRound,
   UserRoundPlus,
 } from "lucide-react-native";
 import Chat from "./screen/Chat";
-import Personal from "./screen/Personal";
 import Login from "./screen/Login";
 import Register from "./screen/Register";
 import AboutMe from "./screen/AboutMe";
@@ -21,7 +18,6 @@ import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState, useDispatch } from "./store/store";
-
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
 import Home from "./screen/Home";
@@ -29,6 +25,7 @@ import ChatDetail from "./screen/ChatDetail";
 import AddFriend from "./screen/AddFriend";
 import FriendList from "./screen/FriendList";
 import FriendInvitation from "./screen/FriendInvitation";
+import UserInfo from "./screen/UserInfo";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -46,7 +43,7 @@ const MainTabNavigator = () => {
             return <MessageCircle color={color} size={size} />;
           } else if (route.name === "addFriend") {
             return <UserRoundPlus color={color} size={size} />;
-          } else if (route.name === "personal") {
+          } else if (route.name === "userInfoPersonal") {
             return <UserRound color={color} size={size} />;
           } else if (route.name === "home") {
             return <House color={color} size={size} />;
@@ -71,10 +68,14 @@ const MainTabNavigator = () => {
         options={{ title: "加好友", headerTitleAlign: "center" }}
         component={AddFriend}
       />
+
       <Tab.Screen
-        name="personal"
-        options={{ title: "個人資料", headerTitleAlign: "center" }}
-        component={Personal}
+        name="userInfoPersonal"
+        options={({ route }) => ({
+          title: "個人資料",
+          mode: "personal",
+        })}
+        component={UserInfo}
       />
     </Tab.Navigator>
   );
@@ -147,6 +148,15 @@ const AuthenticatedStack = () => {
       <Stack.Screen name="FriendList" component={FriendList} />
       {/* 交友邀請*/}
       <Stack.Screen name="friendInvitation" component={FriendInvitation} />
+      {/* 用戶資訊 */}
+      <Stack.Screen
+        name="userInfoFriend"
+        options={({ route }) => ({
+          title: "好友資料",
+          mode: "friend",
+        })}
+        component={UserInfo}
+      />
     </Stack.Navigator>
   );
 };

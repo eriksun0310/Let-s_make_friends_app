@@ -4,9 +4,14 @@ import { useEffect } from "react";
 import { friendCards } from "./AddFriend";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
+import { NavigationProp } from "@react-navigation/native";
+
+interface FriendInvitationProps {
+  navigation: NavigationProp<any>;
+}
 
 //交友邀請
-const FriendInvitation = ({ navigation }) => {
+const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "交友邀請",
@@ -26,10 +31,11 @@ const FriendInvitation = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {friendCards.map((friend, index) => (
           <FriendCard
-            mode="confirm"
+            friendState="confirm"
             key={index}
             index={index}
             friend={friend}
+            navigation={navigation}
           />
         ))}
       </ScrollView>
