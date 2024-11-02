@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { Colors } from "../constants/style";
 
-// const postList = ["2024/08/02"];
+
 
 export const postList = Array(14).fill({
   date: "2024/08/02",
@@ -30,7 +30,7 @@ const Home = () => {
       <PaperProvider>
         <ScrollView>
           {postList?.map((post) => (
-            <Post date={post.date} user={user} />
+            <Post mode='personal' date={post.date} user={user} />
           ))}
         </ScrollView>
         <Portal>

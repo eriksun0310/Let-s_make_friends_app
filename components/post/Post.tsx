@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  Image,
-  Button,
-} from "react-native";
-
+import { View, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import { Menu } from "react-native-paper";
 import { EllipsisVertical } from "lucide-react-native";
 import { Colors } from "../../constants/style";
@@ -25,37 +16,58 @@ interface PostProps {
   };
 }
 const Post: React.FC<PostProps> = ({ mode, date, user }) => {
-  // 點擊...選單
   const [menuVisible, setMenuVisible] = useState(false);
+
+  const showMenu = (event: any) => {
+    setMenuVisible(true);
+  };
+
   return (
-    <View style={styles.articleContainer}>
-      <View style={styles.articleHeader}>
-        <View style={styles.userInfo}>
-          <Image
-            source={user.headShot?.imageUrl}
-            style={styles.articleAvatar}
-          />
-          <Text style={styles.userName}>{user.name}</Text>
-          <Text style={styles.articleDate}>{date}</Text>
+    <TouchableOpacity onPress={() => {}}>
+      <View style={styles.articleContainer}>
+        <View style={styles.articleHeader}>
+          <View style={styles.userInfo}>
+            <Image
+              source={user.headShot?.imageUrl}
+              style={styles.articleAvatar}
+            />
+            <Text style={styles.userName}>{user.name}</Text>
+            <Text style={styles.articleDate}>{date}</Text>
+          </View>
+          {mode === "personal" && (
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <TouchableOpacity onPress={showMenu} style={styles.menuButton}>
+                  <EllipsisVertical color={Colors.icon} />
+                </TouchableOpacity>
+              }
+              contentStyle={[styles.menuContent, { marginTop: -56 }]} // 調整選單位置
+            >
+              <Menu.Item
+                onPress={() => {}}
+                title="編輯"
+                style={{
+                  marginHorizontal: 10,
+
+                  height: 30,
+                }}
+              />
+              <Menu.Item
+                onPress={() => {}}
+                title="刪除"
+                style={{
+                  marginHorizontal: 10,
+                }}
+                titleStyle={{ color: "#ff0000" }}
+              />
+            </Menu>
+          )}
         </View>
-        {mode === "personal" && (
-          <Menu
-            visible={menuVisible}
-            onDismiss={() => setMenuVisible(false)}
-            // anchor={<Button onPress={() => setMenuVisible(true)}>⋮</Button>}
-            anchor={
-              <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                <EllipsisVertical color={Colors.icon} />
-              </TouchableOpacity>
-            }
-          >
-            <Menu.Item onPress={() => {}} title="編輯" />
-            <Menu.Item onPress={() => {}} title="刪除" />
-          </Menu>
-        )}
+        <Text style={styles.articleContent}>這是我的第一篇文章</Text>
       </View>
-      <Text style={styles.articleContent}>這是我的第一篇文章</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -92,5 +104,22 @@ const styles = StyleSheet.create({
   articleContent: {
     marginTop: 10,
   },
+  menuButton: {
+    padding: 8,
+  },
+  menuContent: {
+    backgroundColor: "#fff",
+    elevation: 8,
+    width: 90,
+    height: 85,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
 });
+
 export default Post;

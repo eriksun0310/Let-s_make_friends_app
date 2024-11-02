@@ -13,11 +13,16 @@ import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
 import { UserInfoMode } from "../shared/types";
+import { PaperProvider } from "react-native-paper";
 
 interface UserInfoProps {
   route: { params: { mode: UserInfoMode } };
   navigation: NavigationProp<any>;
 }
+
+export const postList = Array(14).fill({
+  date: "2024/08/02",
+});
 
 // TODO: user 資料要用傳的
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
@@ -51,48 +56,49 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 大頭貼 */}
-        <HeadShot
-          nameValue={user.name}
-          navigation={navigation}
-          headShot={user.headShot}
-        />
+    <PaperProvider>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* 大頭貼 */}
+          <HeadShot
+            nameValue={user.name}
+            navigation={navigation}
+            headShot={user.headShot}
+          />
 
-        <UserCollapse />
-        <View
-          style={{
-            marginTop: 10,
-          }}
-        />
+          <UserCollapse />
+          <View
+            style={{
+              marginTop: 10,
+            }}
+          />
 
-        {mode === "personal" && <PostPermissionsSettings />}
+          {mode === "personal" && <PostPermissionsSettings />}
 
-        <View
-          style={{
-            marginTop: 10,
-          }}
-        />
+          <View
+            style={{
+              marginTop: 10,
+            }}
+          />
 
-        <Post mode={mode} date="2024/08/02" user={user} />
-        <Post mode={mode} date="2024/08/02" user={user} />
+          {postList?.map((post) => (
+            <Post mode={mode} date={post.date} user={user} />
+          ))}
 
-        <Post mode={mode} date="2024/08/02" user={user} />
-
-        {mode === "personal" && (
-          <View style={styles.formContainer1}>
-            <Button
-              style={{
-                width: "50%",
-              }}
-              text="登出"
-              onPress={handleLogout}
-            />
-          </View>
-        )}
-      </ScrollView>
-    </View>
+          {mode === "personal" && (
+            <View style={styles.formContainer1}>
+              <Button
+                style={{
+                  width: "50%",
+                }}
+                text="登出"
+                onPress={handleLogout}
+              />
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    </PaperProvider>
   );
 };
 
@@ -100,6 +106,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    // position: "relative",
+    // zIndex: 1,
   },
   scrollContent: {
     flexGrow: 1,
