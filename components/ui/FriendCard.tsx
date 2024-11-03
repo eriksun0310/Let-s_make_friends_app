@@ -1,12 +1,12 @@
 import { Search, UserRoundCheck, UserRoundPlus, X } from "lucide-react-native";
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Card, Text, Avatar } from "react-native-elements";
 import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendState } from "../../shared/types";
-
+import CustomIcon from "./CustomIcon";
+import { Text, Card, Avatar } from "@rneui/themed";
 interface FriendCardProps {
   friendState: FriendState;
   index: number;
@@ -33,12 +33,12 @@ const FriendCard: React.FC<FriendCardProps> = ({
   const clickCheckFriend = () => {};
   return (
     <Card key={index} containerStyle={styles.card}>
-      <TouchableOpacity
+      <CustomIcon
         style={styles.closeButton}
         onPress={() => console.log("close")}
       >
         <X color={Colors.icon} />
-      </TouchableOpacity>
+      </CustomIcon>
 
       <Avatar
         rounded
@@ -79,9 +79,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     width: "40%",
-    // marginBottom: 16,
+
     borderRadius: 12,
-    // padding: 12,
   },
   closeButton: {
     position: "absolute",

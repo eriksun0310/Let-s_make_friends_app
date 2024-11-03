@@ -6,17 +6,17 @@ import Button from "../components/ui/Button";
 import { RootState, useDispatch } from "../store/store";
 import { logout } from "../store/userSlice";
 import { useSelector } from "react-redux";
-import { ChevronLeft } from "lucide-react-native";
 import { Colors } from "../constants/style";
 
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
-import { UserInfoMode } from "../shared/types";
+import { UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
+import BackButton from "../components/ui/BackButton";
 
 interface UserInfoProps {
-  route: { params: { mode: UserInfoMode } };
+  route: { params: { mode: UserState } };
   navigation: NavigationProp<any>;
 }
 
@@ -42,14 +42,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       headerTitleAlign: "center",
       headerLeft: () => {
         if (mode === "friend") {
-          return (
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.headerIcon}
-            >
-              <ChevronLeft size={30} color={Colors.icon} />
-            </TouchableOpacity>
-          );
+          return <BackButton navigation={navigation} />;
         } else return null;
       },
     });
@@ -82,7 +75,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           />
 
           {postList?.map((post) => (
-            <Post mode={mode} date={post.date} user={user} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("postContent")}
+            >
+              <Post mode="personal" date={post.date} user={user} />
+            </TouchableOpacity>
           ))}
 
           {mode === "personal" && (
@@ -114,7 +111,7 @@ const styles = StyleSheet.create({
   },
   formContainer1: {
     display: "flex",
-    marginTop: 100,
+    marginVertical: 30,
     alignItems: "center",
   },
   formContainer: {
@@ -160,9 +157,6 @@ const styles = StyleSheet.create({
   },
   articleContent: {
     marginTop: 10,
-  },
-  headerIcon: {
-    marginHorizontal: 10,
   },
 });
 

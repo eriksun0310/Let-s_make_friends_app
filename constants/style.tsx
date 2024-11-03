@@ -9,4 +9,5 @@ export const Colors = {
   text: "#000",
   icon: "#939393",
   textGrey: "#808080",
+  iconBlue:'#66b2ff'
 };

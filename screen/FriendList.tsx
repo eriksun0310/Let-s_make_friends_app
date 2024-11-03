@@ -1,10 +1,10 @@
-import { ChevronLeft } from "lucide-react-native";
 import { useEffect } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { Colors } from "../constants/style";
 
 import FriendItem from "../components/ui/FriendItem";
 import { NavigationProp } from "@react-navigation/native";
+import BackButton from "../components/ui/BackButton";
 // 堆疊頁面
 
 export const friendList = Array(34).fill({
@@ -20,15 +20,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     navigation.setOptions({
       title: "好友列表",
       headerTitleAlign: "center",
-
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.headerIcon}
-        >
-          <ChevronLeft size={30} color={Colors.icon} />
-        </TouchableOpacity>
-      ),
+      headerLeft: () => <BackButton navigation={navigation} />,
     });
   }, [navigation]);
   return (

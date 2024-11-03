@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
-import { Menu } from "react-native-paper";
-import { EllipsisVertical } from "lucide-react-native";
-import { Colors } from "../../constants/style";
-import { UserInfoMode } from "../../shared/types";
-
+import React from "react";
+import { View, StyleSheet, Text } from "react-native";
+import { UserState } from "../../shared/types";
+import { NavigationProp } from "@react-navigation/native";
+import CustomMenu from "../ui/CustomMenu";
+import { Card, Avatar, Icon } from "@rneui/themed";
 interface PostProps {
-  mode: UserInfoMode;
+  mode: UserState;
   date: string;
   user: {
     name: string;
@@ -15,110 +14,77 @@ interface PostProps {
     };
   };
 }
-const Post: React.FC<PostProps> = ({ mode, date, user }) => {
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  const showMenu = (event: any) => {
-    setMenuVisible(true);
-  };
-
+const Post: React.FC<PostProps> = ({ mode, user, date }) => {
   return (
-    <TouchableOpacity onPress={() => {}}>
-      <View style={styles.articleContainer}>
-        <View style={styles.articleHeader}>
-          <View style={styles.userInfo}>
-            <Image
-              source={user.headShot?.imageUrl}
-              style={styles.articleAvatar}
-            />
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.articleDate}>{date}</Text>
-          </View>
-          {mode === "personal" && (
-            <Menu
-              visible={menuVisible}
-              onDismiss={() => setMenuVisible(false)}
-              anchor={
-                <TouchableOpacity onPress={showMenu} style={styles.menuButton}>
-                  <EllipsisVertical color={Colors.icon} />
-                </TouchableOpacity>
-              }
-              contentStyle={[styles.menuContent, { marginTop: -56 }]} // 調整選單位置
-            >
-              <Menu.Item
-                onPress={() => {}}
-                title="編輯"
-                style={{
-                  marginHorizontal: 10,
-
-                  height: 30,
-                }}
-              />
-              <Menu.Item
-                onPress={() => {}}
-                title="刪除"
-                style={{
-                  marginHorizontal: 10,
-                }}
-                titleStyle={{ color: "#ff0000" }}
-              />
-            </Menu>
-          )}
+    <Card containerStyle={styles.cardContainer}>
+      <View style={styles.header}>
+        <Avatar rounded source={user.headShot?.imageUrl} size="medium" />
+        <View style={styles.headerText}>
+          <Text style={styles.username}>{user.name}</Text>
+          <Text style={styles.timestamp}>{date}</Text>
         </View>
-        <Text style={styles.articleContent}>這是我的第一篇文章</Text>
+        {mode === "personal" && <CustomMenu />}
       </View>
-    </TouchableOpacity>
+
+      <Text style={styles.content}>這是我的第一篇文章</Text>
+      {mode !== "visitor" && (
+        <View style={styles.footer}>
+          <View style={styles.iconContainer}>
+            <Icon name="heart" type="material-community" color="#ff6666" />
+            <Text style={styles.iconText}>2</Text>
+          </View>
+          <View style={styles.iconContainer}>
+            <Icon name="comment" type="material-community" color="#66b2ff" />
+            <Text style={styles.iconText}>2</Text>
+          </View>
+        </View>
+      )}
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
-  articleContainer: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    backgroundColor: "#fff",
-    marginVertical: 8,
+  cardContainer: {
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ffffff",
+    margin: 8,
   },
-  articleHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  userInfo: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 10,
   },
-  articleAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
+  headerText: {
+    flex: 1,
+    marginLeft: 10,
   },
-  userName: {
+  username: {
     fontWeight: "bold",
-    marginRight: 10,
+    fontSize: 16,
   },
-  articleDate: {
-    color: "#888",
+  timestamp: {
+    color: "#999",
+    fontSize: 12,
   },
-  articleContent: {
-    marginTop: 10,
+  content: {
+    fontSize: 16,
+    marginBottom: 10,
   },
-  menuButton: {
-    padding: 8,
+  footer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
   },
-  menuContent: {
-    backgroundColor: "#fff",
-    elevation: 8,
-    width: 90,
-    height: 85,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  iconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  iconText: {
+    marginLeft: 5,
+    fontSize: 14,
   },
 });
 

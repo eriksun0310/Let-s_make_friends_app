@@ -30,36 +30,41 @@ const PostPermissionsSettings = () => {
   const [expanded, setExpanded] = useState(false);
   const [permissions, setPermissions] = useState("all");
   return (
-    <ListItem.Accordion
-      content={
-        <>
+    <View style={styles.container}>
+      <ListItem.Accordion
+        content={
+          <>
+            <ListItem.Content>
+              <View style={styles.titleContainer}>
+                <Text style={styles.label}>文章權限設定</Text>
+                <Text style={styles.permissionsText}>
+                  ({permissionsText[permissions]})
+                </Text>
+              </View>
+            </ListItem.Content>
+          </>
+        }
+        isExpanded={expanded}
+        onPress={() => setExpanded(!expanded)}
+      >
+        <ListItem>
           <ListItem.Content>
-            <View style={styles.titleContainer}>
-              <Text style={styles.label}>文章權限設定</Text>
-              <Text style={styles.permissionsText}>
-                ({permissionsText[permissions]})
-              </Text>
-            </View>
+            <SegmentedButtons
+              buttons={buttons}
+              onValueChange={setPermissions}
+              initialValue={permissions}
+            />
           </ListItem.Content>
-        </>
-      }
-      isExpanded={expanded}
-      onPress={() => setExpanded(!expanded)}
-    >
-      <ListItem>
-        <ListItem.Content>
-          <SegmentedButtons
-            buttons={buttons}
-            onValueChange={setPermissions}
-            initialValue={permissions}
-          />
-        </ListItem.Content>
-      </ListItem>
-    </ListItem.Accordion>
+        </ListItem>
+      </ListItem.Accordion>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: 10,
+  },
   titleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -1,60 +1,49 @@
-import { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  ScrollView,
-} from "react-native";
-import { FAB, Portal, PaperProvider } from "react-native-paper";
+import { useEffect, useState } from "react";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Post from "../components/post/Post";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { Search } from "lucide-react-native";
+import CustomIcon from "../components/ui/CustomIcon";
 import { Colors } from "../constants/style";
-
-
+import CustomFAB from "../components/ui/CustomFAB";
+import { FAB, PaperProvider, Portal } from "react-native-paper";
 
 export const postList = Array(14).fill({
   date: "2024/08/02",
 });
-const Home = () => {
+const Home = ({ navigation }) => {
   const [state, setState] = useState({ open: false });
 
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
   const user = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <CustomIcon onPress={() => navigation.navigate("search")}>
+          <Search color={Colors.icon} size={25} />
+        </CustomIcon>
+      ),
+    });
+  }, [navigation]);
   return (
-    <View style={styles.screen}>
-      <PaperProvider>
+    <PaperProvider>
+      <View style={styles.screen}>
         <ScrollView>
           {postList?.map((post) => (
-            <Post mode='personal' date={post.date} user={user} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("postContent")}
+            >
+              <Post mode="personal" date={post.date} user={user} />
+            </TouchableOpacity>
           ))}
         </ScrollView>
-        <Portal>
-          <FAB.Group
-            open={open}
-            visible
-            icon={open ? "chevron-down" : "chevron-up"}
-            actions={[
-              {
-                icon: "pencil",
-                label: "寫文章",
-                onPress: () => console.log("Pressed star"),
-              },
-            ]}
-            onStateChange={onStateChange}
-            onPress={() => {
-              if (open) {
-                // do something if the speed dial is open
-              }
-            }}
-          />
-        </Portal>
-      </PaperProvider>
-    </View>
+        <CustomFAB />
+      </View>
+    </PaperProvider>
   );
 };
 const styles = StyleSheet.create({

@@ -1,10 +1,10 @@
-import { ChevronLeft } from "lucide-react-native";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { useEffect } from "react";
 import { friendCards } from "./AddFriend";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
+import BackButton from "../components/ui/BackButton";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -16,14 +16,7 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
     navigation.setOptions({
       title: "交友邀請",
       headerTitleAlign: "center",
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.headerIcon}
-        >
-          <ChevronLeft size={30} color={Colors.icon} />
-        </TouchableOpacity>
-      ),
+      headerLeft: () => <BackButton navigation={navigation} />,
     });
   }, [navigation]);
   return (
@@ -52,9 +45,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-  },
-  headerIcon: {
-    marginHorizontal: 10,
   },
 });
 

@@ -16,7 +16,7 @@ import Register from "./screen/Register";
 import AboutMe from "./screen/AboutMe";
 import EditPersonal from "./screen/EditPersonal";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
-import { Provider, useSelector } from "react-redux";
+import { Provider as ReduxProvider, useSelector } from "react-redux";
 import store, { RootState, useDispatch } from "./store/store";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import { initializeAuth } from "./store/userSlice";
@@ -26,6 +26,8 @@ import AddFriend from "./screen/AddFriend";
 import FriendList from "./screen/FriendList";
 import FriendInvitation from "./screen/FriendInvitation";
 import UserInfo from "./screen/UserInfo";
+import PostContent from "./screen/PostContent";
+import Search from "./screen/Search";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -157,6 +159,12 @@ const AuthenticatedStack = () => {
         })}
         component={UserInfo}
       />
+
+      {/* 貼文內容*/}
+      <Stack.Screen name="postContent" component={PostContent} />
+
+      {/* 搜尋頁面 */}
+      <Stack.Screen name="search" component={Search} />
     </Stack.Navigator>
   );
 };
@@ -191,9 +199,9 @@ export default function App() {
   return (
     <>
       <StatusBar style="dark"></StatusBar>
-      <Provider store={store}>
+      <ReduxProvider store={store}>
         <Navigation />
-      </Provider>
+      </ReduxProvider>
     </>
   );
 }

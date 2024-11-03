@@ -4,6 +4,7 @@ import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
+import CustomIcon from "../components/ui/CustomIcon";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -19,20 +20,14 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate("FriendList")}
-          style={styles.headerIcon}
-        >
+        <CustomIcon onPress={() => navigation.navigate("FriendList")}>
           <Users color={Colors.icon} size={25} />
-        </TouchableOpacity>
+        </CustomIcon>
       ),
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate("friendInvitation")}
-          style={styles.headerIcon}
-        >
+        <CustomIcon onPress={() => navigation.navigate("friendInvitation")}>
           <BellRing color={Colors.icon} size={25} />
-        </TouchableOpacity>
+        </CustomIcon>
       ),
     });
   }, [navigation]);
@@ -63,9 +58,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-  },
-  headerIcon: {
-    marginHorizontal: 15,
   },
 });
 

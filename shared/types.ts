@@ -57,6 +57,6 @@ export type User = {
   email: string;
 };
 
-export type UserInfoMode = "personal" | "friend";
+export type UserState = "personal" | "friend" | "visitor";
 
 export type FriendState = "add" | "confirm";
