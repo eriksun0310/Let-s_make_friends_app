@@ -1,5 +1,6 @@
 import { SendHorizontal } from "lucide-react-native";
 import { View, TextInput, StyleSheet } from "react-native";
+import { Colors } from "../../constants/style";
 
 // 輸入留言
 const EnterComments = () => {
@@ -10,12 +11,12 @@ const EnterComments = () => {
         placeholder="留言..."
         placeholderTextColor="#999"
         onPress={() => {
-          console.log(1111)
+          console.log(1111);
         }}
       />
 
       <SendHorizontal
-        color="#66b2ff"
+        color={Colors.iconBlue}
         style={{
           marginHorizontal: 5,
         }}

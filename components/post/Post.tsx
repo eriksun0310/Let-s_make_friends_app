@@ -4,6 +4,10 @@ import { UserState } from "../../shared/types";
 import { NavigationProp } from "@react-navigation/native";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
+import { Tag, Tags } from "lucide-react-native";
+import { Colors } from "../../constants/style";
+import AntDesign from "@expo/vector-icons/AntDesign";
+
 interface PostProps {
   mode: UserState;
   date: string;
@@ -14,6 +18,10 @@ interface PostProps {
     };
   };
 }
+export const tagList = Array(5).fill({
+  text: "大家好",
+});
+
 const Post: React.FC<PostProps> = ({ mode, user, date }) => {
   return (
     <Card containerStyle={styles.cardContainer}>
@@ -27,6 +35,7 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
       </View>
 
       <Text style={styles.content}>這是我的第一篇文章</Text>
+
       {mode !== "visitor" && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
@@ -34,11 +43,24 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
             <Text style={styles.iconText}>2</Text>
           </View>
           <View style={styles.iconContainer}>
-            <Icon name="comment" type="material-community" color="#66b2ff" />
+            <Icon
+              name="comment"
+              type="material-community"
+              color={Colors.iconBlue}
+            />
             <Text style={styles.iconText}>2</Text>
           </View>
         </View>
       )}
+
+      <View style={styles.tagContainer}>
+        <AntDesign name="tag" size={24} color="#d9d9d9" />
+        {tagList.map((item, index) => (
+          <View style={styles.tag}>
+            <Text style={styles.tagText}>{item.text}</Text>
+          </View>
+        ))}
+      </View>
     </Card>
   );
 };
@@ -85,6 +107,24 @@ const styles = StyleSheet.create({
   iconText: {
     marginLeft: 5,
     fontSize: 14,
+  },
+  tagContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  tag: {
+    backgroundColor: "#e8e8e8b2",
+    padding: 5,
+    marginVertical: 2,
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#ffffff",
+    borderRadius: 5,
+  },
+  tagText: {
+    color: "#adadad",
   },
 });
 
