@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   rightText: {
     fontSize: 17,
-    color: "#117DD5",
+    color: Colors.textBlue,
     marginRight: 8,
   },
 });

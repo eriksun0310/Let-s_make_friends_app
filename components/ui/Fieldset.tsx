@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     left: 10,
     paddingHorizontal: 5,
     fontSize: 16,
-    color: "#888888",
+    color: "#616161",
   },
 });
 export default Fieldset;

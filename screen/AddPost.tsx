@@ -65,6 +65,21 @@ const AddPost = ({ navigation }) => {
           <X color={Colors.icon} size={25} />
         </CustomIcon>
       ),
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            marginHorizontal: 15,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.textBlue,
+            }}
+          >
+            發布
+          </Text>
+        </TouchableOpacity>
+      ),
     });
   }, [navigation]);
 

@@ -1,10 +1,8 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { UserState } from "../../shared/types";
-import { NavigationProp } from "@react-navigation/native";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
-import { Tag, Tags } from "lucide-react-native";
 import { Colors } from "../../constants/style";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
@@ -54,7 +52,12 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
       )}
 
       <View style={styles.tagContainer}>
-        <AntDesign name="tag" size={24} color={Colors.tag} />
+        <AntDesign
+          name="tag"
+          style={{ marginRight: 5 }}
+          size={24}
+          color={Colors.tag}
+        />
         {tagList.map((item) => (
           <View style={styles.tag}>
             <Text style={styles.tagText}>{item.text}</Text>
@@ -114,17 +117,18 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
   },
+
   tag: {
-    backgroundColor: "#e8e8e8b2",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 16,
     padding: 5,
-    marginVertical: 2,
-    marginHorizontal: 5,
-    borderWidth: 1,
-    borderColor: "#ffffff",
-    borderRadius: 5,
+    marginRight: 8,
+    marginTop: 15,
   },
   tagText: {
-    color: "#adadad",
+    color: "#666",
   },
 });
 

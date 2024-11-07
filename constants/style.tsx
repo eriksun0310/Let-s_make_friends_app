@@ -5,10 +5,10 @@ export const Colors = {
   error: "#ff8787d8",
   error100: "#ffababd8",
   snackbar: "#ee6565",
-  textBlue: "#3D74DB",
+  textBlue: "#117DD5",
   text: "#000",
   icon: "#939393",
   textGrey: "#808080",
   iconBlue: "#66b2ff",
-  tag:"#d9d9d9"
+  tag: "#d9d9d9",
 };

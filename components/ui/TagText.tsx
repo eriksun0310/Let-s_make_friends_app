@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   tagText: {
-    fontSize: 14,
+    color: "#666",
     marginRight: 4,
   },
   removeIcon: {

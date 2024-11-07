@@ -47,7 +47,7 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
               <Text
                 style={{
                   color:
-                    headShot.imageType === key ? Colors.textBlue : Colors.text,
+                    headShot.imageType === key ?  Colors.textBlue : Colors.text,
                 }}
               >
                 {key === "people" ? "人像" : "動物"}
