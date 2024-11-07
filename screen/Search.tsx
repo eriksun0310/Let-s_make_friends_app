@@ -1,28 +1,22 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
-import { Avatar, Icon } from "@rneui/themed";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
+import { Avatar } from "@rneui/themed";
 import { Colors } from "../constants/style";
 import CustomIcon from "../components/ui/CustomIcon";
-import { Search as SearchIcon, X } from "lucide-react-native";
+import { X } from "lucide-react-native";
+import SearchBar from "../components/ui/SearchBar";
+import { NavigationProp } from "@react-navigation/native";
 const recentSearches = [
   { id: "1", name: "海鴨" },
   { id: "2", name: "我是海鴨" },
 ];
 
+interface SearchProps {
+  navigation: NavigationProp<any>;
+}
+
 // 搜尋頁面
-const Search = ({ navigation }) => {
-  const [searchText, setSearchText] = useState("");
-
-  console.log("searchText", searchText);
-
+const Search: React.FC<SearchProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -33,49 +27,7 @@ const Search = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* 搜尋列 */}
-
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#fff",
-            paddingBottom: 10,
-            // borderWidth: 1,
-          }}
-        >
-          <View style={styles.searchBar}>
-            <CustomIcon
-              style={{
-                marginHorizontal: 5,
-              }}
-              onPress={() => navigation.navigate("search")}
-            >
-              <SearchIcon color={Colors.icon} size={25} />
-            </CustomIcon>
-            <TextInput
-              value={searchText}
-              placeholder="搜尋"
-              style={styles.searchInput}
-              onChangeText={(e) => setSearchText(e)}
-            />
-
-            {searchText && (
-              <CustomIcon
-                style={{
-                  marginHorizontal: 5,
-                }}
-                onPress={() => setSearchText("")}
-              >
-                <X color={Colors.icon} size={25} />
-              </CustomIcon>
-            )}
-          </View>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelText}>取消</Text>
-          </TouchableOpacity>
-        </View>
+        <SearchBar navigation={navigation} />
 
         <View
           style={{
@@ -112,30 +64,13 @@ const Search = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: {
+    marginTop: 3,
     flex: 1,
     backgroundColor: "white",
   },
   container: {
     flex: 1,
     backgroundColor: "#f0f8ff",
-    // marginTop: 10,
-    // padding: 10,
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#efefef",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginHorizontal: 10,
-    // marginBottom: 10,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    height: 35,
   },
   cancelText: {
     fontSize: 17,

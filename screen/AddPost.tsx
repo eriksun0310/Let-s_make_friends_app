@@ -6,39 +6,27 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Button,
 } from "react-native";
-import BackButton from "../components/ui/BackButton";
+
 import { Colors } from "../constants/style";
 import CustomIcon from "../components/ui/CustomIcon";
 import { X } from "lucide-react-native";
 import AlertDialog from "../components/ui/AlertDialog";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-import { Modalize } from "react-native-modalize";
+import TagSelector from "../components/ui/TagSelector";
+import SelectedTagText from "../components/ui/TagText";
 
 // 新增文章
 const AddPost = ({ navigation }) => {
-  const [isAlertVisible, setIsAlertVisible] = useState(false);
-
   const modalizeRef = useRef(null);
 
-  const openBottomDrawer = () => {
-    modalizeRef.current?.open();
-  };
-  useEffect(() => {
-    navigation.setOptions({
-      title: "新增文章",
-      headerTitleAlign: "center",
-      headerLeft: () => (
-        <CustomIcon onPress={() => setIsAlertVisible(true)}>
-          <X color={Colors.icon} size={25} />
-        </CustomIcon>
-      ),
-    });
-  }, [navigation]);
+  // 顯示在文章上的tag
+  const [postTags, setPostTags] = useState<string[]>([]);
+  // 警告視窗 開啟狀態
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
 
-  // 關閉 新增文章
+  // 關閉 新增文章 page
   const handleClosePost = () => {
     setIsAlertVisible(false);
     navigation.goBack();
@@ -49,6 +37,37 @@ const AddPost = ({ navigation }) => {
     setIsAlertVisible(false);
   };
 
+  // 打開 bottom drawer
+  const openBottomDrawer = () => {
+    modalizeRef.current?.open();
+  };
+
+  // 關閉 bottom drawer
+  const handleCloseDrawer = () => {
+    modalizeRef.current?.close();
+  };
+
+  // 移除 tag
+  const handleRemoveTag = (item: string) => {
+    setPostTags(postTags.filter((i) => i !== item));
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "新增文章",
+      headerTitleAlign: "center",
+      headerLeft: () => (
+        <CustomIcon
+          onPress={() => {
+            setIsAlertVisible(true);
+          }}
+        >
+          <X color={Colors.icon} size={25} />
+        </CustomIcon>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <>
       <AlertDialog
@@ -58,32 +77,52 @@ const AddPost = ({ navigation }) => {
         onClosePost={handleClosePost}
       />
 
-      <View style={styles.container}>
-        <View style={styles.postContainer}>
-          <View style={styles.header}>
-            <Image
-              source={require("../assets/animal/ostrich.png")}
-              style={styles.avatar}
+      <>
+        <View style={styles.container}>
+          <View style={styles.postContainer}>
+            <View style={styles.header}>
+              <Image
+                source={require("../assets/animal/ostrich.png")}
+                style={styles.avatar}
+              />
+              <Text style={styles.username}>海鷗</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="在想什麼...."
+              placeholderTextColor="#999"
+              multiline
             />
-            <Text style={styles.username}>海鷗</Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="在想什麼...."
-            placeholderTextColor="#999"
-            multiline
-          />
-          <TouchableOpacity style={styles.tagButton} onPress={openBottomDrawer}>
-            <AntDesign name="tag" size={24} color="#666" />
-          </TouchableOpacity>
-        </View>
-      </View>
 
-      <Modalize ref={modalizeRef} snapPoint={300}>
-        <View style={{ padding: 20 }}>
-          <Text>這是底部抽屜內容</Text>
+            <View style={styles.tagContainer}>
+              <TouchableOpacity
+                style={styles.tagButton}
+                onPress={openBottomDrawer}
+              >
+                <AntDesign name="tag" size={24} color={Colors.tag} />
+              </TouchableOpacity>
+
+              {/* 文章顯示的tag */}
+              {postTags.length > 0 && (
+                <SelectedTagText
+                  selectedTags={postTags}
+                  removeTag={handleRemoveTag}
+                />
+              )}
+            </View>
+          </View>
         </View>
-      </Modalize>
+
+        {/* tag 選擇器 */}
+        <TagSelector
+          defaultTag={postTags}
+          modalizeRef={modalizeRef}
+          getSelectedItems={(v) => {
+            setPostTags(v);
+          }}
+          onCloseDrawer={handleCloseDrawer}
+        />
+      </>
     </>
   );
 };
@@ -94,8 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   postContainer: {
-    // borderWidth: 1,
-    // borderColor: "#f5f5f5",
     backgroundColor: "#fff",
     padding: 16,
     margin: 16,
@@ -124,62 +161,11 @@ const styles = StyleSheet.create({
   tagButton: {
     padding: 8,
   },
-  drawer: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-    padding: 16,
-  },
-  searchContainer: {
+  tagContainer: {
+    display: "flex",
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
-    marginBottom: 16,
-  },
-  cancelButton: {
-    marginRight: 8,
-  },
-  cancelText: {
-    color: "#666",
-    fontSize: 14,
-  },
-  searchInputContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    padding: 8,
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-  },
-  addButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  addText: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  tagList: {
-    flex: 1,
-  },
-  tagItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  tagText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
   },
 });
 export default AddPost;

@@ -54,8 +54,8 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
       )}
 
       <View style={styles.tagContainer}>
-        <AntDesign name="tag" size={24} color="#d9d9d9" />
-        {tagList.map((item, index) => (
+        <AntDesign name="tag" size={24} color={Colors.tag} />
+        {tagList.map((item) => (
           <View style={styles.tag}>
             <Text style={styles.tagText}>{item.text}</Text>
           </View>
