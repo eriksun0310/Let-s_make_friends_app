@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
 import AllHeadShot from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
@@ -8,6 +8,8 @@ import { RootState } from "../store/store";
 import { setUser } from "../store/userSlice";
 import { editUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
+import BackButton from "../components/ui/BackButton";
+import { Colors } from "../constants/style";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
@@ -44,7 +46,26 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "編輯大頭貼",
-      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+
+      headerLeft: () => <BackButton navigation={navigation} />,
+      // headerRight: () => <Button title="儲存" onPress={handleSave} />,
+
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            marginHorizontal: 15,
+          }}
+          onPress={handleSave}
+        >
+          <Text
+            style={{
+              color: Colors.textBlue,
+            }}
+          >
+            儲存
+          </Text>
+        </TouchableOpacity>
+      ),
     });
   }, [navigation, headShot]);
 

@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
+import SelectedOption from "../aboutMe/SelectedOption";
+import { optionList, tabs } from "../../shared/static";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { Colors } from "../../constants/style";
 
 //TODO: 要傳入user value 個人資料清單
-const UserCollapse = () => {
+const UserCollapse = ({ navigation }) => {
+  const user = useSelector((state: RootState) => state.user.user);
+
   const [expanded, setExpanded] = useState(false);
   return (
     <View style={styles.container}>
@@ -46,12 +53,51 @@ const UserCollapse = () => {
           </ListItem.Content>
         </ListItem>
 
-        <ListItem>
-          <ListItem.Content>
-            <ListItem.Title>興趣: 閱讀</ListItem.Title>
-            {/* <ListItem.Subtitle>閱讀</ListItem.Subtitle> */}
-          </ListItem.Content>
-        </ListItem>
+        {Object.keys(tabs).map((key) => {
+          return (
+            <ListItem>
+              <ListItem.Content>
+                <ListItem.Title
+                  onPress={() =>
+                    navigation.navigate("aboutMeSelectOption", {
+                      currentTab: key,
+                    })
+                  }
+                >
+                  <View>
+                    <Text>{tabs[key]}:</Text>
+                  </View>
+                  <View>
+                    {user.selectedOption[key]?.length > 0 ? (
+                      user.selectedOption[key]?.map((item) => {
+                        const option = optionList?.[key]?.[item];
+
+                        return (
+                          <Text
+                            style={{
+                              paddingLeft: 10,
+                            }}
+                          >
+                            {option}
+                          </Text>
+                        );
+                      })
+                    ) : (
+                      <Text
+                        style={{
+                          paddingLeft: 10,
+                          color: Colors.textBlue,
+                        }}
+                      >
+                        請選擇
+                      </Text>
+                    )}
+                  </View>
+                </ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          );
+        })}
       </ListItem.Accordion>
     </View>
   );

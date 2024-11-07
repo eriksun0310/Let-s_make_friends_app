@@ -59,7 +59,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             headShot={user.headShot}
           />
 
-          <UserCollapse />
+          <UserCollapse  navigation={navigation}/>
           <View
             style={{
               marginTop: 10,
