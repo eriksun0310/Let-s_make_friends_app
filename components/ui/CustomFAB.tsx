@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { FAB, Portal } from "react-native-paper";
 import { Colors } from "../../constants/style";
 
-const CustomFAB = () => {
+const CustomFAB = ({ navigation }) => {
   const [state, setState] = useState({ open: false });
 
   const onStateChange = ({ open }) => setState({ open });
@@ -22,8 +22,8 @@ const CustomFAB = () => {
         actions={[
           {
             icon: "pencil",
-            label: "寫文章",
-            onPress: () => console.log("Pressed star"),
+            label: "新增文章",
+            onPress: () => navigation.navigate("addPost"),
             color: Colors.iconBlue,
             style: {
               backgroundColor: "#ffffff",

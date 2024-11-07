@@ -28,6 +28,7 @@ import FriendInvitation from "./screen/FriendInvitation";
 import UserInfo from "./screen/UserInfo";
 import PostContent from "./screen/PostContent";
 import Search from "./screen/Search";
+import AddPost from "./screen/AddPost";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -165,6 +166,8 @@ const AuthenticatedStack = () => {
 
       {/* 搜尋頁面 */}
       <Stack.Screen name="search" component={Search} />
+      {/* 新增文章 */}
+      <Stack.Screen name="addPost" component={AddPost} />
     </Stack.Navigator>
   );
 };

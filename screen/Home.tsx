@@ -41,7 +41,7 @@ const Home = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-        <CustomFAB />
+        <CustomFAB navigation={navigation} />
       </View>
     </PaperProvider>
   );
