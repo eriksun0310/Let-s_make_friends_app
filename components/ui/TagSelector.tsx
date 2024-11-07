@@ -15,7 +15,7 @@ import Fieldset from "./Fieldset";
 import SelectedTagText from "./TagText";
 
 // 模擬搜尋選項數據
-const mockOptions = ["嗨", "嗨嗨", "嗨你好", "123", "456"];
+const mockOptions = ["嗨", "嗨嗨", "嗨你好", "123456", "4561"];
 
 interface TagSelectorProps {
   modalizeRef: React.RefObject<Modalize>;
@@ -37,7 +37,12 @@ const TagSelector = ({
   // 新增選項
   const handleSelect = (item: string) => {
     setSelectedTags([...selectedTags, item]);
-    setSearchText("");
+
+    console.log("filteredOptions", filteredOptions);
+    // 沒有搜尋文字, 就清空 searchText
+    if (filteredOptions.length === 1) {
+      setSearchText("");
+    }
   };
 
   // 移除 tag
@@ -57,7 +62,7 @@ const TagSelector = ({
   }, [defaultTag]);
 
   return (
-    <Modalize ref={modalizeRef} snapPoint={550}>
+    <Modalize ref={modalizeRef} snapPoint={650}>
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <TouchableOpacity
@@ -113,7 +118,7 @@ const TagSelector = ({
           </View>
         )}
 
-        {/* tag 的選項 */}
+        {/* 有符合的 tag 選項 */}
         <ScrollView style={styles.optionsContainer}>
           {searchText !== "" &&
             filteredOptions.map((option, index) => (
@@ -153,7 +158,7 @@ const styles = StyleSheet.create({
   },
 
   optionsContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
   },
   option: {
     paddingVertical: 12,

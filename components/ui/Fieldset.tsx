@@ -19,15 +19,14 @@ const styles = StyleSheet.create({
   fieldset: {
     borderWidth: 1,
     borderColor: "#ccc",
+
     padding: 10,
     borderRadius: 5,
-    marginBottom: 10,
   },
   legend: {
     position: "absolute",
     top: -10,
     left: 10,
-    backgroundColor: "#fff",
     paddingHorizontal: 5,
     fontSize: 16,
     color: "#888888",
