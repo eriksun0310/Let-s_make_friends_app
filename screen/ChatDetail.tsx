@@ -12,6 +12,7 @@ import {
   StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../constants/style";
 const ChatDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [messages, setMessages] = useState([
@@ -31,13 +32,30 @@ const ChatDetail = ({ route, navigation }) => {
 
   const renderMessage = ({ item }) => (
     <View
-      style={[
-        styles.messageBubble,
-        item.sender === "me" ? styles.myMessage : styles.theirMessage,
-      ]}
+      style={{
+        // borderBottomWidth: 1,
+        display: "flex",
+        flexDirection: item.sender === "me" ? "row-reverse" : "row",
+        alignItems: "center",
+      }}
     >
-      <Text style={styles.messageText}>{item.text}</Text>
-      <Text style={styles.messageTime}>{item.time}</Text>
+      <View
+        style={[
+          styles.messageBubble,
+          item.sender === "me" ? styles.myMessage : styles.theirMessage,
+        ]}
+      >
+        <Text style={styles.messageText}>{item.text}</Text>
+      </View>
+      <View
+        style={{
+          // marginHorizontal: 10,
+          marginRight: item.sender === "me" ? 5 : 0,
+          marginLeft: item.sender !== "me" ? 5 : 0,
+        }}
+      >
+        <Text style={styles.messageTime}>{item.time}</Text>
+      </View>
     </View>
   );
   return (
@@ -49,12 +67,6 @@ const ChatDetail = ({ route, navigation }) => {
           </TouchableOpacity>
           <Image source={{ uri: item.icon }} style={styles.avatar} />
           <Text style={styles.headerTitle}>{item.name}</Text>
-          {/* <TouchableOpacity>
-            <Ionicons name="call" size={24} color="black" />
-          </TouchableOpacity> */}
-          {/* <TouchableOpacity>
-            <Ionicons name="menu" size={24} color="black" />
-          </TouchableOpacity> */}
         </View>
         <FlatList
           data={messages}
@@ -72,12 +84,6 @@ const ChatDetail = ({ route, navigation }) => {
             onChangeText={setInputText}
             placeholder="輸入訊息..."
           />
-          {/* <TouchableOpacity>
-            <Ionicons name="happy" size={24} color="gray" />
-          </TouchableOpacity> */}
-          {/* <TouchableOpacity>
-            <Ionicons name="mic" size={24} color="gray" />
-          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
@@ -91,7 +97,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: "white",
@@ -124,11 +130,12 @@ const styles = StyleSheet.create({
   },
   myMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#DCF8C6",
+    backgroundColor: "#a6d2ff",
   },
   theirMessage: {
     alignSelf: "flex-start",
     backgroundColor: "white",
+    paddingHorizontal: 15,
   },
   messageText: {
     fontSize: 16,

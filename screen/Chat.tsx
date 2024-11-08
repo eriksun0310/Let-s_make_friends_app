@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { Colors } from "../constants/style";
 
 const Chat = ({ navigation }) => {
   const chatData = [
@@ -50,13 +51,11 @@ const Chat = ({ navigation }) => {
         navigation.navigate("chatDetail", { item: item });
       }}
     >
-      {/* <View style={styles.chatItem}> */}
       <Image source={{ uri: item.icon }} style={styles.chatIcon} />
       <View style={styles.chatInfo}>
         <Text style={styles.chatName}>{item.name}</Text>
         <Text style={styles.chatMessage}>{item.message}</Text>
       </View>
-      {/* </View> */}
     </TouchableOpacity>
   );
 
@@ -73,13 +72,13 @@ const Chat = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   chatItem: {
     flexDirection: "row",
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#ffffff",
   },
   chatIcon: {
     width: 50,
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   chatMessage: {
-    color: "gray",
+    color: "#7e7e7e",
   },
 });
 export default Chat;
