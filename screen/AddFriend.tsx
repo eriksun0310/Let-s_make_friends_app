@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
@@ -6,6 +6,7 @@ import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
+import { getAllUsers } from "../util/auth";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -18,7 +19,11 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
+  // 所有的用戶資料
+  const [allUsers, setAllUsers] = useState([]);
+
   useEffect(() => {
+    // 設置導航選項
     navigation.setOptions({
       headerLeft: () => (
         <CustomIcon onPress={() => navigation.navigate("FriendList")}>
@@ -34,7 +39,20 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
         </CustomIcon>
       ),
     });
+
+    // 取得所有用戶資料的 async 函式
+
+    const fetchUsers = async () => {
+      try {
+        const userData = await getAllUsers();
+        setAllUsers(userData);
+      } catch (error) {}
+    };
+
+    fetchUsers(); // 調用 API 獲取資料
   }, [navigation]);
+
+  console.log("allUsers", allUsers);
 
   return (
     <View style={styles.screen}>

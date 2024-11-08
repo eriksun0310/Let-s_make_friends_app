@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { editUserData } from "../util/auth";
 import SaveButton from "../components/ui/button/SaveButton";
+import BackButton from "../components/ui/button/BackButton";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
@@ -102,6 +103,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
     navigation.setOptions({
       title: "更多關於我的設定",
       headerTitleAlign: "center",
+      headerLeft: () => <BackButton navigation={navigation} />,
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, selectedOption]);

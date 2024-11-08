@@ -3,14 +3,13 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { get, push, ref, set, update } from "firebase/database";
+import { child, get, push, ref, set, update } from "firebase/database";
 import { User } from "../shared/types";
 import {
   getDownloadURL,
   ref as storageRef,
   uploadBytes,
 } from "firebase/storage";
-
 
 // 會員註冊
 export const createUser = async (email: string, password: string) => {
@@ -62,7 +61,6 @@ export const savePostData = async (userId: string, postData) => {
   });
 };
 
-
 // TODO: 首頁 發文有包含圖片的話,要上傳到 firebase storage
 // 假設 `file` 是用戶上傳的圖片檔案
 export const uploadPostWithMedia = async (
@@ -106,5 +104,26 @@ export const editUserData = async ({
     await update(ref(database, `${userId}/user`), updates);
   } catch (error) {
     console.error("Error updating user data:", error);
+  }
+};
+
+// 取得所有用戶資料
+export const getAllUsers = async () => {
+  // const db = getDatabase();
+  const usersRef = ref(database, "/");
+
+  try {
+    const snapshot = await get(child(usersRef, ""));
+    if (snapshot.exists()) {
+      const allUsersData = snapshot.val();
+      console.log("allUsersData", allUsersData);
+      return Object.values(allUsersData).map((user) => user.user); // 只返回用戶資訊
+    } else {
+      console.log("No data available");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    return null;
   }
 };

@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
-import { calculateAge } from "../../shared/funcs";
+import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { Snackbar } from "react-native-paper";
 
 //TODO: 要傳入user value 個人資料清單
@@ -101,6 +101,18 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
           </ListItem.Content>
         </ListItem>
 
+        <ListItem>
+          <ListItem.Content>
+            <TouchableOpacity
+              onPress={() => {
+                onToggleSnackBar("星座");
+              }}
+            >
+              <Text>星座 :{getZodiacSign(user.birthday)}</Text>
+            </TouchableOpacity>
+          </ListItem.Content>
+        </ListItem>
+
         {Object.keys(tabs).map((key) => {
           return (
             <ListItem>
@@ -182,7 +194,7 @@ const styles = StyleSheet.create({
   optionContainer: {
     display: "flex",
     flexDirection: "row",
-    paddingLeft: 10,
+    paddingLeft: 5,
   },
   pleaseSelectText: {
     color: Colors.textBlue,
