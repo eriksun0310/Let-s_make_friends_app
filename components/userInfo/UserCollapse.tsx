@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { optionList, tabs } from "../../shared/static";
+import { gender, optionList, tabs } from "../../shared/static";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
+import { calculateAge } from "../../shared/funcs";
+import { Snackbar } from "react-native-paper";
 
 //TODO: 要傳入user value 個人資料清單
 
@@ -14,9 +16,21 @@ interface UserCollapseProps {
 }
 
 const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
+  const [expanded, setExpanded] = useState(false);
+  // 顯示 Snackbar
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  // 顯示 Snackbar文字
+  const [snackbarText, setSnackbarText] = useState("");
+
   const user = useSelector((state: RootState) => state.user.user);
 
-  const [expanded, setExpanded] = useState(false);
+  const onToggleSnackBar = (text: string) => {
+    setSnackbarText(text);
+    setSnackbarVisible(!snackbarVisible);
+  };
+
+  const onDismissSnackBar = () => setSnackbarVisible(false);
   return (
     <View style={styles.container}>
       <ListItem.Accordion
@@ -32,25 +46,52 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
       >
         <ListItem>
           <ListItem.Content>
-            <ListItem.Title>自我介紹: hi</ListItem.Title>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("editUserInfo", {
+                  mode: "introduce",
+                  defaultValue: user.introduce,
+                })
+              }
+            >
+              <Text>自我介紹: {user.introduce}</Text>
+            </TouchableOpacity>
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
-            <ListItem.Title>性別: 男</ListItem.Title>
+            <TouchableOpacity
+              onPress={() => {
+                onToggleSnackBar("性別");
+              }}
+            >
+              <Text>性別: {gender[user.gender]}</Text>
+            </TouchableOpacity>
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
-            <ListItem.Title>生日: 2000-01-01</ListItem.Title>
+            <TouchableOpacity
+              onPress={() => {
+                onToggleSnackBar("生日");
+              }}
+            >
+              <Text>生日: {user.birthday}</Text>
+            </TouchableOpacity>
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
-            <ListItem.Title>年齡 :24</ListItem.Title>
+            <TouchableOpacity
+              onPress={() => {
+                onToggleSnackBar("年齡");
+              }}
+            >
+              <Text>年齡 :{calculateAge(user.birthday)}</Text>
+            </TouchableOpacity>
           </ListItem.Content>
         </ListItem>
 
@@ -93,6 +134,32 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
           );
         })}
       </ListItem.Accordion>
+
+      <Snackbar
+        duration={1000}
+        style={{
+          flex: 1,
+          // width: "40%",
+          borderRadius: 10,
+          backgroundColor: Colors.snackbar, // 自訂背景顏色
+        }}
+        visible={snackbarVisible}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: "X",
+          onPress: onDismissSnackBar,
+        }}
+        icon={"close"}
+        theme={{
+          colors: {
+            inversePrimary: Colors.textWhite, //自訂 X 的顏色
+          },
+        }}
+      >
+        <Text style={{ color: Colors.textWhite, fontSize: 16 }}>
+          {snackbarText} 不可修改
+        </Text>
+      </Snackbar>
     </View>
   );
 };

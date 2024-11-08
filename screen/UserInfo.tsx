@@ -14,7 +14,6 @@ import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 
-
 interface UserInfoProps {
   route: { params: { mode: UserState } };
   navigation: NavigationProp<any>;
@@ -59,7 +58,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             headShot={user.headShot}
           />
 
-          <UserCollapse  navigation={navigation}/>
+          <UserCollapse navigation={navigation} />
           <View
             style={{
               marginTop: 10,
@@ -68,11 +67,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
           {mode === "personal" && <PostPermissionsSettings />}
 
-          <View
-            style={{
-              marginTop: 10,
-            }}
-          />
+          <View style={{ marginTop: 10 }} />
 
           {postList?.map((post) => (
             <TouchableOpacity
@@ -83,7 +78,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           ))}
 
           {mode === "personal" && (
-            <View style={styles.formContainer1}>
+            <View style={styles.formContainer}>
               <Button
                 style={{
                   width: "50%",
@@ -103,60 +98,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    // position: "relative",
-    // zIndex: 1,
   },
   scrollContent: {
     flexGrow: 1,
   },
-  formContainer1: {
+  formContainer: {
     display: "flex",
     marginVertical: 30,
     alignItems: "center",
-  },
-  formContainer: {
-    paddingHorizontal: 16,
-  },
-  label: {
-    fontSize: 23,
-    fontWeight: "bold",
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  visibilityContainer: {
-    marginTop: 16,
-    backgroundColor: "#ffff",
-    padding: 16,
-  },
-  articleContainer: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  articleHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  userInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  articleAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  userName: {
-    fontWeight: "bold",
-    marginRight: 10,
-  },
-  articleDate: {
-    color: "#888",
-  },
-  articleContent: {
-    marginTop: 10,
   },
 });
 

@@ -14,7 +14,7 @@ import Chat from "./screen/Chat";
 import Login from "./screen/Login";
 import Register from "./screen/Register";
 import AboutMe from "./screen/AboutMe";
-import EditPersonal from "./screen/EditPersonal";
+import EditUserInfo from "./screen/EditUserInfo";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
 import { Provider as ReduxProvider, useSelector } from "react-redux";
 import store, { RootState, useDispatch } from "./store/store";
@@ -144,7 +144,7 @@ const AuthenticatedStack = () => {
         component={AboutMeSelectOption}
       />
 
-      <Stack.Screen name="editPersonal" component={EditPersonal} />
+      <Stack.Screen name="editUserInfo" component={EditUserInfo} />
 
       <Stack.Screen name="editHeadShot" component={EditHeadShot} />
       {/* 好友列表*/}

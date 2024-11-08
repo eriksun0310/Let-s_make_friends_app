@@ -4,11 +4,12 @@ export const Colors = {
   button: "#93cfe3",
   error: "#ff8787d8",
   error100: "#ffababd8",
-  snackbar: "#ee6565",
+  snackbar: "#FF8484",
   textBlue: "#117DD5",
   text: "#000",
   icon: "#939393",
   textGrey: "#808080",
   iconBlue: "#66b2ff",
   tag: "#d9d9d9",
+  textWhite: "#fff",
 };

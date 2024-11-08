@@ -28,10 +28,9 @@ const HeadShot: React.FC<HeadShotProps> = ({
       {nameValue && (
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("editPersonal", {
-              label: "名稱",
+            navigation.navigate("editUserInfo", {
+              mode: "name",
               defaultValue: nameValue,
-              name: "name",
             });
           }}
         >
@@ -47,28 +46,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 20,
   },
-
   label: {
     fontSize: 23,
     fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
   },
-  defaultCircle: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 100, // 使其成为圆形
-    backgroundColor: "#e5e5e5", // 圆形的背景颜色
-    alignItems: "center", // 垂直居中图标
-    justifyContent: "center", // 水平居中图标
-  },
   option: {
     width: 150,
     height: 150,
-  },
-  optionImage: {
-    width: "100%",
-    height: "100%",
   },
 });
 

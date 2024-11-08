@@ -1,4 +1,4 @@
-import { View, StyleSheet, Button, Alert } from "react-native";
+import { View, StyleSheet, Alert } from "react-native";
 import Input from "../components/ui/Input";
 import { useEffect, useState } from "react";
 import { editUserData } from "../util/auth";
@@ -8,20 +8,27 @@ import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
 
-interface EditPersonalProps {
+const title = {
+  name: "姓名",
+  introduce: "自我介紹",
+};
+
+interface EditUserInfoProps {
   route: {
     params: {
-      label: string;
+      mode: "introduce" | "name";
       defaultValue: string;
-      name: string;
+      // name: string;
     };
   };
   navigation: NavigationProp<any>;
 }
-const EditPersonal: React.FC<EditPersonalProps> = ({ route, navigation }) => {
+
+// 編輯個人資料
+const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
-  const { label, defaultValue, name } = route.params;
+  const { mode, defaultValue } = route.params;
 
   const [value, setValue] = useState("");
 
@@ -36,11 +43,11 @@ const EditPersonal: React.FC<EditPersonalProps> = ({ route, navigation }) => {
       Alert.alert("請填寫空白處");
     } else {
       // 更新回redux
-      dispatch(setUser({ ...user, [name]: value }));
+      dispatch(setUser({ ...user, [mode]: value }));
       // 更新firebase
       await editUserData({
         userId: user.userId,
-        fieldName: name,
+        fieldName: mode,
         fieldValue: value,
       });
       navigation.goBack();
@@ -49,7 +56,8 @@ const EditPersonal: React.FC<EditPersonalProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: `編輯${label}`,
+      title: `編輯${title[mode]}`,
+      headerTitleAlign: "center",
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, value]);
@@ -61,7 +69,7 @@ const EditPersonal: React.FC<EditPersonalProps> = ({ route, navigation }) => {
           borderWidth: 3,
           width: "90%",
         }}
-        multiline={label === "自我介紹"}
+        multiline={mode === "introduce"}
         value={value}
         setValue={(v) => {
           setValue(v);
@@ -80,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditPersonal;
+export default EditUserInfo;
