@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
 import { Avatar } from "@rneui/themed";
 import { Colors } from "../constants/style";
-import CustomIcon from "../components/ui/CustomIcon";
+import CustomIcon from "../components/ui/button/CustomIcon";
 import { X } from "lucide-react-native";
 import SearchBar from "../components/ui/SearchBar";
 import { NavigationProp } from "@react-navigation/native";

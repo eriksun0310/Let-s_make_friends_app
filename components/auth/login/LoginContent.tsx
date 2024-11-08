@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import CustomTextInput from "../../ui/CustomTextInput";
-import Button from "../../ui/Button";
-import FlatButton from "../../ui/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import type{ LoginForm, LoginIsValid } from "../../../shared/types";
+import Button from "../../ui/button/Button";
+import FlatButton from "../../ui/button/FlatButton";
 // import * as Google from "expo-auth-session/providers/google";
 // import { auth, GoogleAuthProvider } from "../../../util/firebase";
 // import { makeRedirectUri } from "expo-auth-session";

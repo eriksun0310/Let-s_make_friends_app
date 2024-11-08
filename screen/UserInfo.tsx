@@ -2,18 +2,18 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
-import Button from "../components/ui/Button";
 import { RootState, useDispatch } from "../store/store";
 import { logout } from "../store/userSlice";
 import { useSelector } from "react-redux";
 import { Colors } from "../constants/style";
-
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
 import { UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
-import BackButton from "../components/ui/BackButton";
+import BackButton from "../components/ui/button/BackButton";
+import Button from "../components/ui/button/Button";
+
 
 interface UserInfoProps {
   route: { params: { mode: UserState } };

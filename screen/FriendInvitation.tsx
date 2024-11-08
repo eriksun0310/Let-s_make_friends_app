@@ -4,7 +4,8 @@ import { friendCards } from "./AddFriend";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
-import BackButton from "../components/ui/BackButton";
+import BackButton from "../components/ui/button/BackButton";
+
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;

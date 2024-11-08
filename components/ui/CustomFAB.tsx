@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
 import { FAB, Portal } from "react-native-paper";
 import { Colors } from "../../constants/style";
+import { NavigationProp } from "@react-navigation/native";
+interface CustomFABProps {
+  navigation: NavigationProp<any, any>;
+}
 
-const CustomFAB = ({ navigation }) => {
+const CustomFAB: React.FC<CustomFABProps> = ({ navigation }) => {
   const [state, setState] = useState({ open: false });
 
   const onStateChange = ({ open }) => setState({ open });

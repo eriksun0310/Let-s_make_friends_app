@@ -11,6 +11,7 @@ import { setUser } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { editUserData } from "../util/auth";
+import SaveButton from "../components/ui/button/SaveButton";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
@@ -100,7 +101,8 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   useEffect(() => {
     navigation.setOptions({
       title: "更多關於我的設定",
-      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+      headerTitleAlign: "center",
+      headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, selectedOption]);
 

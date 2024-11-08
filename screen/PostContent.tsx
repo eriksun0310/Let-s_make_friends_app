@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import React, { useEffect } from "react";
-import BackButton from "../components/ui/BackButton";
+
 import { NavigationProp } from "@react-navigation/native";
 import Comments from "../components/post/Comments";
 
@@ -9,6 +9,7 @@ import { PaperProvider } from "react-native-paper";
 import Post from "../components/post/Post";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import BackButton from "../components/ui/button/BackButton";
 
 interface PostContentProps {
   navigation: NavigationProp<any>;

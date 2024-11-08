@@ -5,7 +5,7 @@ import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendState } from "../../shared/types";
-import CustomIcon from "./CustomIcon";
+import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
 interface FriendCardProps {
   friendState: FriendState;

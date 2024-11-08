@@ -8,11 +8,11 @@ import {
   ScrollView,
 } from "react-native";
 import { Modalize } from "react-native-modalize";
-import CustomIcon from "./CustomIcon";
+import CustomIcon from "./button/CustomIcon";
 import { SearchIcon, X } from "lucide-react-native";
 import { Colors } from "../../constants/style";
 import Fieldset from "./Fieldset";
-import SelectedTagText from "./TagText";
+import SelectedTagText from "./SelectedTagText";
 
 // 模擬搜尋選項數據
 const mockOptions = ["嗨", "嗨嗨", "嗨你好", "123456", "4561"];

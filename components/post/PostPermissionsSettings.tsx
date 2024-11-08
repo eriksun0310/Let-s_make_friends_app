@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
-import SegmentedButtons from "../ui/SegmentedButtons";
 import { Text, View, StyleSheet } from "react-native";
-import { Colors } from "../../constants/style";
+import SegmentedButtons from "../ui/button/SegmentedButtons";
 
 const buttons = [
   {

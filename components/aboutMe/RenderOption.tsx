@@ -1,8 +1,9 @@
 import React from "react";
-import BorderButton from "../ui/BorderButton";
+
 import { View, StyleSheet } from "react-native";
 import { Tab, SelectedOption } from "../../shared/types";
 import { optionList } from "../../shared/static";
+import BorderButton from "../ui/button/BorderButton";
 
 interface RenderOptionProps {
   currentTab: Tab;

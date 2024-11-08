@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
+import SaveButton from "../components/ui/button/SaveButton";
 
 interface EditPersonalProps {
   route: {
@@ -49,7 +50,7 @@ const EditPersonal: React.FC<EditPersonalProps> = ({ route, navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: `編輯${label}`,
-      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+      headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, value]);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 
 interface BorderButtonProps {
   text: string;

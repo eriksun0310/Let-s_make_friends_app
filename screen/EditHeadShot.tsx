@@ -8,8 +8,10 @@ import { RootState } from "../store/store";
 import { setUser } from "../store/userSlice";
 import { editUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
-import BackButton from "../components/ui/BackButton";
+
 import { Colors } from "../constants/style";
+import BackButton from "../components/ui/button/BackButton";
+import SaveButton from "../components/ui/button/SaveButton";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
@@ -46,26 +48,9 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: "編輯大頭貼",
-
+      headerTitleAlign: "center",
       headerLeft: () => <BackButton navigation={navigation} />,
-      // headerRight: () => <Button title="儲存" onPress={handleSave} />,
-
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginHorizontal: 15,
-          }}
-          onPress={handleSave}
-        >
-          <Text
-            style={{
-              color: Colors.textBlue,
-            }}
-          >
-            儲存
-          </Text>
-        </TouchableOpacity>
-      ),
+      headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, headShot]);
 
@@ -83,6 +68,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  headerText: {
+    marginHorizontal: 15,
+  },
+  headerTextColor: {
+    color: Colors.textBlue,
   },
 });
 

@@ -6,7 +6,8 @@ import {
   StyleProp,
   TextStyle,
 } from "react-native";
-import { Colors } from "../../constants/style";
+import { Colors } from "../../../constants/style";
+
 
 interface ButtonProps {
   style?: StyleProp<TextStyle>;

@@ -2,7 +2,6 @@ import { View, StyleSheet, ScrollView, Alert, Button } from "react-native";
 import { Colors } from "../constants/style";
 import HeadShot from "../components/userInfo/HeadShot";
 import Input from "../components/ui/Input";
-import GenderButtons from "../components/ui/GenderButtons";
 import AgeCalculator from "../components/ui/AgeCalculator";
 import { Gender, HeadShot as HeadShotType, User } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
@@ -13,6 +12,8 @@ import { useEffect, useState } from "react";
 import { checkRequired } from "../shared/funcs";
 import { saveUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
+import GenderButtons from "../components/ui/button/GenderButtons";
+import SaveButton from "../components/ui/button/SaveButton";
 
 interface AboutMeProps {
   navigation: NavigationProp<any>;
@@ -78,7 +79,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button title="儲存" onPress={handleSave} />,
+      headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, form]);
 

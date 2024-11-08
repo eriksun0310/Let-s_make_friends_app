@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Colors } from "../../constants/style";
+import { Colors } from "../../../constants/style";
+
 
 interface ButtonConfig {
   value: string;

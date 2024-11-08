@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Colors } from "../../constants/style";
+
 import { ReactNode } from "react";
+import { Colors } from "../../../constants/style";
 
 interface FlatButtonProps {
   children: ReactNode;

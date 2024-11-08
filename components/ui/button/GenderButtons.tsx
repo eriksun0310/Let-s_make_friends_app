@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ButtonGroup } from "@rneui/themed";
-import { Colors } from "../../constants/style";
-import { Gender } from "../../shared/types";
-import { gender } from "../../shared/static";
+
 import { Text, StyleSheet } from "react-native";
+import { Gender } from "../../../shared/types";
+import { gender } from "../../../shared/static";
+import { Colors } from "../../../constants/style";
 
 interface GenderButtonsProps {
   value: Gender;

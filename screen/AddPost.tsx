@@ -9,13 +9,13 @@ import {
 } from "react-native";
 
 import { Colors } from "../constants/style";
-import CustomIcon from "../components/ui/CustomIcon";
+import CustomIcon from "../components/ui/button/CustomIcon";
 import { X } from "lucide-react-native";
 import AlertDialog from "../components/ui/AlertDialog";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 import TagSelector from "../components/ui/TagSelector";
-import SelectedTagText from "../components/ui/TagText";
+import SelectedTagText from "../components/ui/SelectedTagText";
 
 // 新增文章
 const AddPost = ({ navigation }) => {

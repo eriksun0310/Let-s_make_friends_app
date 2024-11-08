@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import FlatButton from "../../ui/FlatButton";
+
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import RegisterForm from "./RegisterForm";
 import type { Form, RegisterIsValid } from "../../../shared/types";
 import { logout } from "../../../store/userSlice";
 import { useDispatch } from "../../../store/store";
+import FlatButton from "../../ui/button/FlatButton";
 
 const initIsValid = {
   email: { value: false, errorText: "" },

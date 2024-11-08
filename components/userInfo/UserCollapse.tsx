@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
-import { View, StyleSheet, Text } from "react-native";
-import SelectedOption from "../aboutMe/SelectedOption";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { optionList, tabs } from "../../shared/static";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Colors } from "../../constants/style";
+import { NavigationProp } from "@react-navigation/native";
 
 //TODO: 要傳入user value 個人資料清單
-const UserCollapse = ({ navigation }) => {
+
+interface UserCollapseProps {
+  navigation: NavigationProp<any>;
+}
+
+const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
   const [expanded, setExpanded] = useState(false);
@@ -28,28 +33,24 @@ const UserCollapse = ({ navigation }) => {
         <ListItem>
           <ListItem.Content>
             <ListItem.Title>自我介紹: hi</ListItem.Title>
-            {/* <ListItem.Subtitle>hi</ListItem.Subtitle> */}
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
             <ListItem.Title>性別: 男</ListItem.Title>
-            {/* <ListItem.Subtitle>男</ListItem.Subtitle> */}
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
             <ListItem.Title>生日: 2000-01-01</ListItem.Title>
-            {/* <ListItem.Subtitle>2000-01-01</ListItem.Subtitle> */}
           </ListItem.Content>
         </ListItem>
 
         <ListItem>
           <ListItem.Content>
             <ListItem.Title>年齡 :24</ListItem.Title>
-            {/* <ListItem.Subtitle>24</ListItem.Subtitle> */}
           </ListItem.Content>
         </ListItem>
 
@@ -57,7 +58,8 @@ const UserCollapse = ({ navigation }) => {
           return (
             <ListItem>
               <ListItem.Content>
-                <ListItem.Title
+                <TouchableOpacity
+                  style={styles.listItemContainer}
                   onPress={() =>
                     navigation.navigate("aboutMeSelectOption", {
                       currentTab: key,
@@ -67,33 +69,25 @@ const UserCollapse = ({ navigation }) => {
                   <View>
                     <Text>{tabs[key]}:</Text>
                   </View>
-                  <View>
+                  <View style={styles.optionContainer}>
                     {user.selectedOption[key]?.length > 0 ? (
-                      user.selectedOption[key]?.map((item) => {
+                      user.selectedOption[key]?.map((item, index) => {
+                        const isLastItem =
+                          index === user.selectedOption[key]?.length - 1;
                         const option = optionList?.[key]?.[item];
 
                         return (
-                          <Text
-                            style={{
-                              paddingLeft: 10,
-                            }}
-                          >
+                          <Text key={index}>
                             {option}
+                            {!isLastItem && "、"}
                           </Text>
                         );
                       })
                     ) : (
-                      <Text
-                        style={{
-                          paddingLeft: 10,
-                          color: Colors.textBlue,
-                        }}
-                      >
-                        請選擇
-                      </Text>
+                      <Text style={styles.pleaseSelectText}>請選擇</Text>
                     )}
                   </View>
-                </ListItem.Title>
+                </TouchableOpacity>
               </ListItem.Content>
             </ListItem>
           );
@@ -106,6 +100,19 @@ const UserCollapse = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
+  },
+
+  listItemContainer: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  optionContainer: {
+    display: "flex",
+    flexDirection: "row",
+    paddingLeft: 10,
+  },
+  pleaseSelectText: {
+    color: Colors.textBlue,
   },
 });
 export default UserCollapse;

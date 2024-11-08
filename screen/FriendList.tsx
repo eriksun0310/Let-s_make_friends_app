@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { Colors } from "../constants/style";
-
 import FriendItem from "../components/ui/FriendItem";
 import { NavigationProp } from "@react-navigation/native";
-import BackButton from "../components/ui/BackButton";
+import BackButton from "../components/ui/button/BackButton";
+
 // 堆疊頁面
 
 export const friendList = Array(34).fill({

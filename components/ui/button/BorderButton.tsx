@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
-import { Tab } from "../../shared/types";
+import { Tab } from "../../../shared/types";
+
 
 interface BorderButtonProps {
   currentTab: Tab;

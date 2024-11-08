@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
-import CustomIcon from "../components/ui/CustomIcon";
+import CustomIcon from "../components/ui/button/CustomIcon";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",

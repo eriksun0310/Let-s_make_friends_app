@@ -2,9 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import React from "react";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
-import { HeadShot as HeadShotType, User } from "../../shared/types";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../store/userSlice";
+import { HeadShot as HeadShotType } from "../../shared/types";
+
 interface HeadShotProps {
   nameValue?: string;
   navigation: NavigationProp<any>;

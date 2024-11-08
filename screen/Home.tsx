@@ -4,7 +4,7 @@ import Post from "../components/post/Post";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { Search } from "lucide-react-native";
-import CustomIcon from "../components/ui/CustomIcon";
+import CustomIcon from "../components/ui/button/CustomIcon";
 import { Colors } from "../constants/style";
 import CustomFAB from "../components/ui/CustomFAB";
 import { FAB, PaperProvider, Portal } from "react-native-paper";

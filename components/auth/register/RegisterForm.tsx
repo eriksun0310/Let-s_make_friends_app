@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import CustomTextInput from "../../ui/CustomTextInput";
-import Button from "../../ui/Button";
+
 import type { Form, RegisterIsValid } from "../../../shared/types";
+import Button from "../../ui/button/Button";
 
 interface RegisterFormProps {
   isValid: RegisterIsValid;

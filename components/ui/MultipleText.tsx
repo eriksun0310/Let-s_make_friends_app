@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import ViewBorderButton from "./ViewBorderButton";
+import ViewBorderButton from "./button/ViewBorderButton";
 import { Tab } from "../../shared/types";
 import { Colors } from "../../constants/style";
 import { optionList, tabs } from "../../shared/static";

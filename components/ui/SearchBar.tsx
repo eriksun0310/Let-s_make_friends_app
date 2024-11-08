@@ -6,12 +6,13 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import CustomIcon from "./CustomIcon";
+import CustomIcon from "./button/CustomIcon";
 import { SearchIcon, X } from "lucide-react-native";
 import { Colors } from "../../constants/style";
+import { NavigationProp } from "@react-navigation/native";
 
 interface SearchBarProps {
-  navigation: any;
+  navigation: NavigationProp<any>;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ navigation }) => {
