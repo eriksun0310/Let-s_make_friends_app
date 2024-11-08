@@ -7,19 +7,22 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-
 import { Colors } from "../constants/style";
 import CustomIcon from "../components/ui/button/CustomIcon";
-import { X } from "lucide-react-native";
+import { Eye, X } from "lucide-react-native";
 import AlertDialog from "../components/ui/AlertDialog";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
 import TagSelector from "../components/ui/TagSelector";
 import SelectedTagText from "../components/ui/SelectedTagText";
+import SegmentedButtons from "../components/ui/button/SegmentedButtons";
+import { segmentedButtons } from "../shared/static";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 // 新增文章
 const AddPost = ({ navigation }) => {
   const modalizeRef = useRef(null);
+
+  const [permissions, setPermissions] = useState("all");
 
   // 顯示在文章上的tag
   const [postTags, setPostTags] = useState<string[]>([]);
@@ -66,18 +69,8 @@ const AddPost = ({ navigation }) => {
         </CustomIcon>
       ),
       headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginHorizontal: 15,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.textBlue,
-            }}
-          >
-            發布
-          </Text>
+        <TouchableOpacity style={{ marginHorizontal: 15 }}>
+          <Text style={{ color: Colors.textBlue }}>發布</Text>
         </TouchableOpacity>
       ),
     });
@@ -109,6 +102,7 @@ const AddPost = ({ navigation }) => {
               multiline
             />
 
+            {/* 文章標籤 */}
             <View style={styles.tagContainer}>
               <TouchableOpacity
                 style={styles.tagButton}
@@ -124,6 +118,23 @@ const AddPost = ({ navigation }) => {
                   removeTag={handleRemoveTag}
                 />
               )}
+            </View>
+
+            {/* 文章權限設定 */}
+            <View style={styles.eyeContainer}>
+              <View style={{ marginLeft: 10 }}>
+                <MaterialCommunityIcons
+                  name="account-eye"
+                  size={30}
+                  color={Colors.tag}
+                />
+              </View>
+
+              <SegmentedButtons
+                buttons={segmentedButtons}
+                onValueChange={setPermissions}
+                initialValue={permissions}
+              />
             </View>
           </View>
         </View>
@@ -181,6 +192,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+  },
+  eyeContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 export default AddPost;

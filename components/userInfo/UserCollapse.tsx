@@ -37,7 +37,13 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
         content={
           <>
             <ListItem.Content>
-              <ListItem.Title>個人資料</ListItem.Title>
+              <ListItem.Title
+                style={{
+                  color: Colors.textGrey,
+                }}
+              >
+                個人資料
+              </ListItem.Title>
             </ListItem.Content>
           </>
         }

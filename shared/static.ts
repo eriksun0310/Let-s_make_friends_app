@@ -25,3 +25,19 @@ export const gender = {
   female: "女",
   male: "男",
 };
+
+
+export const segmentedButtons = [
+  {
+    value: "all",
+    label: "全部",
+  },
+  {
+    value: "public",
+    label: "公開",
+  },
+  {
+    value: "friends",
+    label: "朋友",
+  },
+];

@@ -5,6 +5,7 @@ import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
+import { Badge } from "react-native-paper";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -26,7 +27,10 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       ),
       headerRight: () => (
         <CustomIcon onPress={() => navigation.navigate("friendInvitation")}>
-          <BellRing color={Colors.icon} size={25} />
+          <View style={styles.bellRingContainer}>
+            <Badge style={styles.badge}>3</Badge>
+            <BellRing color={Colors.icon} size={25} />
+          </View>
         </CustomIcon>
       ),
     });
@@ -58,6 +62,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+  },
+  bellRingContainer: {
+    position: "relative",
+  },
+  badge: {
+    fontSize: 12,
+    position: "absolute",
+    top: -10,
+    right: -8,
+    zIndex: 1,
+    backgroundColor: "#ff4949",
   },
 });
 
