@@ -1,12 +1,12 @@
 import { View, StyleSheet, Alert } from "react-native";
 import Input from "../components/ui/Input";
 import { useEffect, useState } from "react";
-import { editUserData } from "../util/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
+import { editUserData } from "../util/personApi";
 
 const title = {
   name: "姓名",

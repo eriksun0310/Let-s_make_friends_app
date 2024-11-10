@@ -20,7 +20,7 @@ export const createUser = async (email: string, password: string) => {
   }
 };
 
-//login:具體的接口,專門處理會員登入的邏輯
+// 會員登入 
 export const login = async (email: string, password: string) => {
   const userCredential = await signInWithEmailAndPassword(
     auth,
@@ -33,23 +33,8 @@ export const login = async (email: string, password: string) => {
   };
 };
 
-// 取得用戶資料
-export const getUserData = async (userId: string) => {
-  const userRef = ref(database, `${userId}/user`);
-  const snapshot = await get(userRef);
-  if (snapshot.exists()) {
-    return snapshot.val();
-  } else {
-    return null;
-  }
-};
 
-// 儲存用戶基本資料
-export const saveUserData = async (user: User) => {
-  set(ref(database, `${user.userId}/user`), {
-    ...user,
-  });
-};
+
 
 // 儲存用戶貼文資料，為每篇貼文建立唯一 ID
 //TODO: 首頁  + PostData type
@@ -87,43 +72,3 @@ export const uploadPostWithMedia = async (
   });
 };
 
-// 編輯用戶資料(for:單一欄位)
-export const editUserData = async ({
-  userId,
-  fieldName,
-  fieldValue,
-}: {
-  userId: string;
-  fieldName: string;
-  fieldValue: any;
-}) => {
-  try {
-    const updates: Record<string, any> = {};
-    updates[fieldName] = fieldValue;
-
-    await update(ref(database, `${userId}/user`), updates);
-  } catch (error) {
-    console.error("Error updating user data:", error);
-  }
-};
-
-// 取得所有用戶資料
-export const getAllUsers = async () => {
-  // const db = getDatabase();
-  const usersRef = ref(database, "/");
-
-  try {
-    const snapshot = await get(child(usersRef, ""));
-    if (snapshot.exists()) {
-      const allUsersData = snapshot.val();
-      console.log("allUsersData", allUsersData);
-      return Object.values(allUsersData).map((user) => user.user); // 只返回用戶資訊
-    } else {
-      console.log("No data available");
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching all users:", error);
-    return null;
-  }
-};

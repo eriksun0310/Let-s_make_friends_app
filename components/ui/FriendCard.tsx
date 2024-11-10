@@ -7,6 +7,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { FriendState } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
+import { HeadShot } from "../../shared/types";
 interface FriendCardProps {
   friendState: FriendState;
   index: number;
@@ -14,6 +15,7 @@ interface FriendCardProps {
     name: string;
     birthDate: string;
     age: number;
+    headShot: HeadShot;
   };
   navigation: NavigationProp<any>;
 }
@@ -44,13 +46,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
         rounded
         size="medium"
         containerStyle={styles.avatar}
-        source={require("../../assets/animal/ostrich.png")}
+        source={friend.headShot.imageUrl}
       />
 
       <Card.Title>{friend.name}</Card.Title>
 
-      <Text style={styles.info}>年齡: {calculateAge(friend.birthDate)}</Text>
-      <Text style={styles.info}>星座: {getZodiacSign(friend.birthDate)}</Text>
+      <Text style={styles.info}>年齡: {calculateAge(friend.birthday)}</Text>
+      <Text style={styles.info}>星座: {getZodiacSign(friend.birthday)}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.actionButton} onPress={clickSearch}>
           <Search color={Colors.icon} />

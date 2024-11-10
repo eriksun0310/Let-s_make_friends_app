@@ -1,0 +1,151 @@
+
+{
+  "users": {
+    "A1": {
+      "userId": "A1",
+      "name": "User A1",
+      "gender": "female",
+      "introduce": "Hi, I'm A1",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": ""
+    },
+    "A2": {
+      "userId": "A2",
+      "name": "User A2",
+      "gender": "male",
+      "introduce": "Hi, I'm A2",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": ""
+    },
+    "A3": {
+      "userId": "A3",
+      "name": "User A3",
+      "gender": "female",
+      "introduce": "Hi, I'm A3",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": ""
+    },
+    "A4": {
+      "userId": "A4",
+      "name": "User A4",
+      "gender": "male",
+      "introduce": "Hi, I'm A4",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": ""
+    }
+  },
+  // 好友關係
+  "friendships": {
+    "A1": {
+      "friends": {
+        "A2": {
+          "status": "friends",
+          "since": "2024-11-10T08:00:00Z"
+        }
+      }
+    },
+    "A2": {
+      "friends": {
+        "A1": {
+          "status": "friends",
+          "since": "2024-11-10T08:00:00Z"
+        }
+      }
+    }
+  },
+  // 好友邀請
+  "friendRequests": {
+    "request1": {
+      "senderId": "A3",
+      "receiverId": "A1",
+      "status": "pending",
+      "timestamp": "2024-11-10T09:00:00Z"
+    }
+  },
+  "posts": {
+    "-postId123": {
+      "authorId": "123",
+      "content": "大家好",
+      "createdAt": 1698633600000,
+      "updatedAt": 1698633600000,
+      "privacy": "friends-only",
+      "likeCount": 2, // 更新為2個讚
+      "commentCount": 1
+    }
+  },
+  // 限好友貼文
+  "post-privacy": {
+    "friends-only": {
+      "-postId123": true
+    }
+  },
+  // 用於:查123 這個人可以看到123 所有的發文
+  "user-posts": {
+    "123": {
+      "-postId123": true
+    }
+  },
+  // 文章留言
+  "post-comments": {
+    "-postId123": {
+      "-commentId456": {
+        "authorId": "456",
+        "content": "嗨嗨",
+        "createdAt": 1698633660000,
+        "updatedAt": 1698633660000
+      }
+    }
+  },
+  // 記錄每篇文章的按讚者
+  "post-likes": {
+    "-postId123": {
+      "123": true,
+      "456": true
+    }
+  },
+  // 記錄每個用戶按過讚的文章
+  "user-likes": {
+    "123": {
+      "-postId123": true
+    },
+    "456": {
+      "-postId123": true
+    }
+  }
+}

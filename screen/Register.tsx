@@ -21,7 +21,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
       await createUser(form.email, form.password);
 
       // 註冊成功後回到登入頁面
-      navigation.replace("login");
+      navigation.navigate("login");
     } catch (error) {
       console.log("error", error);
       setError("註冊失敗，請稍後再試");

@@ -10,10 +10,10 @@ import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import { useEffect, useState } from "react";
 import { checkRequired } from "../shared/funcs";
-import { saveUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
+import { saveUserData } from "../util/personApi";
 
 interface AboutMeProps {
   navigation: NavigationProp<any>;

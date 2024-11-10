@@ -111,8 +111,23 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
+  const isNewUser = useSelector((state: RootState) => state.user.isNewUser);
+  // 是否已經登入
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.user.isAuthenticated
+  );
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}
+    >
+      <Stack.Screen
+        name="login"
+        options={{
+          title: "會員登入",
+          headerShown: false,
+        }}
+        component={Login}
+      />
       <Stack.Screen
         name="main"
         options={{

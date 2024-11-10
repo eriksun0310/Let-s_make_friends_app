@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
-import { getAllUsers } from "../util/auth";
+import { getAllUsers } from "../util/searchFriends";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -19,6 +21,8 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
+  const user = useSelector((state: RootState) => state.user.user);
+
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState([]);
 
@@ -44,7 +48,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
 
     const fetchUsers = async () => {
       try {
-        const userData = await getAllUsers();
+        const userData = await getAllUsers(user.userId);
         setAllUsers(userData);
       } catch (error) {}
     };
@@ -57,7 +61,21 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {friendCards.map((friend, index) => (
+        {Object.keys(allUsers)?.map((key) => {
+          const user = allUsers[key];
+
+          console.log('user', user)
+          return (
+            <FriendCard
+              friendState="add"
+              key={key}
+              index={key}
+              friend={user}
+              navigation={navigation}
+            />
+          );
+        })}
+        {/* {friendCards.map((friend, index) => (
           <FriendCard
             friendState="add"
             key={index}
@@ -65,7 +83,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
             friend={friend}
             navigation={navigation}
           />
-        ))}
+        ))} */}
       </ScrollView>
     </View>
   );

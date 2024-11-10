@@ -6,12 +6,12 @@ import { HeadShot } from "../shared/types";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { setUser } from "../store/userSlice";
-import { editUserData } from "../util/auth";
 import { NavigationProp } from "@react-navigation/native";
 
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
+import { editUserData } from "../util/personApi";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;

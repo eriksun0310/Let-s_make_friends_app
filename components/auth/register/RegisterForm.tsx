@@ -18,9 +18,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ isValid, onSubmit }) => {
   } = isValid;
 
   const [form, setForm] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
+    email: "111@gmail.com",
+    password: "11111111",
+    confirmPassword: "11111111",
   });
 
   //更新form state

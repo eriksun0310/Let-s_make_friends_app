@@ -30,8 +30,8 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
 
   const navigation = useNavigation();
   const [value, setValue] = useState<LoginForm>({
-    email: "222@gmail.com",
-    password: "22222222",
+    email: "111@gmail.com",
+    password: "11111111",
   });
 
   // useEffect(() => {

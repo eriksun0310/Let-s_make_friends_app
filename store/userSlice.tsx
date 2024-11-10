@@ -2,13 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { auth } from "../util/firebaseConfig";
-import { getUserData } from "../util/auth";
+import { getUserData } from "../util/personApi";
 import { useNavigation } from "@react-navigation/native";
 
 interface InitialStateProps {
   user: User;
-  isAuthenticated: boolean;
-  initialized: boolean;
+  isAuthenticated: boolean; // 是否已經登入
+  initialized: boolean; // 應用程序這個初始化步驟已完成
+  isNewUser: boolean; // 是否是新用戶
 }
 
 const initialState: InitialStateProps = {
@@ -31,6 +32,7 @@ const initialState: InitialStateProps = {
   },
   isAuthenticated: false, // 是否已經登入
   initialized: false, // 應用程序這個初始化步驟已完成,
+  isNewUser: false,
 };
 
 // slice 定義
@@ -82,6 +84,10 @@ const userSlice = createSlice({
         }
       }
     },
+
+    setIsNewUser(state, action) {
+      state.isNewUser = action.payload;
+    },
   },
 });
 
@@ -101,19 +107,24 @@ export const logout = (): AppThunk => async (dispatch) => {
 
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Firebase 認證狀態
 export const initializeAuth = (): AppThunk => async (dispatch) => {
+  // const navigation = useNavigation()
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       const userData = await getUserData(user.uid);
 
+      // 舊用戶登入
       if (userData) {
         dispatch(userSlice.actions.setUser(userData));
+        dispatch(userSlice.actions.setIsNewUser(false));
+
+        // 新用戶登入
       } else {
         dispatch(
           userSlice.actions.setUser({ userId: user.uid, email: user.email })
         );
+        dispatch(userSlice.actions.setIsNewUser(true));
       }
 
-      // 如果有用戶已登入，更新用戶信息並設置為已認證
       dispatch(userSlice.actions.setIsAuthenticated(true));
     } else {
       // 如果用戶沒有登入，設置為未認證
@@ -123,7 +134,8 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
     dispatch(userSlice.actions.setInitialized(true));
   });
 };
-export const { setUser, setSelectedOption } = userSlice.actions;
+export const { setUser, setSelectedOption, setIsAuthenticated } =
+  userSlice.actions;
 export const selectUser = (state: RootState) => state.user;
 
 export default userSlice.reducer;

@@ -1,4 +1,4 @@
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
@@ -10,9 +10,9 @@ import { RouteProp } from "@react-navigation/native";
 import { setUser } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { editUserData } from "../util/auth";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
+import { editUserData } from "../util/personApi";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",

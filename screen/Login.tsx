@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import LoginContent from "../components/auth/login/LoginContent";
-import { getUserData, login } from "../util/auth";
+import { login } from "../util/auth";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 
-import { useDispatch } from "react-redux";
-import { setUser } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import userSlice, { setInitialized, setIsAuthenticated, setUser } from "../store/userSlice";
+import { getUserData } from "../util/personApi";
 
 interface LoginEmailProps {
   navigation: NavigationProp<any>;
@@ -73,7 +74,9 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
 
       // 取得用戶資料
       const userData = await getUserData(userId);
-
+   
+      // dispatch(setIsAuthenticated(true));
+      console.log('userData', userData)
       if (userData) {
         dispatch(setUser(userData));
         navigation.navigate("main", { screen: "chat" }); // 如果用戶資料存在，可以選擇跳轉 聊天室

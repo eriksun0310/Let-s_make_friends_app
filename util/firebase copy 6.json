@@ -1,0 +1,209 @@
+
+//11/10 目前確定有的格式
+{
+  // 用戶資料（保持不變）
+  "users": {
+    "A1": {
+      "userId": "A1",
+      "name": "User A1",
+      "gender": "female",
+      "introduce": "Hi, I'm A1",
+      "headShot": {
+        "imageUrl": "",
+        "imageType": "people"
+      },
+      "selectedOption": {
+        "interests": [],
+        "favoriteFood": [],
+        "dislikedFood": []
+      },
+      "birthday": "",
+      "email": "",
+      "isPublic": true
+    },
+    // ... A2, A3, A4 的資料
+  },
+  // 好友關係（保持不變）
+  "friendships": {
+    "A1": {
+      "friends": {
+        "A2": {
+          "status": "friends",
+          "since": "2024-11-10T08:00:00Z"
+        }
+      }
+    },
+    "A2": {
+      "friends": {
+        "A1": {
+          "status": "friends",
+          "since": "2024-11-10T08:00:00Z"
+        }
+      }
+    }
+  },
+  // 好友請求（保持不變）
+  "friendRequests": {
+    "request1": {
+      "senderId": "A3",
+      "receiverId": "A1",
+      "status": "pending",
+      "timestamp": "2024-11-10T09:00:00Z"
+    }
+  },
+  // 優化後的貼文結構
+  "posts": {
+    "post1": {
+      "authorId": "A1",
+      "content": "Hi 大家好",
+      "createdAt": "2024-11-10T10:00:00Z",
+      "updatedAt": "2024-11-10T10:00:00Z",
+      "visibility": "friends-only", // "friends-only" 或 "public"
+      "likeCount": 1,
+      "commentCount": 1,
+      "tags": [
+        "Hi"
+      ] // 新增 tags 欄位
+    },
+    "post2": {
+      "authorId": "A3",
+      "content": "Hi",
+      "createdAt": "2024-11-10T11:00:00Z",
+      "updatedAt": "2024-11-10T11:00:00Z",
+      "visibility": "public",
+      "likeCount": 0,
+      "commentCount": 0
+    }
+  },
+  // 新增 tags 索引集合
+  "tags": {
+    "hi": { // 轉小寫存儲，方便搜尋
+      "postCount": 1,
+      "lastUsed": "2024-11-10T10:00:00Z"
+    }
+  },
+  // 新增 tag-posts 關聯集合
+  "tagPosts": {
+    "hi": {
+      "post1": {
+        "createdAt": "2024-11-10T10:00:00Z",
+        "authorId": "A1",
+        "visibility": "friends-only"
+      }
+    }
+  },
+  // 貼文互動
+  "postInteractions": {
+    "post1": {
+      "likes": {
+        "A2": {
+          "timestamp": "2024-11-10T10:05:00Z"
+        }
+      },
+      "comments": {
+        "comment1": {
+          "authorId": "A2",
+          "content": "Hi",
+          "createdAt": "2024-11-10T10:10:00Z",
+          "updatedAt": "2024-11-10T10:10:00Z"
+        }
+      }
+    }
+  },
+  // 用戶貼文索引
+  "userPosts": {
+    "A1": {
+      "post1": {
+        "createdAt": "2024-11-10T10:00:00Z",
+        "visibility": "friends-only",
+        "tags": [
+          "Hi"
+        ]
+      }
+    },
+    "A3": {
+      "post2": {
+        "createdAt": "2024-11-10T11:00:00Z",
+        "visibility": "public"
+      }
+    }
+  },
+  // 用戶互動索引（方便查詢用戶的所有互動）
+  "userInteractions": {
+    "A2": {
+      "likes": {
+        "post1": {
+          "timestamp": "2024-11-10T10:05:00Z"
+        }
+      },
+      "comments": {
+        "post1_comment1": {
+          "timestamp": "2024-11-10T10:10:00Z"
+        }
+      }
+    }
+  },
+
+
+ // 聊天室集合
+  "chatRooms": {
+    "room1": {
+      "roomId": "room1",
+      "type": "private", // private 或 group
+      "participants": ["A1", "A2"],
+      "createdAt": "2024-11-10T08:00:00Z",
+      "lastMessageId": "msg2",
+      "lastActivity": "2024-11-10T08:05:00Z"
+    }
+  },
+
+  // 聊天訊息集合
+  "messages": {
+    "msg1": {
+      "messageId": "msg1",
+      "roomId": "room1",
+      "senderId": "A1",
+      "content": "嗨",
+      "type": "text", // text, image, file 等
+      "createdAt": "2024-11-10T08:00:00Z",
+      "status": "delivered", // sending, delivered, failed
+      "readBy": {
+        "A2": {
+          "readAt": "2024-11-10T08:01:00Z"
+        }
+      }
+    },
+    "msg2": {
+      "messageId": "msg2",
+      "roomId": "room1",
+      "senderId": "A2",
+      "content": "你好",
+      "type": "text",
+      "createdAt": "2024-11-10T08:05:00Z",
+      "status": "delivered",
+      "readBy": {
+        "A1": {
+          "readAt": "2024-11-10T08:06:00Z"
+        }
+      }
+    }
+  },
+
+  // 用戶聊天室索引 - 方便查詢用戶參與的所有聊天室
+  "userChatRooms": {
+    "A1": {
+      "room1": {
+        "joinedAt": "2024-11-10T08:00:00Z",
+        "lastRead": "2024-11-10T08:06:00Z", // 用戶最後讀取時間
+        "unreadCount": 0
+      }
+    },
+    "A2": {
+      "room1": {
+        "joinedAt": "2024-11-10T08:00:00Z",
+        "lastRead": "2024-11-10T08:01:00Z",
+        "unreadCount": 0
+      }
+    }
+  }
+}
