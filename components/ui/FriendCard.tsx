@@ -8,10 +8,14 @@ import { FriendState } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
 import { HeadShot } from "../../shared/types";
+import { sendFriendRequest } from "../../util/searchFriends";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 interface FriendCardProps {
   friendState: FriendState;
   index: number;
   friend: {
+    userId: string;
     name: string;
     birthDate: string;
     age: number;
@@ -25,12 +29,28 @@ const FriendCard: React.FC<FriendCardProps> = ({
   friend,
   navigation,
 }) => {
+  const user = useSelector((state: RootState) => state.user.user);
   // 點擊 好友資訊
   const clickSearch = () => {
     navigation.navigate?.("userInfoFriend", { mode: "friend" });
   };
   //點擊 加好友
-  const clickAddFriend = () => {};
+  const clickAddFriend = async (senderId: string) => {
+    // // console.log("friend", friend);
+    // sendFriendRequest(user.userId, senderId);
+
+    try {
+      const result = await sendFriendRequest(user.userId, senderId);
+      if (result.success) {
+        console.log("Friend request sent successfully!");
+        // 可以添加一些UI反饋，比如彈出提示
+      } else {
+        console.error("Failed to send friend request");
+      }
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
+  };
   //點擊 好友確認
   const clickCheckFriend = () => {};
   return (
@@ -61,7 +81,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
           style={styles.actionButton}
           onPress={() => {
             if (friendState === "add") {
-              clickAddFriend();
+              clickAddFriend(friend.userId);
             } else {
               clickCheckFriend();
             }

@@ -42,7 +42,7 @@ const TagSelector = ({
   const handleSelect = (item: string) => {
     setSelectedTags([...selectedTags, item]);
 
-    console.log("filteredOptions", filteredOptions);
+    // console.log("filteredOptions", filteredOptions);
     // 沒有搜尋文字, 就清空 searchText
     if (filteredOptions.length === 1) {
       setSearchText("");

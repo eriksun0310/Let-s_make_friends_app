@@ -5,7 +5,10 @@ import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
-
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { useFriendRequests } from "../components/hooks/useFriendRequests";
+import { getSenderFriendData } from "../util/searchFriends";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -13,6 +16,12 @@ interface FriendInvitationProps {
 
 //交友邀請
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
+  const user = useSelector((state: RootState) => state.user.user);
+
+  // console.log("userId 22222", user.userId);
+
+  const { friendRequests, loading } = useFriendRequests(user.userId);
+
   useEffect(() => {
     navigation.setOptions({
       title: "交友邀請",
@@ -23,7 +32,16 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {friendCards.map((friend, index) => (
+        {Object.entries(friendRequests).map(([requestId, request]) => {
+          console.log("requestId", requestId);
+          console.log("request", request.senderId); //A1
+          // 寄出好友邀請的好友資料
+          const senderFriendData =  getSenderFriendData(request.senderId);
+          console.log("senderFriendData", senderFriendData);
+
+          return <></>;
+        })}
+        {/* {friendCards.map((friend, index) => (
           <FriendCard
             friendState="confirm"
             key={index}
@@ -31,7 +49,7 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
             friend={friend}
             navigation={navigation}
           />
-        ))}
+        ))} */}
       </ScrollView>
     </View>
   );

@@ -9,6 +9,7 @@ import { Badge } from "react-native-paper";
 import { getAllUsers } from "../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { useFriendRequests } from "../components/hooks/useFriendRequests";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -23,6 +24,12 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
+  console.log("userId 22222", user.userId);
+
+  const { friendRequests, loading } = useFriendRequests(user.userId);
+
+  console.log("friendRequests 1111", Object.keys(friendRequests).length);
+  // if (loading) return <Text>Loading...</Text>;
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState([]);
 
@@ -37,7 +44,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       headerRight: () => (
         <CustomIcon onPress={() => navigation.navigate("friendInvitation")}>
           <View style={styles.bellRingContainer}>
-            <Badge style={styles.badge}>3</Badge>
+            <Badge style={styles.badge}>
+              {Object.keys(friendRequests).length || 0}
+            </Badge>
             <BellRing color={Colors.icon} size={25} />
           </View>
         </CustomIcon>
@@ -54,9 +63,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     };
 
     fetchUsers(); // 調用 API 獲取資料
-  }, [navigation]);
+  }, [navigation, friendRequests]);
 
-  console.log("allUsers", allUsers);
+  // console.log("allUsers", allUsers);
 
   return (
     <View style={styles.screen}>
@@ -64,7 +73,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
         {Object.keys(allUsers)?.map((key) => {
           const user = allUsers[key];
 
-          console.log('user', user)
+          // console.log("user", user);
           return (
             <FriendCard
               friendState="add"

@@ -1,6 +1,9 @@
 import { database } from "./firebaseConfig";
 import { get, ref, set, update } from "firebase/database";
 
+// 用於管理好友請求的 Firebase 參考路徑
+const friendRequestsRef = ref(database, "friendRequests");
+
 /*
 總共有四個用戶 A1、A2 、A3 、A4  
 1. A1 跟A2 互為好友 
@@ -25,12 +28,50 @@ export const getAllUsers = async (currentUserId: string) => {
         result[userId] = allUsers[userId];
         return result;
       }, {});
-    console.log("filterUsers", JSON.stringify(filterUsers, null, 2));
-    // 移除掉自己
 
     return filterUsers;
   }
   return {};
+};
+
+// 發送好友邀請
+export const sendFriendRequest = async (
+  senderId: string,
+  receiverId: string
+) => {
+  // A1 寄好友邀請給 A2
+  // friendRequests 的資料結構如下:
+  // {
+  //   "requestId": {
+  //     "senderId": "senderId", A1  a6ajkChLx6Xv7OSxjsEnL6VNYVJ2
+  //     "receiverId": "receiverId", A2 B1DSzr0OjoNoB1dO5Q4faOb1VS93
+  //     "status": "pending", // pending:待處理, accepted:已接受, rejected:已拒絕
+  //     "createdAt": "建立時間戳"
+  //   }
+  // }
+  const requestId = `${senderId}_${receiverId}_${Date.now()}`; // 產生唯一的請求ID
+
+  const newRequest = {
+    senderId,
+    receiverId,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  };
+  // 更新 Firebase 數據庫
+  await set(ref(database, `friendRequests/${requestId}`), newRequest);
+  return { success: true, requestId };
+};
+
+// 取得好友資訊
+export const getSenderFriendData = async (friendId) => {
+  console.log("friendId", friendId);
+  const userRef = ref(database, `users/${friendId}`);
+  const snapshot = await get(userRef);
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    return null;
+  }
 };
 
 const checkFriendship = async (userId1, userId2) => {
