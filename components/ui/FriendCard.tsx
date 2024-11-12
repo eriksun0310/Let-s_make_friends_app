@@ -4,23 +4,16 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
-import { FriendState } from "../../shared/types";
+import { FriendState, User } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
-import { HeadShot } from "../../shared/types";
 import { sendFriendRequest } from "../../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 interface FriendCardProps {
   friendState: FriendState;
-  index: number;
-  friend: {
-    userId: string;
-    name: string;
-    birthDate: string;
-    age: number;
-    headShot: HeadShot;
-  };
+  index: number | string;
+  friend: User;
   navigation: NavigationProp<any>;
 }
 const FriendCard: React.FC<FriendCardProps> = ({

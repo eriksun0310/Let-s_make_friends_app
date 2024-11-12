@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import { getSenderFriendData } from "../util/searchFriends";
+import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -32,24 +33,15 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {Object.entries(friendRequests).map(([requestId, request]) => {
-          console.log("requestId", requestId);
-          console.log("request", request.senderId); //A1
-          // 寄出好友邀請的好友資料
-          const senderFriendData =  getSenderFriendData(request.senderId);
-          console.log("senderFriendData", senderFriendData);
-
-          return <></>;
+        {Object.entries(friendRequests).map(([requestId, friendRequest]) => {
+          return (
+            <FriendInvitationItem
+              key={requestId}
+              friendRequest={friendRequest}
+              navigation={navigation}
+            />
+          );
         })}
-        {/* {friendCards.map((friend, index) => (
-          <FriendCard
-            friendState="confirm"
-            key={index}
-            index={index}
-            friend={friend}
-            navigation={navigation}
-          />
-        ))} */}
       </ScrollView>
     </View>
   );

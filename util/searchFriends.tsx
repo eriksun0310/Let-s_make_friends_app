@@ -1,3 +1,4 @@
+import { User } from "../shared/types";
 import { database } from "./firebaseConfig";
 import { get, ref, set, update } from "firebase/database";
 
@@ -14,24 +15,78 @@ const friendRequestsRef = ref(database, "friendRequests");
 // 1. 查詢 A1 和 A2 的好友關係
 
 // 查詢所有用戶(排除掉自己)
+// export const getAllUsers = async (currentUserId: string) => {
+//   const usersRef = ref(database, "users");
+//   const snapshot = await get(usersRef);
+
+//   if (snapshot.exists()) {
+//     const allUsers = snapshot.val();
+
+//     // 移除掉自己
+//     const filterUsers = Object.keys(allUsers)
+//       .filter((userId) => userId !== currentUserId)
+//       .reduce((result, userId) => {
+//         result[userId] = allUsers[userId];
+//         return result;
+//       }, {});
+
+//     console.log("filterUsers1111111", filterUsers);
+
+//     return filterUsers;
+//   }
+//   return {};
+// };
+
 export const getAllUsers = async (currentUserId: string) => {
-  const usersRef = ref(database, "users");
-  const snapshot = await get(usersRef);
 
-  if (snapshot.exists()) {
-    const allUsers = snapshot.val();
+  console.log('currentUserId', currentUserId)
+  try {
+    // 獲取所有用戶
+    const usersRef = ref(database, "users");
+    const usersSnapshot = await get(usersRef);
 
-    // 移除掉自己
-    const filterUsers = Object.keys(allUsers)
-      .filter((userId) => userId !== currentUserId)
-      .reduce((result, userId) => {
-        result[userId] = allUsers[userId];
+    // 獲取所有好友請求
+    const requestsRef = ref(database, "friendRequests");
+    const requestsSnapshot = await get(requestsRef);
+
+    if (!usersSnapshot.exists()) {
+      return {};
+    }
+
+    const allUsers = usersSnapshot.val();
+    const allRequests = requestsSnapshot.val() || {};
+
+    // 獲取當前用戶已發送請求的用戶ID列表
+    const sentRequestUserIds = Object.values(allRequests)
+      .filter(
+        (request: any) =>
+          // 收到好友邀請者是當前用戶 且 請求狀態是待處理
+          (request.receiverId === currentUserId || request.senderId === currentUserId) && request.status === "pending"
+      )
+      .map((request: any) => request.senderId); // 取得發送者的用戶ID
+
+    console.log("已發送請求的用戶:", sentRequestUserIds);
+
+    // 過濾用戶列表
+    const filterUsers = Object.entries(allUsers)
+      .filter(
+        ([userId, userData]) =>
+          // 排除自己
+          userId !== currentUserId &&
+          // 排除已發送請求的用戶
+          !sentRequestUserIds.includes(userId)
+      )
+      .reduce((result, [userId, userData]) => {
+        result[userId] = userData;
         return result;
       }, {});
 
+    console.log("過濾後的用戶列表:", filterUsers);
     return filterUsers;
+  } catch (error) {
+    console.error("Error getting filtered users:", error);
+    return {};
   }
-  return {};
 };
 
 // 發送好友邀請

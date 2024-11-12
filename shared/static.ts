@@ -1,4 +1,4 @@
-import { OptionList, Tabs } from "./types";
+import { OptionList, Tabs, User } from "./types";
 
 export const tabs: Tabs = {
   interests: "興趣",
@@ -26,7 +26,6 @@ export const gender = {
   male: "男",
 };
 
-
 export const segmentedButtons = [
   {
     value: "all",
@@ -41,3 +40,21 @@ export const segmentedButtons = [
     label: "朋友",
   },
 ];
+
+export const userInit: User = {
+  userId: "",
+  name: "",
+  gender: "female",
+  introduce: "",
+  headShot: {
+    imageUrl: "",
+    imageType: "people",
+  },
+  selectedOption: {
+    interests: [],
+    favoriteFood: [],
+    dislikedFood: [],
+  },
+  birthday: "",
+  email: "",
+};

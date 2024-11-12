@@ -10,6 +10,7 @@ import { getAllUsers } from "../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
+import { User } from "../shared/types";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -24,14 +25,14 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
-  console.log("userId 22222", user.userId);
+  
 
   const { friendRequests, loading } = useFriendRequests(user.userId);
 
-  console.log("friendRequests 1111", Object.keys(friendRequests).length);
+
   // if (loading) return <Text>Loading...</Text>;
   // 所有的用戶資料
-  const [allUsers, setAllUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
 
   useEffect(() => {
     // 設置導航選項
@@ -57,7 +58,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
 
     const fetchUsers = async () => {
       try {
-        const userData = await getAllUsers(user.userId);
+        const userData = await getAllUsers(user.userId) as User[];
         setAllUsers(userData);
       } catch (error) {}
     };

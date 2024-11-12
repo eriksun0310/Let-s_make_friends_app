@@ -60,3 +60,12 @@ export type User = {
 export type UserState = "personal" | "friend" | "visitor";
 
 export type FriendState = "add" | "confirm";
+
+export type FriendInvitationStatus = "pending" | "accepted" | "rejected";
+
+export type FriendRequest = {
+  receiverId: string;
+  senderId: string;
+  status: FriendInvitationStatus;
+  createdAt: Date;
+};

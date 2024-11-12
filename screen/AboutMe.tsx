@@ -14,6 +14,7 @@ import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
 import { saveUserData } from "../util/personApi";
+import { userInit } from "../shared/static";
 
 interface AboutMeProps {
   navigation: NavigationProp<any>;
@@ -23,23 +24,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
 
-  const [form, setForm] = useState<User>({
-    userId: "",
-    name: "",
-    gender: "female",
-    introduce: "",
-    headShot: {
-      imageUrl: "",
-      imageType: "people",
-    },
-    selectedOption: {
-      interests: [],
-      favoriteFood: [],
-      dislikedFood: [],
-    },
-    birthday: "",
-    email: "",
-  });
+  const [form, setForm] = useState<User>(userInit);
 
   //更新form state
   const handleChange = (
