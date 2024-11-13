@@ -10,31 +10,44 @@ import {
   ref as storageRef,
   uploadBytes,
 } from "firebase/storage";
+import { supabase } from "./supabaseClient";
 
 // 會員註冊
 export const createUser = async (email: string, password: string) => {
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    console.log("error createUser", error);
+    if (error) throw error;
+
+    // return data; // 成功後會返回使用者的註冊資料
   } catch (error) {
-    error;
+    console.error("Registration error:", error.message);
+    throw error;
   }
 };
 
-// 會員登入 
+// 會員登入
 export const login = async (email: string, password: string) => {
-  const userCredential = await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
 
-  return {
-    userId: userCredential.user.uid,
-  };
+    console.log("data login", data);
+    console.log("data user", data.user.id);
+    return {
+      userId: data.user.id,
+    };
+  } catch (error) {
+    console.error("Login error:", error.message);
+    throw error;
+  }
 };
-
-
-
 
 // 儲存用戶貼文資料，為每篇貼文建立唯一 ID
 //TODO: 首頁  + PostData type
@@ -71,4 +84,3 @@ export const uploadPostWithMedia = async (
     timestamp: new Date().toISOString(),
   });
 };
-

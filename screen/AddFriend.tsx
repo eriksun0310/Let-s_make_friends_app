@@ -25,11 +25,12 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
-  
-
   const { friendRequests, loading } = useFriendRequests(user.userId);
 
-
+  console.log(
+    "Object.keys(friendRequests).length",
+    Object.keys(friendRequests).length
+  );
   // if (loading) return <Text>Loading...</Text>;
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -45,9 +46,11 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       headerRight: () => (
         <CustomIcon onPress={() => navigation.navigate("friendInvitation")}>
           <View style={styles.bellRingContainer}>
-            <Badge style={styles.badge}>
-              {Object.keys(friendRequests).length || 0}
-            </Badge>
+            {Object.keys(friendRequests).length > 0 && (
+              <Badge style={styles.badge}>
+                {Object.keys(friendRequests).length}
+              </Badge>
+            )}
             <BellRing color={Colors.icon} size={25} />
           </View>
         </CustomIcon>
@@ -58,7 +61,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
 
     const fetchUsers = async () => {
       try {
-        const userData = await getAllUsers(user.userId) as User[];
+        const userData = (await getAllUsers(user.userId)) as User[];
         setAllUsers(userData);
       } catch (error) {}
     };
