@@ -55,6 +55,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
     const required = checkRequired(form);
     if (required.isRequired) {
       dispatch(setUser(form)); // 更新redux
+      console.log('form', form);
       await saveUserData(form); // 更新 firebase
       navigation.navigate("main", { screen: "chat" });
     } else {

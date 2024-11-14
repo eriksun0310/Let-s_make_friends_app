@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
-import { editUserData } from "../util/personApi";
+import { editUserData, saveUserSelectedOption } from "../util/personApi";
 const tabs: Tabs = {
   interests: "興趣",
   favoriteFood: "喜歡的食物",
@@ -91,9 +91,8 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
     // 更新回redux
     dispatch(setUser({ ...user, selectedOption }));
     // 更新firebase
-    await editUserData({
+    await saveUserSelectedOption({
       userId: user.userId,
-      fieldName: "selectedOption",
       fieldValue: selectedOption,
     });
     navigation.goBack();

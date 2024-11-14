@@ -58,3 +58,8 @@ export const userInit: User = {
   birthday: "",
   email: "",
 };
+
+export const updateUserTitle = {
+  name: "姓名",
+  introduce: "自我介紹",
+};

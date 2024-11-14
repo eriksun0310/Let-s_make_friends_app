@@ -69,3 +69,6 @@ export type FriendRequest = {
   status: FriendInvitationStatus;
   createdAt: Date;
 };
+
+
+export type EditUserFieldName = 'name' | 'introduce' | 'headShot' | 'selectedOption';

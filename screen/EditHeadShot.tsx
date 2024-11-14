@@ -11,7 +11,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
-import { editUserData } from "../util/personApi";
+import { editUserData, saveUserHeadShot } from "../util/personApi";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
@@ -37,9 +37,8 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
     // 更新回redux
     dispatch(setUser({ ...user, headShot }));
     // 更新firebase
-    await editUserData({
+    await saveUserHeadShot({
       userId: user.userId,
-      fieldName: "headShot",
       fieldValue: headShot,
     });
     navigation.goBack();

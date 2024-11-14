@@ -42,6 +42,7 @@ export const login = async (email: string, password: string) => {
     console.log("data user", data.user.id);
     return {
       userId: data.user.id,
+      email: data.user.email,
     };
   } catch (error) {
     console.error("Login error:", error.message);

@@ -7,7 +7,11 @@ import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 
 import { useDispatch, useSelector } from "react-redux";
-import userSlice, { setInitialized, setIsAuthenticated, setUser } from "../store/userSlice";
+import userSlice, {
+  setInitialized,
+  setIsAuthenticated,
+  setUser,
+} from "../store/userSlice";
 import { getUserData } from "../util/personApi";
 
 interface LoginEmailProps {
@@ -70,22 +74,30 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
   const loginHandler = async (form: LoginForm) => {
     setLoading(true);
     try {
-      const { userId } = await login(form.email, form.password);
+      const { userId, email } = await login(form.email, form.password);
 
       // 取得用戶資料
-      const userData = await getUserData(userId);
-   
-      // dispatch(setIsAuthenticated(true));
-      // console.log('userData', userData)
+      const userData = await getUserData({
+        userId,
+        email,
+      });
       if (userData) {
         dispatch(setUser(userData));
-        navigation.navigate("main", { screen: "chat" }); // 如果用戶資料存在，可以選擇跳轉 聊天室
+
+        // 根據有無資料選擇導航
+        if (userData.name && userData.gender && userData.birthday) {
+          navigation.navigate("main", { screen: "chat" }); // 如果用戶資料完整，跳轉聊天頁面
+        } else {
+          navigation.navigate("aboutMe"); // 否則導航到 'aboutMe' 頁面
+        }
+
+        // navigation.navigate("main", { screen: "chat" }); // 如果用戶資料存在，可以選擇跳轉 聊天室
       } else {
         navigation.navigate("aboutMe"); // 如果用戶資料不存在，導航到 aboutMe
       }
     } catch (error) {
-      const errorMessage = error.error.message as string;
-
+      // 捕獲錯誤並處理
+      const errorMessage = error.message || "An unexpected error occurred";
       catchError({
         errorMessage,
         setError,

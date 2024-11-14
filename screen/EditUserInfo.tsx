@@ -7,11 +7,8 @@ import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
 import { editUserData } from "../util/personApi";
+import { updateUserTitle } from "../shared/static";
 
-const title = {
-  name: "姓名",
-  introduce: "自我介紹",
-};
 
 interface EditUserInfoProps {
   route: {
@@ -56,7 +53,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: `編輯${title[mode]}`,
+      title: `編輯${updateUserTitle[mode]}`,
       headerTitleAlign: "center",
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
