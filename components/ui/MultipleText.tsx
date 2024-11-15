@@ -23,6 +23,7 @@ const MultipleText: React.FC<MultipleTextProps> = ({
       onPress={() =>
         navigation.navigate("aboutMeSelectOption", {
           currentTab: currentTab,
+          screen: "aboutMe",
         })
       }
     >

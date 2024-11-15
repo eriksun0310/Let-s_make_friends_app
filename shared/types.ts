@@ -70,5 +70,10 @@ export type FriendRequest = {
   createdAt: Date;
 };
 
+export type EditUserFieldName =
+  | "name"
+  | "introduce"
+  | "headShot"
+  | "selectedOption";
 
-export type EditUserFieldName = 'name' | 'introduce' | 'headShot' | 'selectedOption';
+export type Screen = "userInfo" | "aboutMe";

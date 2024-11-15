@@ -122,6 +122,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
                   onPress={() =>
                     navigation.navigate("aboutMeSelectOption", {
                       currentTab: key,
+                      screen: "userInfo",
                     })
                   }
                 >

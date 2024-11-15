@@ -12,16 +12,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
-import { editUserData, saveUserSelectedOption } from "../util/personApi";
-const tabs: Tabs = {
-  interests: "興趣",
-  favoriteFood: "喜歡的食物",
-  dislikedFood: "不喜歡的食物",
-};
+import { saveUserSelectedOption } from "../util/personApi";
+import { tabs } from "../shared/static";
+import { Screen } from "../shared/types";
 
 type RootStackParamList = {
   aboutMe: undefined;
-  AboutMeSelectOption: { currentTab: string };
+  AboutMeSelectOption: { currentTab: string; screen: Screen };
   // 其他 screen 的定義...
 };
 
@@ -44,7 +41,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
 }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
-  const { currentTab } = route.params;
+  const { currentTab, screen } = route.params;
 
   const [selectedOption, setSelectedOption] = useState<SelectedOption>({});
 
@@ -90,11 +87,17 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   const handleSave = async () => {
     // 更新回redux
     dispatch(setUser({ ...user, selectedOption }));
-    // 更新firebase
-    await saveUserSelectedOption({
-      userId: user.userId,
-      fieldValue: selectedOption,
-    });
+
+    // 判斷哪個畫面需要打api
+    if (screen === "userInfo") {
+      await saveUserSelectedOption({
+        user: {
+          ...user,
+          selectedOption,
+        },
+      });
+    }
+
     navigation.goBack();
   };
 

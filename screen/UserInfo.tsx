@@ -54,6 +54,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* 大頭貼 */}
           <HeadShot
+            screen="userInfo"
             nameValue={user.name}
             navigation={navigation}
             headShot={user.headShot}

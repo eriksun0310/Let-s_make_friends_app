@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, Alert, Button } from "react-native";
+import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { Colors } from "../constants/style";
 import HeadShot from "../components/userInfo/HeadShot";
 import Input from "../components/ui/Input";
@@ -13,7 +13,7 @@ import { checkRequired } from "../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
-import { createNewUser, saveUserData } from "../util/personApi";
+import { saveAboutMe } from "../util/personApi";
 import { userInit } from "../shared/static";
 
 interface AboutMeProps {
@@ -54,9 +54,16 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
   const handleSave = async () => {
     const required = checkRequired(form);
     if (required.isRequired) {
-      dispatch(setUser(form)); // 更新redux
-      console.log('form', form);
-      await saveUserData(form); // 更新 firebase
+      dispatch(
+        setUser({
+          ...form,
+        })
+      ); // 更新redux
+      console.log("form", form);
+      console.log("user aboutMe", user);
+      await saveAboutMe({
+        user: form,
+      });
       navigation.navigate("main", { screen: "chat" });
     } else {
       Alert.alert(required.requiredText);
@@ -74,26 +81,29 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
       setForm((prev) => ({
         ...prev,
         userId: user.userId,
+        email: user.email,
         selectedOption: user.selectedOption,
         headShot: user.headShot,
       }));
     }
   }, [user]);
 
-  
-    // useEffect(()=>{
-    //   const aa = async () => {
-    //     await createNewUser({ userId: userId, email: email });
-    //   }
-      
-     
-    // }, [])
+  // useEffect(()=>{
+  //   const aa = async () => {
+  //     await createNewUser({ userId: userId, email: email });
+  //   }
+
+  // }, [])
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
-        <HeadShot navigation={navigation} headShot={form.headShot} />
+        <HeadShot
+          screen="aboutMe"
+          navigation={navigation}
+          headShot={form.headShot}
+        />
 
         {/* 性別 */}
         <View style={styles.formContainer}>

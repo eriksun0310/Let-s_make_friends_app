@@ -3,14 +3,17 @@ import { NavigationProp } from "@react-navigation/native";
 import React from "react";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
 import { HeadShot as HeadShotType } from "../../shared/types";
+import { Screen } from "../../shared/types";
 
 interface HeadShotProps {
+  screen: Screen; // 判斷是哪個頁面的大頭貼
   nameValue?: string;
   navigation: NavigationProp<any>;
   headShot: HeadShotType;
 }
 
 const HeadShot: React.FC<HeadShotProps> = ({
+  screen,
   nameValue,
   navigation,
   headShot,
@@ -19,7 +22,7 @@ const HeadShot: React.FC<HeadShotProps> = ({
     <View style={styles.avatarContainer}>
       <TouchableOpacity
         style={styles.option}
-        onPress={() => navigation.navigate("editHeadShot")}
+        onPress={() => navigation.navigate("editHeadShot", { screen })}
       >
         <ShowHeadShot imageUrl={headShot?.imageUrl} />
       </TouchableOpacity>

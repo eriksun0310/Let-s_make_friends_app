@@ -2,8 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { auth } from "../util/firebaseConfig";
-import { createNewUser, getUserData } from "../util/personApi";
-import { useNavigation } from "@react-navigation/native";
+import { getUserData } from "../util/personApi";
 import { supabase } from "../util/supabaseClient";
 
 interface InitialStateProps {
@@ -144,7 +143,6 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
       const user = session.user;
       const userData = await getUserData({
         userId: user.id,
-        email: user.email,
       }); // 取得用戶資料
 
       // 舊用戶登入

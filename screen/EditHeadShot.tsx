@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet } from "react-native";
 import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
 import AllHeadShot from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
@@ -11,15 +11,22 @@ import { NavigationProp } from "@react-navigation/native";
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
-import { editUserData, saveUserHeadShot } from "../util/personApi";
+import { saveUserHeadShot } from "../util/personApi";
+import { Screen } from "../shared/types";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
+  route: {
+    params: {
+      screen: Screen;
+    };
+  };
 }
 
-const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
+const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  //從 params 中獲取 headShot、setHeadShot
+
+  const { screen } = route.params;
 
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -36,11 +43,17 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ navigation }) => {
   const handleSave = async () => {
     // 更新回redux
     dispatch(setUser({ ...user, headShot }));
-    // 更新firebase
-    await saveUserHeadShot({
-      userId: user.userId,
-      fieldValue: headShot,
-    });
+
+    // 判斷哪個畫面需要打api
+    if (screen === "userInfo") {
+      await saveUserHeadShot({
+        user: {
+          ...user,
+          headShot,
+        },
+      });
+    }
+
     navigation.goBack();
   };
 

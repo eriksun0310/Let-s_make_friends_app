@@ -7,11 +7,7 @@ import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 
 import { useDispatch, useSelector } from "react-redux";
-import userSlice, {
-  setInitialized,
-  setIsAuthenticated,
-  setUser,
-} from "../store/userSlice";
+import { setUser } from "../store/userSlice";
 import { getUserData } from "../util/personApi";
 
 interface LoginEmailProps {
@@ -79,10 +75,9 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       // 取得用戶資料
       const userData = await getUserData({
         userId,
-        email,
       });
 
-      console.log('userData', userData);
+      console.log("userData", userData);
       if (userData) {
         dispatch(setUser(userData));
         navigation.navigate("main", { screen: "chat" }); // 如果用戶資料完整，跳轉聊天頁面

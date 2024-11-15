@@ -6,9 +6,8 @@ import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
-import { editUserData } from "../util/personApi";
+import { updateUser } from "../util/personApi";
 import { updateUserTitle } from "../shared/static";
-
 
 interface EditUserInfoProps {
   route: {
@@ -41,8 +40,8 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
     } else {
       // 更新回redux
       dispatch(setUser({ ...user, [mode]: value }));
-      // 更新firebase
-      await editUserData({
+      // 更新supabase
+      await updateUser({
         userId: user.userId,
         fieldName: mode,
         fieldValue: value,
