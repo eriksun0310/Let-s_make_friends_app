@@ -375,7 +375,7 @@ export const editUserData = async ({
 // 儲存 user_head_shot saveUserHeadShot()
 // 儲存 user_selected_option saveUserSelectedOption()
 
-//
+// 
 export const saveUserData1 = async ({
   user,
   fieldName,
@@ -517,94 +517,6 @@ export const saveUserData1 = async ({
   }
 };
 
-// ----------------------從下面開始------------------------------------------
-
-// 點擊 關於我的儲存
-const saveAboutMe = () => {};
-
-// 更新 個人資料的單一欄位( name、introduce)
-const updateUser = async ({
-  userId,
-  fieldName,
-  fieldValue,
-}: {
-  userId: string;
-  fieldName: "name" | "introduce";
-  fieldValue: any;
-}) => {
-  try {
-    let result;
-    if (["name", "introduce"].includes(fieldName)) {
-      console.log(" introduce fieldValue", fieldValue);
-      // 更新基本用戶資料
-      result = await supabase
-        .from("users")
-        .upsert({
-          [fieldName]: fieldValue,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("userid", userId);
-    }
-
-    // 檢查更新結果
-    if (result.error) {
-      throw result.error;
-    }
-  } catch (error) {
-    console.error("updateUser:", error);
-  }
-};
-
-// 儲存自己的基本資料(for aboutMe 的儲存)
-export const saveUser = async ({ user }: { user: User }) => {
-  try {
-    const {
-      data,
-      error: error,
-      count,
-    } = await supabase
-      .from("users")
-      .select("userid", { count: "exact" }) // 只查詢 user_id，減少不必要的資料
-      .eq("userid", user.userId); // 篩選條件：id 等於 userId
-
-    if (error) {
-      console.error("Error checking existing user options:", error);
-    }
-
-    let result;
-    if (count > 0) {
-      // 如果 興趣選項 已經存在，執行更新
-      result = await supabase
-        .from("users")
-        .update({
-          name: user.name,
-          gender: user.gender,
-          introduce: user.introduce,
-          birthday: user.birthday,
-          email: user.email,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", user.userId);
-    } else {
-      // 如果 user 不存在，執行插入
-      result = await supabase.from("users").insert({
-        name: user.name,
-        gender: user.gender,
-        introduce: user.introduce,
-        birthday: user.birthday,
-        email: user.email,
-        created_at: new Date().toISOString(),
-      });
-    }
-    // 檢查更新結果
-    if (result.error) {
-      throw result.error;
-    }
-  } catch (error) {
-    console.error("Error updating users:", error);
-  }
-};
-
 // 儲存用戶大頭貼
 export const saveUserHeadShot = async ({
   userId,
@@ -613,20 +525,30 @@ export const saveUserHeadShot = async ({
   userId: string;
   fieldValue: any;
 }) => {
+  console.log("userId", userId);
+  let updateResult;
   try {
-    const { data, error, count } = await supabase
+    const {
+      data: existingHeadShot,
+      error: selectError,
+      count,
+    } = await supabase
       .from("user_head_shot")
       .select("user_id", { count: "exact" })
       .eq("user_id", userId);
 
-    if (error) {
-      console.error("Error checking existing headshot:", error);
+    console.log("Supabase response:", { existingHeadShot, selectError, count });
+    if (selectError) {
+      console.error("Error checking existing headshot:", selectError);
     }
 
-    let result;
+    console.log("count", count);
+    console.log("existingHeadShot", existingHeadShot);
+    // let updateResult;
     if (count > 0) {
+      console.log(11111);
       // 如果大頭貼已經存在，執行更新
-      result = await supabase
+      updateResult = await supabase
         .from("user_head_shot")
         .update({
           image_url: fieldValue.imageUrl,
@@ -635,21 +557,86 @@ export const saveUserHeadShot = async ({
         })
         .eq("user_id", userId);
     } else {
+      console.log(22222);
       // 如果大頭貼不存在，執行插入
-      result = await supabase.from("user_head_shot").insert({
+      updateResult = await supabase.from("user_head_shot").insert({
         user_id: userId,
         image_url: fieldValue.imageUrl,
         image_type: fieldValue.imageType,
       });
     }
-    // 檢查更新結果
-    if (result.error) {
-      throw result.error;
-    }
   } catch (error) {
     console.error("Error updating user_head_shot:", error);
   }
 };
+
+// export const saveUserHeadShot = async ({
+//   userId,
+//   fieldValue,
+// }: {
+//   userId: string;
+//   fieldValue: {
+//     imageUrl: string;
+//     imageType: string;
+//   };
+// }) => {
+//   console.log("Processing user headshot for userId:", userId);
+
+//   try {
+//     // 使用單一查詢來獲取完整的記錄，而不是只查詢 user_id
+//     const { data, error: selectError } = await supabase
+//       .from("user_head_shot")
+//       .select("*")
+//       .eq("user_id", userId)
+//       .maybeSingle();  // 使用 maybeSingle() 來獲取單一記錄或 null
+
+//     if (selectError) {
+//       console.error("Error checking existing headshot:", selectError);
+//       throw selectError;
+//     }
+
+//     console.log("Existing record:", data);
+
+//     let updateResult;
+
+//     if (data) {
+//       console.log("Updating existing record");
+//       updateResult = await supabase
+//         .from("user_head_shot")
+//         .update({
+//           image_url: fieldValue.imageUrl,
+//           image_type: fieldValue.imageType,
+//           updated_at: new Date().toISOString(),
+//         })
+//         .eq("user_id", userId)
+//         .select();  // 添加 select() 來獲取更新後的記錄
+//     } else {
+//       console.log("Creating new record");
+//       updateResult = await supabase
+//         .from("user_head_shot")
+//         .insert({
+//           user_id: userId,
+//           image_url: fieldValue.imageUrl,
+//           image_type: fieldValue.imageType,
+//           created_at: new Date().toISOString(),
+//           updated_at: new Date().toISOString(),
+//         })
+//         .select();  // 添加 select() 來獲取插入的記錄
+//     }
+
+//     if (updateResult.error) {
+//       console.error("Error updating/inserting record:", updateResult.error);
+//       throw updateResult.error;
+//     }
+
+//     console.log("Operation successful:", updateResult.data);
+//     return updateResult.data;
+
+//   } catch (error) {
+//     console.error("Error in saveUserHeadShot:", error);
+//     throw error;  // 向上傳遞錯誤以便調用方處理
+//   }
+// };
 
 // 儲存用戶興趣選項
 export const saveUserSelectedOption = async ({
@@ -659,20 +646,28 @@ export const saveUserSelectedOption = async ({
   userId: string;
   fieldValue: any;
 }) => {
+  console.log("userId", userId);
+  console.log("fieldValue", fieldValue);
+  let updateResult;
   try {
-    const { data, error, count } = await supabase
+    const {
+      data: existingUserOptions,
+      error: selectError,
+      count,
+    } = await supabase
       .from("user_options")
       .select("user_id", { count: "exact" }) // 只查詢 user_id，減少不必要的資料
       .eq("user_id", userId); // 篩選條件：id 等於 userId
 
-    if (error) {
-      console.error("Error checking existing user options:", error);
+    if (selectError) {
+      console.error("Error checking existing user options:", selectError);
     }
 
-    let result;
+    console.log("existingUserOptions", existingUserOptions);
+    // let updateResult;
     if (count > 0) {
       // 如果 興趣選項 已經存在，執行更新
-      result = await supabase
+      updateResult = await supabase
         .from("user_options")
         .update({
           interests: fieldValue.interests,
@@ -683,17 +678,12 @@ export const saveUserSelectedOption = async ({
         .eq("user_id", userId);
     } else {
       // 如果 興趣選項 不存在，執行插入
-      result = await supabase.from("user_options").insert({
+      updateResult = await supabase.from("user_options").insert({
         user_id: userId,
         interests: fieldValue.interests,
         favorite_food: fieldValue.favoriteFood,
         disliked_food: fieldValue.dislikedFood,
       });
-    }
-
-    // 檢查更新結果
-    if (result.error) {
-      throw result.error;
     }
   } catch (error) {
     console.error("Error updating user_options:", error);

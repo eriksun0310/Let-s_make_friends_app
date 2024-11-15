@@ -13,7 +13,7 @@ import { checkRequired } from "../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
-import { saveUserData } from "../util/personApi";
+import { createNewUser, saveUserData } from "../util/personApi";
 import { userInit } from "../shared/static";
 
 interface AboutMeProps {
@@ -79,6 +79,15 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
       }));
     }
   }, [user]);
+
+  
+    // useEffect(()=>{
+    //   const aa = async () => {
+    //     await createNewUser({ userId: userId, email: email });
+    //   }
+      
+     
+    // }, [])
 
   return (
     <View style={styles.container}>

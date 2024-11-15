@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { auth } from "../util/firebaseConfig";
-import { getUserData } from "../util/personApi";
+import { createNewUser, getUserData } from "../util/personApi";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../util/supabaseClient";
 
@@ -142,7 +142,10 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (session) {
       const user = session.user;
-      const userData = await getUserData(user.id); // 取得用戶資料
+      const userData = await getUserData({
+        userId: user.id,
+        email: user.email,
+      }); // 取得用戶資料
 
       // 舊用戶登入
       if (userData) {
@@ -150,6 +153,8 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
         dispatch(userSlice.actions.setIsNewUser(false));
       } else {
         // 新用戶登入
+
+        // await createNewUser({ userId: user.id, email: user.email });
         dispatch(
           userSlice.actions.setUser({
             userId: user.id,
@@ -170,36 +175,107 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
   });
 
   // 確保在應用啟動時進行一次認證狀態的檢查
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  // const {
+  //   data: { user },
+  //   error,
+  // } = await supabase.auth.getUser();
 
-  if (user) {
-    // 如果用戶已經登入過
-    const userData = await getUserData(user.id); // 取得用戶資料
-    if (userData) {
-      dispatch(userSlice.actions.setUser(userData));
-      dispatch(userSlice.actions.setIsNewUser(false));
-    } else {
-      // 新用戶登入
-      dispatch(
-        userSlice.actions.setUser({
-          userId: user.id,
-          email: user.email,
-        })
-      );
-      dispatch(userSlice.actions.setIsNewUser(true));
-    }
+  // if (user) {
+  //   // 如果用戶已經登入過
+  //   const userData = await getUserData(user.id); // 取得用戶資料
+  //   if (userData) {
+  //     dispatch(userSlice.actions.setUser(userData));
+  //     dispatch(userSlice.actions.setIsNewUser(false));
+  //   } else {
+  //     // 新用戶登入
+  //     dispatch(
+  //       userSlice.actions.setUser({
+  //         userId: user.id,
+  //         email: user.email,
+  //       })
+  //     );
+  //     dispatch(userSlice.actions.setIsNewUser(true));
+  //   }
 
-    dispatch(userSlice.actions.setIsAuthenticated(true)); // 設置用戶為已認證
-  } else {
-    dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置用戶為未認證
-  }
+  //   dispatch(userSlice.actions.setIsAuthenticated(true)); // 設置用戶為已認證
+  // } else {
+  //   dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置用戶為未認證
+  // }
 
-  // 設置初始化完成標記
-  dispatch(userSlice.actions.setInitialized(true));
+  // // 設置初始化完成標記
+  // dispatch(userSlice.actions.setInitialized(true));
 };
+
+// export const initializeAuth = (): AppThunk => async (dispatch) => {
+//   // 使用 onAuthStateChange 來監聽認證狀態變化
+//   supabase.auth.onAuthStateChange(async (event, session) => {
+//     console.log("event", event);
+//     console.log("session", session);
+
+//     if (event === "SIGNED_IN" && session) {
+//       const user = session.user;
+
+//       // 檢查用戶是否存在
+//       const userData = await getUserData({
+//         userId: user.id,
+//         email: user.email,
+//       });
+
+//       if (userData) {
+//         // 舊用戶登入
+//         dispatch(userSlice.actions.setUser(userData));
+//         dispatch(userSlice.actions.setIsNewUser(false));
+//       } else {
+//         await createNewUser({ userId: user.id, email: user.email });
+//         // 新用戶登入
+//         dispatch(
+//           userSlice.actions.setUser({
+//             userId: user.id,
+//             email: user.email,
+//           })
+//         );
+//         dispatch(userSlice.actions.setIsNewUser(true));
+//       }
+
+//       dispatch(userSlice.actions.setIsAuthenticated(true)); // 設置用戶為已認證
+//     } else if (event === "SIGNED_OUT") {
+//       dispatch(userSlice.actions.setIsAuthenticated(false)); // 用戶未登入
+//     }
+
+//     // 設置初始化完成標記
+//     dispatch(userSlice.actions.setInitialized(true));
+//   });
+
+//   // 應用啟動時進行一次認證狀態的檢查
+//   const { data, error } = await supabase.auth.getUser();
+
+//   if (data.user) {
+//     const user = data.user;
+//     const userData = await getUserData({
+//       userId: user.id,
+//       email: user.email,
+//     });
+
+//     if (userData) {
+//       dispatch(userSlice.actions.setUser(userData));
+//       dispatch(userSlice.actions.setIsNewUser(false));
+//     } else {
+//       dispatch(
+//         userSlice.actions.setUser({
+//           userId: user.id,
+//           email: user.email,
+//         })
+//       );
+//       dispatch(userSlice.actions.setIsNewUser(true));
+//     }
+
+//     dispatch(userSlice.actions.setIsAuthenticated(true));
+//   } else {
+//     dispatch(userSlice.actions.setIsAuthenticated(false));
+//   }
+
+//   dispatch(userSlice.actions.setInitialized(true));
+// };
 export const { setUser, setSelectedOption, setIsAuthenticated } =
   userSlice.actions;
 export const selectUser = (state: RootState) => state.user;

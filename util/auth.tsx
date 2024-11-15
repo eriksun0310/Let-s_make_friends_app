@@ -39,7 +39,7 @@ export const login = async (email: string, password: string) => {
     if (error) throw error;
 
     console.log("data login", data);
-    console.log("data user", data.user.id);
+    console.log("data user", data.user);
     return {
       userId: data.user.id,
       email: data.user.email,

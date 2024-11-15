@@ -81,17 +81,11 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         userId,
         email,
       });
+
+      console.log('userData', userData);
       if (userData) {
         dispatch(setUser(userData));
-
-        // 根據有無資料選擇導航
-        if (userData.name && userData.gender && userData.birthday) {
-          navigation.navigate("main", { screen: "chat" }); // 如果用戶資料完整，跳轉聊天頁面
-        } else {
-          navigation.navigate("aboutMe"); // 否則導航到 'aboutMe' 頁面
-        }
-
-        // navigation.navigate("main", { screen: "chat" }); // 如果用戶資料存在，可以選擇跳轉 聊天室
+        navigation.navigate("main", { screen: "chat" }); // 如果用戶資料完整，跳轉聊天頁面
       } else {
         navigation.navigate("aboutMe"); // 如果用戶資料不存在，導航到 aboutMe
       }
