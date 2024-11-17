@@ -77,7 +77,6 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         userId,
       });
 
-      console.log("userData", userData);
       if (userData) {
         dispatch(setUser(userData));
         navigation.navigate("main", { screen: "chat" }); // 如果用戶資料完整，跳轉聊天頁面

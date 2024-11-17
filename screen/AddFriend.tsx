@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Text } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
@@ -25,12 +25,8 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
-  const { friendRequests, loading } = useFriendRequests(user.userId);
+  const { friendRequests } = useFriendRequests(user.userId);
 
-  console.log(
-    "Object.keys(friendRequests).length",
-    Object.keys(friendRequests).length
-  );
   // if (loading) return <Text>Loading...</Text>;
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -69,34 +65,18 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     fetchUsers(); // 調用 API 獲取資料
   }, [navigation, friendRequests]);
 
-  // console.log("allUsers", allUsers);
-
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {Object.keys(allUsers)?.map((key) => {
-          const user = allUsers[key];
-
-          // console.log("user", user);
-          return (
-            <FriendCard
-              friendState="add"
-              key={key}
-              index={key}
-              friend={user}
-              navigation={navigation}
-            />
-          );
-        })}
-        {/* {friendCards.map((friend, index) => (
+        {Object.keys(allUsers)?.map((key) => (
           <FriendCard
             friendState="add"
-            key={index}
-            index={index}
-            friend={friend}
+            key={key}
+            index={key}
+            friend={allUsers[key]}
             navigation={navigation}
           />
-        ))} */}
+        ))}
       </ScrollView>
     </View>
   );

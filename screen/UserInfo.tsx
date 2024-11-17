@@ -29,7 +29,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
-  // console.log("UserInfo   ", user);
   const handleLogout = () => {
     dispatch(logout()).then(() => {
       navigation.navigate("login");
@@ -47,7 +46,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       },
     });
   }, [navigation]);
-
   return (
     <PaperProvider>
       <View style={styles.container}>

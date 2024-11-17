@@ -46,15 +46,24 @@ export interface SelectedOption {
 
 export type Gender = "female" | "male";
 
-export type User = {
+export type Users = {
   userId: string;
   name: string;
   gender: Gender;
   introduce: string;
-  headShot: HeadShot;
-  selectedOption: SelectedOption;
   birthday: string;
   email: string;
+};
+
+export type User = {
+  userId: string;
+  name: string;
+  gender: Gender;
+  birthday: string;
+  email: string;
+  introduce: string;
+  headShot: HeadShot;
+  selectedOption: SelectedOption;
 };
 
 export type UserState = "personal" | "friend" | "visitor";

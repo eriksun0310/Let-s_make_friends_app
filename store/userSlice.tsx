@@ -18,6 +18,8 @@ const initialState: InitialStateProps = {
     name: "",
     gender: "female",
     introduce: "",
+    birthday: "",
+    email: "",
     headShot: {
       imageUrl: "",
       imageType: "people",
@@ -27,8 +29,6 @@ const initialState: InitialStateProps = {
       favoriteFood: [],
       dislikedFood: [],
     },
-    birthday: "",
-    email: "",
   },
   isAuthenticated: false, // 是否已經登入
   initialized: false, // 應用程序這個初始化步驟已完成,

@@ -19,8 +19,6 @@ interface FriendInvitationProps {
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
-  // console.log("userId 22222", user.userId);
-
   const { friendRequests, loading } = useFriendRequests(user.userId);
 
   useEffect(() => {

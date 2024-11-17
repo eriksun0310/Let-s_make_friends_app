@@ -15,11 +15,10 @@ import { supabase } from "./supabaseClient";
 // 會員註冊
 export const createUser = async (email: string, password: string) => {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
-    console.log("error createUser", error);
     if (error) throw error;
 
     // return data; // 成功後會返回使用者的註冊資料
@@ -37,9 +36,6 @@ export const login = async (email: string, password: string) => {
       password,
     });
     if (error) throw error;
-
-    console.log("data login", data);
-    console.log("data user", data.user);
     return {
       userId: data.user.id,
       email: data.user.email,

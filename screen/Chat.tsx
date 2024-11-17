@@ -46,8 +46,6 @@ const Chat = ({ navigation }) => {
     <TouchableOpacity
       style={styles.chatItem}
       onPress={() => {
-        console.log("click ");
-        console.log("item", item);
         navigation.navigate("chatDetail", { item: item });
       }}
     >
