@@ -1,6 +1,7 @@
 import { User } from "../shared/types";
 import { database } from "./firebaseConfig";
 import { get, ref, set, update } from "firebase/database";
+import { supabase } from "./supabaseClient";
 
 // 用於管理好友請求的 Firebase 參考路徑
 const friendRequestsRef = ref(database, "friendRequests");
@@ -15,77 +16,90 @@ const friendRequestsRef = ref(database, "friendRequests");
 // 1. 查詢 A1 和 A2 的好友關係
 
 // 查詢所有用戶(排除掉自己)
-// export const getAllUsers = async (currentUserId: string) => {
-//   const usersRef = ref(database, "users");
-//   const snapshot = await get(usersRef);
-
-//   if (snapshot.exists()) {
-//     const allUsers = snapshot.val();
-
-//     // 移除掉自己
-//     const filterUsers = Object.keys(allUsers)
-//       .filter((userId) => userId !== currentUserId)
-//       .reduce((result, userId) => {
-//         result[userId] = allUsers[userId];
-//         return result;
-//       }, {});
-
-//     console.log("filterUsers1111111", filterUsers);
-
-//     return filterUsers;
-//   }
-//   return {};
-// };
-
 export const getAllUsers = async (currentUserId: string) => {
-
-  console.log('currentUserId', currentUserId)
+  console.log("currentUserId", currentUserId);
   try {
-    // 獲取所有用戶
-    const usersRef = ref(database, "users");
-    const usersSnapshot = await get(usersRef);
+    // 查詢 `users` 表，排除自己的資料
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select(
+        "userid, name, gender, introduce, birthday, email, created_at, updated_at"
+      )
+      .neq("userid", currentUserId); // 排除自己的 userId
 
-    // 獲取所有好友請求
-    const requestsRef = ref(database, "friendRequests");
-    const requestsSnapshot = await get(requestsRef);
-
-    if (!usersSnapshot.exists()) {
-      return {};
+    if (usersError) {
+      console.error("Error fetching users:", usersError);
+      return [];
     }
 
-    const allUsers = usersSnapshot.val();
-    const allRequests = requestsSnapshot.val() || {};
+    // 查詢 `user_head_shot` 表的必要欄位
+    const { data: headShotsData, error: headShotsError } = await supabase
+      .from("user_head_shot")
+      .select("user_id, image_url, image_type"); // 指定需要的欄位
 
-    // 獲取當前用戶已發送請求的用戶ID列表
-    const sentRequestUserIds = Object.values(allRequests)
-      .filter(
-        (request: any) =>
-          // 收到好友邀請者是當前用戶 且 請求狀態是待處理
-          (request.receiverId === currentUserId || request.senderId === currentUserId) && request.status === "pending"
-      )
-      .map((request: any) => request.senderId); // 取得發送者的用戶ID
+    if (headShotsError) {
+      console.error("Error fetching user headshots:", headShotsError);
+    }
 
-    console.log("已發送請求的用戶:", sentRequestUserIds);
+    // 查詢 `user_selected_option` 表的必要欄位
+    const { data: selectedOptionsData, error: selectedOptionsError } =
+      await supabase
+        .from("user_selected_option")
+        .select("user_id, interests, favorite_food, disliked_food"); // 指定需要的欄位
 
-    // 過濾用戶列表
-    const filterUsers = Object.entries(allUsers)
-      .filter(
-        ([userId, userData]) =>
-          // 排除自己
-          userId !== currentUserId &&
-          // 排除已發送請求的用戶
-          !sentRequestUserIds.includes(userId)
-      )
-      .reduce((result, [userId, userData]) => {
-        result[userId] = userData;
-        return result;
-      }, {});
+    if (selectedOptionsError) {
+      console.error(
+        "Error fetching user selected options:",
+        selectedOptionsError
+      );
+    }
 
-    console.log("過濾後的用戶列表:", filterUsers);
-    return filterUsers;
+    // 整合三張表的資料
+    const allUsers = usersData.map((user) => {
+      // 找到對應的頭像資料
+      const headShot = headShotsData?.find(
+        (h) => h.user_id === user.userid
+      ) || {
+        image_type: "",
+        image_url: "",
+      };
+
+      // 找到對應的選項資料
+
+      const selectedOption = selectedOptionsData?.find(
+        (s) => s.user_id === user.userid
+      ) || {
+        interests: [],
+        favorite_food: [],
+        disliked_food: [],
+      };
+
+      return {
+        userId: user.userid,
+        name: user.name,
+        gender: user.gender,
+        introduce: user.introduce,
+        birthday: user.birthday,
+        email: user.email,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at,
+        headShot: {
+          imageUrl: headShot.image_url || null,
+          imageType: headShot.image_type || null,
+        },
+        selectedOption: {
+          interests: selectedOption.interests || [],
+          favoriteFood: selectedOption.favorite_food || [],
+          dislikedFood: selectedOption.disliked_food || [],
+        },
+      };
+    });
+
+    // 返回整合後的用戶陣列
+    return allUsers;
   } catch (error) {
-    console.error("Error getting filtered users:", error);
-    return {};
+    console.error("Error fetching all users:", error);
+    return [];
   }
 };
 

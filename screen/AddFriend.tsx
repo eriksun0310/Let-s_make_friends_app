@@ -68,15 +68,17 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {Object.keys(allUsers)?.map((key) => (
-          <FriendCard
-            friendState="add"
-            key={key}
-            index={key}
-            friend={allUsers[key]}
-            navigation={navigation}
-          />
-        ))}
+        {allUsers?.map((user) => {
+          return (
+            <FriendCard
+              friendState="add"
+              key={user.userId}
+              index={user.userId}
+              friend={user}
+              navigation={navigation}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );
