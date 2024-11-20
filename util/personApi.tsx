@@ -162,45 +162,6 @@ export const saveUser = async ({ user }: { user: User }) => {
   }
 };
 
-// 儲存用戶大頭貼
-// export const saveUserHeadShot = async ({ user }: { user: User }) => {
-//   try {
-//     // 檢查 用戶大頭貼 是否存在
-//     const { data, error } = await supabase
-//       .from("user_head_shot")
-//       .select("user_id")
-//       .eq("user_id", user.userId)
-//       .maybeSingle(); // 只取一筆資料
-
-//     if (error) {
-//       console.error("Error checking existing headshot:", error.message);
-//     }
-
-//     const updateOrInsert = data
-//       ? supabase
-//           .from("user_head_shot")
-//           .update({
-//             image_url: user.headShot.imageUrl,
-//             image_type: user.headShot.imageType,
-//             updated_at: new Date().toISOString(),
-//           })
-//           .eq("user_id", user.userId)
-//       : supabase.from("user_head_shot").insert({
-//           user_id: user.userId,
-//           image_url: user.headShot.imageUrl,
-//           image_type: user.headShot.imageType,
-//         });
-
-//     const { error: updateError } = await updateOrInsert;
-
-//     if (updateError) {
-//       throw new Error(`Error saving headshot: ${updateError.message}`);
-//     }
-//   } catch (error) {
-//     console.error("Error updating user_head_shot:", error.message);
-//   }
-// };
-
 export const saveUserHeadShot = async ({ user }: { user: User }) => {
   try {
     const { error } = await supabase.from("user_head_shot").upsert(
@@ -220,45 +181,6 @@ export const saveUserHeadShot = async ({ user }: { user: User }) => {
     console.error("Error saving user headshot:", error.message);
   }
 };
-
-// 儲存用戶興趣選項
-// export const saveUserSelectedOption = async ({ user }: { user: User }) => {
-//   try {
-//     const { data, error } = await supabase
-//       .from("user_selected_option")
-//       .select("user_id")
-//       .eq("user_id", user.userId)
-//       .maybeSingle(); // 只取一筆資料
-
-//     if (error) {
-//       console.error("Error checking existing user options:", error.message);
-//     }
-
-//     const updateOrInsert = data
-//       ? await supabase
-//           .from("user_selected_option")
-//           .update({
-//             interests: user.selectedOption?.interests,
-//             favorite_food: user.selectedOption?.favoriteFood,
-//             disliked_food: user.selectedOption?.dislikedFood,
-//             updated_at: new Date().toISOString(),
-//           })
-//           .eq("user_id", user.userId)
-//       : supabase.from("user_selected_option").insert({
-//           user_id: user.userId,
-//           interests: user.selectedOption?.interests,
-//           favorite_food: user.selectedOption?.favoriteFood,
-//           disliked_food: user.selectedOption?.dislikedFood,
-//         });
-//     const { error: updateError } = await updateOrInsert;
-
-//     if (updateError) {
-//       throw new Error(`Error saving headshot: ${updateError.message}`);
-//     }
-//   } catch (error) {
-//     console.error("Error updating user_selected_option:", error);
-//   }
-// };
 
 // 儲存用戶興趣選項
 export const saveUserSelectedOption = async ({ user }: { user: User }) => {
