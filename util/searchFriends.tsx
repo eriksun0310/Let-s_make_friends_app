@@ -23,9 +23,9 @@ export const getAllUsers = async (currentUserId: string) => {
     const { data: usersData, error: usersError } = await supabase
       .from("users")
       .select(
-        "userid, name, gender, introduce, birthday, email, created_at, updated_at"
+        "id, name, gender, introduce, birthday, email, created_at, updated_at"
       )
-      .neq("userid", currentUserId); // 排除自己的 userId
+      .neq("id", currentUserId); // 排除自己的 userId
 
     if (usersError) {
       console.error("Error fetching users:", usersError);
@@ -58,7 +58,7 @@ export const getAllUsers = async (currentUserId: string) => {
     const allUsers = usersData.map((user) => {
       // 找到對應的頭像資料
       const headShot = headShotsData?.find(
-        (h) => h.user_id === user.userid
+        (h) => h.user_id === user.id
       ) || {
         image_type: "",
         image_url: "",
@@ -67,7 +67,7 @@ export const getAllUsers = async (currentUserId: string) => {
       // 找到對應的選項資料
 
       const selectedOption = selectedOptionsData?.find(
-        (s) => s.user_id === user.userid
+        (s) => s.user_id === user.id
       ) || {
         interests: [],
         favorite_food: [],
@@ -75,7 +75,7 @@ export const getAllUsers = async (currentUserId: string) => {
       };
 
       return {
-        userId: user.userid,
+        userId: user.id,
         name: user.name,
         gender: user.gender,
         introduce: user.introduce,

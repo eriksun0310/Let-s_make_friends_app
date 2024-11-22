@@ -14,10 +14,10 @@ export const getUserData = async ({
     count: userCount,
   } = await supabase
     .from("users")
-    .select("userid, name, gender, introduce, birthday, email", {
+    .select("id, name, gender, introduce, birthday, email", {
       count: "exact",
     })
-    .eq("userid", userId); // 篩選條件：id 等於 userId
+    .eq("id", userId); // 篩選條件：id 等於 userId
 
   if (userError) {
     console.error("Error fetching user data:", userError);
@@ -32,7 +32,7 @@ export const getUserData = async ({
 
   // 初始化返回資料
   let responseData: User = {
-    userId: userData[0].userid,
+    userId: userData[0].id,
     name: userData[0].name,
     gender: userData[0].gender,
     introduce: userData[0].introduce,
@@ -127,7 +127,7 @@ export const updateUser = async ({
         [fieldName]: fieldValue,
         updated_at: new Date().toISOString(),
       })
-      .eq("userid", userId);
+      .eq("id", userId);
 
     if (error) {
       throw new Error(`Error updating user ${fieldName}: ${error.message}`);
@@ -142,7 +142,7 @@ export const saveUser = async ({ user }: { user: User }) => {
   try {
     const { error } = await supabase.from("users").upsert(
       {
-        userid: user.userId,
+        id: user.userId,
         name: user.name,
         gender: user.gender,
         introduce: user.introduce,
@@ -151,7 +151,7 @@ export const saveUser = async ({ user }: { user: User }) => {
         updated_at: new Date().toISOString(), // 如果是更新，記錄更新時間
         created_at: new Date().toISOString(), // 如果是插入，記錄建立時間
       },
-      { onConflict: "userid" } // 指定衝突鍵
+      { onConflict: "id" } // 指定衝突鍵
     );
 
     if (error) {
