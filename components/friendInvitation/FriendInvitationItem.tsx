@@ -21,7 +21,10 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
   useEffect(() => {
     const fetchSenderData = async () => {
       try {
-        const data = await getSenderFriendData(friendRequest.senderId);
+        const data = await getSenderFriendData(friendRequest.sender_id);
+
+
+       
 
         setSenderData(data);
       } catch (error) {
@@ -32,9 +35,9 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
     };
 
     fetchSenderData();
-  }, [friendRequest.senderId]);
+  }, [friendRequest.sender_id]);
 
-  console.log("senderData", senderData);
+
 
   if (loading) {
     return <LoadingOverlay message="loading ..." />;
@@ -44,12 +47,24 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
     Object.keys(senderData || {}).length > 0 && (
       <FriendCard
         friendState="confirm"
-        key={friendRequest.senderId}
-        index={friendRequest.senderId}
+        key={friendRequest.sender_id}
+        index={friendRequest.sender_id}
         friend={senderData}
         navigation={navigation}
       />
     )
+
+    // sendersData?.map((sender) => {
+    //   return (
+    //     <FriendCard
+    //       friendState="confirm"
+    //       key={friendRequest.sender_id}
+    //       index={friendRequest.sender_id}
+    //       friend={sender}
+    //       navigation={navigation}
+    //     />
+    //   );
+    // })
   );
 };
 

@@ -11,7 +11,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
-import { saveUserHeadShot } from "../util/personApi";
+import { saveUserHeadShot } from "../util/person";
 import { Screen } from "../shared/types";
 
 interface AvatarCreatorProps {

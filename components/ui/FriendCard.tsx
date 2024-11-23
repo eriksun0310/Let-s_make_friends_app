@@ -7,7 +7,11 @@ import { NavigationProp } from "@react-navigation/native";
 import { FriendState, User } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
-import { sendFriendRequest } from "../../util/searchFriends";
+import {
+  confirmFriendRequest,
+  rejectFriendRequest,
+  sendFriendRequest,
+} from "../../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 interface FriendCardProps {
@@ -28,12 +32,12 @@ const FriendCard: React.FC<FriendCardProps> = ({
     navigation.navigate?.("userInfoFriend", { mode: "friend" });
   };
   //點擊 加好友
-  const clickAddFriend = async (senderId: string) => {
-    // // console.log("friend", friend);
-    // sendFriendRequest(user.userId, senderId);
-
+  const clickAddFriend = async (receiverId: string) => {
     try {
-      const result = await sendFriendRequest(user.userId, senderId);
+      const result = await sendFriendRequest({
+        senderId: user.userId,
+        receiverId: receiverId,
+      });
       if (result.success) {
         console.log("Friend request sent successfully!");
         // 可以添加一些UI反饋，比如彈出提示
@@ -44,13 +48,48 @@ const FriendCard: React.FC<FriendCardProps> = ({
       console.error("Error sending friend request:", error);
     }
   };
-  //點擊 好友確認
-  const clickCheckFriend = () => {};
+  //點擊 確認交友邀請
+  const clickConfirmFriend = async (senderId: string) => {
+    try {
+      const result = await confirmFriendRequest({
+        senderId: senderId,
+        receiverId: user.userId,
+      });
+
+      if (result.success) {
+        console.log("confirm Friend  successfully!");
+        // 可以添加一些UI反饋，比如彈出提示
+      } else {
+        console.error("Failed to confirm Friend request");
+      }
+    } catch (error) {
+      console.error("Error confirm Friend request:", error);
+    }
+  };
+
+  // 點擊 拒絕交友邀請
+  const clickRejectFriend = async (senderId: string) => {
+    try {
+      const result = await rejectFriendRequest({
+        senderId: senderId,
+        receiverId: user.userId,
+      });
+
+      if (result.success) {
+        console.log("reject Friend  successfully!");
+        // 可以添加一些UI反饋，比如彈出提示
+      } else {
+        console.error("Failed to reject Friend request");
+      }
+    } catch (error) {
+      console.error("Error reject Friend request:", error);
+    }
+  };
   return (
     <Card key={index} containerStyle={styles.card}>
       <CustomIcon
         style={styles.closeButton}
-        onPress={() => console.log("close")}
+        onPress={() => clickRejectFriend(friend.userId)}
       >
         <X color={Colors.icon} />
       </CustomIcon>
@@ -76,7 +115,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
             if (friendState === "add") {
               clickAddFriend(friend.userId);
             } else {
-              clickCheckFriend();
+              clickConfirmFriend(friend.userId);
             }
           }}
         >

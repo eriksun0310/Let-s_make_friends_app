@@ -1,10 +1,9 @@
-import { User } from "../shared/types";
-import { database } from "./firebaseConfig";
-import { get, ref, set, update } from "firebase/database";
 import { supabase } from "./supabaseClient";
 
-// 用於管理好友請求的 Firebase 參考路徑
-const friendRequestsRef = ref(database, "friendRequests");
+interface FriendProps {
+  senderId: string;
+  receiverId: string;
+}
 
 /*
 總共有四個用戶 A1、A2 、A3 、A4  
@@ -15,17 +14,51 @@ const friendRequestsRef = ref(database, "friendRequests");
 */
 // 1. 查詢 A1 和 A2 的好友關係
 
-// 查詢所有用戶(排除掉自己)
+// 取得可以成為好友的用戶
 export const getAllUsers = async (currentUserId: string) => {
-  console.log("currentUserId", currentUserId);
   try {
-    // 查詢 `users` 表，排除自己的資料
+    // 取得已發送的好友邀請對象
+    // const { data: sentRequests, error: sentRequestsError } = await supabase
+    //   .from("friend_requests")
+    //   .select("receiver_id") // 查詢接收者的 ID
+    //   .eq("sender_id", currentUserId); // 只查詢當前用戶發送的邀請
+
+    const { data: friendRequests, error: friendRequestsError } = await supabase
+      .from("friend_requests")
+      .select("sender_id, receiver_id")
+      .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`); // 同時過濾 sender 和 receiver
+
+    if (friendRequestsError) {
+      console.error("Error fetching friend requests:", friendRequestsError);
+      return [];
+    }
+
+    // 整理需要排除的用戶 ID
+    const excludeUserIds = friendRequests.flatMap((req) => [
+      req.sender_id,
+      req.receiver_id,
+    ]);
+
+    // 整理已發送好友邀請的 userId
+    // const sentRequestIds = sentRequests.map((req) => req.receiver_id);
+
+    // // 查詢 `users` 表，排除自己的資料和已發送好友邀請的用戶
+    // const { data: usersData, error: usersError } = await supabase
+    //   .from("users")
+    //   .select(
+    //     "id, name, gender, introduce, birthday, email, created_at, updated_at"
+    //   )
+    //   .neq("id", currentUserId) // 排除自己的 userId
+    //   .not("id", "in", `(${sentRequestIds.join(",")})`); // 排除已發送好友邀請的用戶
+
+    // 查詢 `users` 表，排除自己和所有已經有好友邀請關係的用戶
     const { data: usersData, error: usersError } = await supabase
       .from("users")
       .select(
         "id, name, gender, introduce, birthday, email, created_at, updated_at"
       )
-      .neq("id", currentUserId); // 排除自己的 userId
+      .neq("id", currentUserId) // 排除自己的 userId
+      .not("id", "in", `(${excludeUserIds.join(",")})`); // 排除所有與好友邀請相關的用戶
 
     if (usersError) {
       console.error("Error fetching users:", usersError);
@@ -57,15 +90,12 @@ export const getAllUsers = async (currentUserId: string) => {
     // 整合三張表的資料
     const allUsers = usersData.map((user) => {
       // 找到對應的頭像資料
-      const headShot = headShotsData?.find(
-        (h) => h.user_id === user.id
-      ) || {
+      const headShot = headShotsData?.find((h) => h.user_id === user.id) || {
         image_type: "",
         image_url: "",
       };
 
       // 找到對應的選項資料
-
       const selectedOption = selectedOptionsData?.find(
         (s) => s.user_id === user.id
       ) || {
@@ -103,147 +133,220 @@ export const getAllUsers = async (currentUserId: string) => {
   }
 };
 
-// 發送好友邀請
-export const sendFriendRequest = async (
-  senderId: string,
-  receiverId: string
-) => {
-  // A1 寄好友邀請給 A2
-  // friendRequests 的資料結構如下:
-  // {
-  //   "requestId": {
-  //     "senderId": "senderId", A1  a6ajkChLx6Xv7OSxjsEnL6VNYVJ2
-  //     "receiverId": "receiverId", A2 B1DSzr0OjoNoB1dO5Q4faOb1VS93
-  //     "status": "pending", // pending:待處理, accepted:已接受, rejected:已拒絕
-  //     "createdAt": "建立時間戳"
-  //   }
-  // }
-  const requestId = `${senderId}_${receiverId}_${Date.now()}`; // 產生唯一的請求ID
-
-  const newRequest = {
-    senderId,
-    receiverId,
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  };
-  // 更新 Firebase 數據庫
-  await set(ref(database, `friendRequests/${requestId}`), newRequest);
-  return { success: true, requestId };
-};
-
-// 取得好友資訊
-export const getSenderFriendData = async (friendId) => {
-  console.log("friendId", friendId);
-  const userRef = ref(database, `users/${friendId}`);
-  const snapshot = await get(userRef);
-  if (snapshot.exists()) {
-    return snapshot.val();
-  } else {
-    return null;
-  }
-};
-
-const checkFriendship = async (userId1, userId2) => {
-  const friendshipRef = firebase
-    .firestore()
-    .collection("friendships")
-    .doc(userId1);
-
-  const doc = await friendshipRef.get();
-  if (doc.exists) {
-    return doc.data().friends?.[userId2]?.status === "friends";
-  }
-  return false;
-};
-
-// 2. 查詢 A1 的待處理好友請求（包括 A3 的請求）
-const getPendingRequests = async (userId) => {
-  const requestsRef = firebase.firestore().collection("friendRequests");
-
-  const requests = await requestsRef
-    .where("receiverId", "==", userId)
-    .where("status", "==", "pending")
-    .get();
-
-  // 同時獲取發送請求者的資料
-  const requestsWithUserInfo = await Promise.all(
-    requests.docs.map(async (doc) => {
-      const senderInfo = await firebase
-        .firestore()
-        .collection("users")
-        .doc(doc.data().senderId)
-        .get();
-
+/*
+ex:111 寄給 222  
+senderId: 111.user_id
+receiverId: 222.user_id
+*/
+// 發送交友邀請
+export const sendFriendRequest = async ({
+  senderId,
+  receiverId,
+}: FriendProps) => {
+  try {
+    const { error } = await supabase.from("friend_requests").insert({
+      sender_id: senderId,
+      receiver_id: receiverId,
+      status: "pending",
+    });
+    if (error) {
+      console.error("Error sending friend request:", error);
       return {
-        ...doc.data(),
-        senderInfo: senderInfo.data(),
+        success: false,
+        message: "Failed to send friend request. Please try again later.",
       };
+    }
+
+    return { success: true, message: "Friend request sent successfully!" };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      message: "An error occurred. Please try again later.",
+    };
+  }
+};
+
+// 更新 friend_requests 狀態
+const updateFriendRequestStatus = async ({
+  senderId,
+  receiverId,
+  status,
+}: {
+  senderId: string;
+  receiverId: string;
+  status: "accepted" | "rejected";
+}) => {
+  // 更新 friend_requests 狀態
+  const { error } = await supabase
+    .from("friend_requests")
+    .update({
+      status: status,
+      updated_at: new Date().toISOString(),
     })
-  );
+    .eq("sender_id", senderId)
+    .eq("receiver_id", receiverId);
 
-  return requestsWithUserInfo;
+  if (error) {
+    console.error("Error updating friend request status:", error);
+    return { success: false, message: error };
+  }
+
+  return {
+    success: true,
+  };
 };
 
-// 3. 獲取可以添加的好友列表（例如 A1 可以看到 A4）
-const getAvailableUsers = async (userId) => {
-  // 1. 獲取所有用戶
-  const usersRef = firebase.firestore().collection("users");
-  const allUsers = await usersRef.get();
-
-  // 2. 獲取當前用戶的好友列表
-  const friendshipsRef = firebase
-    .firestore()
-    .collection("friendships")
-    .doc(userId);
-  const friendships = await friendshipsRef.get();
-  const friends = friendships.exists
-    ? Object.keys(friendships.data().friends || {})
-    : [];
-
-  // 3. 獲取待處理的好友請求
-  const requestsRef = firebase.firestore().collection("friendRequests");
-  const sentRequests = await requestsRef.where("senderId", "==", userId).get();
-  const receivedRequests = await requestsRef
-    .where("receiverId", "==", userId)
-    .get();
-
-  // 整合所有不應該顯示的用戶ID
-  const excludeIds = new Set([
-    userId, // 自己
-    ...friends, // 已經是好友的
-    ...sentRequests.docs.map((doc) => doc.data().receiverId), // 已發送請求的
-    ...receivedRequests.docs.map((doc) => doc.data().senderId), // 已收到請求的
-  ]);
-
-  // 過濾可用的用戶
-  return allUsers.docs
-    .filter((doc) => !excludeIds.has(doc.id))
-    .map((doc) => doc.data());
+// 取得好友列表
+const getFriendList = async (currentUserId: string) => {
+  
 };
 
-// 4. 獲取好友列表（例如獲取 A1 的好友列表，會看到 A2）
-const getFriendsList = async (userId) => {
-  const friendshipsRef = firebase
-    .firestore()
-    .collection("friendships")
-    .doc(userId);
+// 新增 好友資訊到 friends 表
+const insertFriend = async ({ userId, friendId }:{
+  userId: string;
+  friendId: string;
+}) => {
+  try {
+    // 插入 user_id 和 friend_id 的關聯
+    const { error: insertError1 } = await supabase.from("friends").insert({
+      user_id: userId,
+      friend_id: friendId,
+    });
+    if (insertError1) {
+      console.error("Error inserting friend record 1:", insertError1);
+      throw insertError1; // 拋出錯誤
+    }
 
-  const doc = await friendshipsRef.get();
-  if (!doc.exists) return [];
+    // 插入反向關聯 friend_id 和 user_id 的關聯
+    const { error: insertError2 } = await supabase.from("friends").insert({
+      user_id: friendId,
+      friend_id: userId,
+    });
 
-  const friendIds = Object.keys(doc.data().friends || {});
+    if (insertError2) {
+      console.error("Error inserting friend record 2:", insertError2);
+      throw insertError2; // 拋出錯誤
+    }
 
-  // 獲取所有好友的詳細資料
-  const friendsData = await Promise.all(
-    friendIds.map((friendId) =>
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(friendId)
-        .get()
-        .then((doc) => doc.data())
+    console.log("Friendship successfully added!");
+  } catch (error) {
+    console.error("Error inserting friend:", error);
+  }
+};
+
+// 確認交友邀請
+export const confirmFriendRequest = async ({
+  senderId,
+  receiverId,
+}: FriendProps) => {
+  try {
+    const { success, message } = await updateFriendRequestStatus({
+      senderId: senderId,
+      receiverId: receiverId,
+      status: "accepted",
+    });
+
+    if (!success) {
+      return {
+        success: false,
+        message: message || "Failed to accept friend request.",
+      };
+    }
+
+    // 新增好友資訊到 friends 表
+    await insertFriend({
+      userId: senderId,
+      friendId: receiverId,
+    });
+
+    return { success: true, message: "Friend request accepted successfully!" };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      message: "An error occurred. Please try again later.",
+    };
+  }
+};
+
+// 拒絕交友邀請
+export const rejectFriendRequest = async ({
+  senderId,
+  receiverId,
+}: FriendProps) => {
+  try {
+    const { success, message } = await updateFriendRequestStatus({
+      senderId,
+      receiverId,
+      status: "rejected",
+    });
+
+    if (!success) {
+      return {
+        success: false,
+        message: message || "Failed to reject the friend request.",
+      };
+    }
+
+    return { success: true, message: "Friend request rejected successfully!" };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      message: "An error occurred. Please try again later.",
+    };
+  }
+};
+
+// 取得寄出交友邀請的 好友資訊(單一)
+export const getSenderFriendData = async (friendId: string) => {
+  console.log("friendId 1111111", friendId);
+
+  // 查詢 users
+  const { data, error } = await supabase
+    .from("users")
+    .select(
+      `
+      id, 
+      name, 
+      gender, 
+      introduce, 
+      birthday, 
+      email, 
+      created_at, 
+      updated_at,
+      user_head_shot(image_url, image_type),
+      user_selected_option(interests, favorite_food, disliked_food)
+      `
     )
-  );
+    .eq("id", friendId)
+    .single(); // 單筆記錄，因為 friendId 是唯一的
 
-  return friendsData;
+  if (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+
+  console.log("data  ===>111111", data);
+
+  return {
+    userId: data.id,
+    name: data.name,
+    gender: data.gender,
+    introduce: data.introduce,
+    birthday: data.birthday,
+    email: data.email,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    headShot: {
+      imageUrl: data.user_head_shot?.image_url || null,
+      imageType: data.user_head_shot?.image_type || null,
+    },
+    selectedOption: {
+      interests: data.user_selected_option?.interests || [],
+      favoriteFood: data.user_selected_option?.favorite_food || [],
+      dislikedFood: data.user_selected_option?.disliked_food || [],
+    },
+  };
 };

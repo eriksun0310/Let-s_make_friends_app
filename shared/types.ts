@@ -73,8 +73,8 @@ export type FriendState = "add" | "confirm";
 export type FriendInvitationStatus = "pending" | "accepted" | "rejected";
 
 export type FriendRequest = {
-  receiverId: string;
-  senderId: string;
+  receiver_id: string;
+  sender_id: string;
   status: FriendInvitationStatus;
   createdAt: Date;
 };

@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { auth } from "../util/firebaseConfig";
-import { getUserData } from "../util/personApi";
+import { getUserData } from "../util/person";
 import { supabase } from "../util/supabaseClient";
 
 interface InitialStateProps {
