@@ -59,8 +59,6 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
           ...form,
         })
       ); // 更新redux
-      console.log("form", form);
-      console.log("user aboutMe", user);
       await saveAboutMe({
         user: form,
       });

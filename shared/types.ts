@@ -68,7 +68,7 @@ export type User = {
 
 export type UserState = "personal" | "friend" | "visitor";
 
-export type FriendState = "add" | "confirm";
+export type FriendState = "add" | "accepted";
 
 export type FriendInvitationStatus = "pending" | "accepted" | "rejected";
 

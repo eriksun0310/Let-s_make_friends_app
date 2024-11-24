@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getSenderFriendData } from "../../util/searchFriends";
+import { getFriendDetail } from "../../util/searchFriends";
 import FriendCard from "../ui/FriendCard";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendRequest, User } from "../../shared/types";
@@ -12,6 +12,7 @@ interface FriendInvitationItemProps {
 }
 
 const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
+  loading1,
   friendRequest,
   navigation,
 }) => {
@@ -21,10 +22,7 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
   useEffect(() => {
     const fetchSenderData = async () => {
       try {
-        const data = await getSenderFriendData(friendRequest.sender_id);
-
-
-       
+        const data = await getFriendDetail(friendRequest.sender_id);
 
         setSenderData(data);
       } catch (error) {
@@ -37,16 +35,10 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
     fetchSenderData();
   }, [friendRequest.sender_id]);
 
-
-
-  if (loading) {
-    return <LoadingOverlay message="loading ..." />;
-  }
-
   return (
     Object.keys(senderData || {}).length > 0 && (
       <FriendCard
-        friendState="confirm"
+        friendState="accepted"
         key={friendRequest.sender_id}
         index={friendRequest.sender_id}
         friend={senderData}

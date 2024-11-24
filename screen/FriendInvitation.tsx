@@ -8,8 +8,8 @@ import BackButton from "../components/ui/button/BackButton";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
-import { getSenderFriendData } from "../util/searchFriends";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -28,12 +28,20 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
       headerLeft: () => <BackButton navigation={navigation} />,
     });
   }, [navigation]);
+
+
+  if (loading) {
+    return <LoadingOverlay message="交友邀請 loading ..." />;
+  }
+
+
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {Object.entries(friendRequests).map(([requestId, friendRequest]) => {
           return (
             <FriendInvitationItem
+            loading={loading}
               key={requestId}
               friendRequest={friendRequest}
               navigation={navigation}

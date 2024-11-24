@@ -1,6 +1,11 @@
 import { Search, UserRoundCheck, UserRoundPlus, X } from "lucide-react-native";
-import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
@@ -8,88 +13,88 @@ import { FriendState, User } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
 import { Text, Card, Avatar } from "@rneui/themed";
 import {
-  confirmFriendRequest,
-  rejectFriendRequest,
+  acceptedFriendRequest,
+  rejectedFriendRequest,
   sendFriendRequest,
 } from "../../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { useFriendRequests } from "../hooks/useFriendRequests";
+
+type FriendActionType = "accepted" | "rejected";
+
 interface FriendCardProps {
   friendState: FriendState;
   index: number | string;
   friend: User;
   navigation: NavigationProp<any>;
+  onAddFriend?: (receiverId: string) => Promise<void>;
 }
 const FriendCard: React.FC<FriendCardProps> = ({
   friendState,
   index,
   friend,
   navigation,
+  onAddFriend,
 }) => {
+  const [buttonLoading, setButtonLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user.user);
   // 點擊 好友資訊
   const clickSearch = () => {
     navigation.navigate?.("userInfoFriend", { mode: "friend" });
   };
-  //點擊 加好友
-  const clickAddFriend = async (receiverId: string) => {
+
+  //
+  const handleFriendAction = async ({
+    actionType,
+    targetUserId,
+  }: {
+    actionType: FriendActionType;
+    targetUserId: string;
+  }) => {
+    console.log("actionType", actionType);
+    setButtonLoading(true);
     try {
-      const result = await sendFriendRequest({
-        senderId: user.userId,
-        receiverId: receiverId,
-      });
-      if (result.success) {
-        console.log("Friend request sent successfully!");
-        // 可以添加一些UI反饋，比如彈出提示
-      } else {
-        console.error("Failed to send friend request");
+      let result;
+      switch (actionType) {
+        case "accepted":
+          result = await acceptedFriendRequest({
+            senderId: targetUserId,
+            receiverId: user.userId,
+          });
+          break;
+
+        case "rejected":
+          result = await rejectedFriendRequest({
+            senderId: targetUserId,
+            receiverId: user.userId,
+          });
+          break;
+
+        default:
+          throw new Error("Invalid action type");
+      }
+
+      if (!result.success) {
+        console.error(`Failed to ${actionType} friend`);
       }
     } catch (error) {
-      console.error("Error sending friend request:", error);
-    }
-  };
-  //點擊 確認交友邀請
-  const clickConfirmFriend = async (senderId: string) => {
-    try {
-      const result = await confirmFriendRequest({
-        senderId: senderId,
-        receiverId: user.userId,
-      });
-
-      if (result.success) {
-        console.log("confirm Friend  successfully!");
-        // 可以添加一些UI反饋，比如彈出提示
-      } else {
-        console.error("Failed to confirm Friend request");
-      }
-    } catch (error) {
-      console.error("Error confirm Friend request:", error);
+      console.error(`Error while performing ${actionType} action:`, error);
+    } finally {
+      setButtonLoading(false);
     }
   };
 
-  // 點擊 拒絕交友邀請
-  const clickRejectFriend = async (senderId: string) => {
-    try {
-      const result = await rejectFriendRequest({
-        senderId: senderId,
-        receiverId: user.userId,
-      });
-
-      if (result.success) {
-        console.log("reject Friend  successfully!");
-        // 可以添加一些UI反饋，比如彈出提示
-      } else {
-        console.error("Failed to reject Friend request");
-      }
-    } catch (error) {
-      console.error("Error reject Friend request:", error);
-    }
-  };
   return (
     <Card key={index} containerStyle={styles.card}>
       <CustomIcon
         style={styles.closeButton}
-        onPress={() => clickRejectFriend(friend.userId)}
+        onPress={() => {
+          handleFriendAction({
+            actionType: "rejected",
+            targetUserId: friend.userId,
+          });
+        }}
       >
         <X color={Colors.icon} />
       </CustomIcon>
@@ -110,16 +115,24 @@ const FriendCard: React.FC<FriendCardProps> = ({
           <Search color={Colors.icon} />
         </TouchableOpacity>
         <TouchableOpacity
+          disabled={buttonLoading}
           style={styles.actionButton}
-          onPress={() => {
+          onPress={async () => {
             if (friendState === "add") {
-              clickAddFriend(friend.userId);
+              setButtonLoading(true);
+              await onAddFriend?.(friend.userId);
+              setButtonLoading(false);
             } else {
-              clickConfirmFriend(friend.userId);
+              handleFriendAction({
+                actionType: "accepted",
+                targetUserId: friend.userId,
+              });
             }
           }}
         >
-          {friendState === "add" ? (
+          {buttonLoading ? (
+            <ActivityIndicator size="small" color={Colors.icon} /> // 加載動畫
+          ) : friendState === "add" ? (
             <UserRoundPlus color={Colors.icon} />
           ) : (
             <UserRoundCheck color={Colors.icon} />

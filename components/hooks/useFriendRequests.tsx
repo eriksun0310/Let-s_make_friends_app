@@ -32,21 +32,87 @@ import { supabase } from "../../util/supabaseClient";
 
 //   return { friendRequests, loading };
 // };
+// export const useFriendRequests = (userId: string) => {
+//   const [friendRequests, setFriendRequests] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchFriendRequests = async () => {
+//       // 初始載入好友邀請
+//       const { data, error } = await supabase
+//         .from("friend_requests")
+//         .select("*")
+//         .eq("receiver_id", userId);
+
+
+  
+
+//       if (error) {
+//         console.error("Error fetching friend requests:", error);
+//         setLoading(false);
+//         return;
+//       }
+
+//       setFriendRequests(data || []);
+//       setLoading(false);
+//     };
+
+//     fetchFriendRequests();
+
+//     // 即時監聽好友邀請的變化
+//     const subscription = supabase
+//       .channel("public:friend_requests") // 訂閱 friend_requests 資料表的變化
+//       .on(
+//         "postgres_changes",
+//         { event: "*", schema: "public", table: "friend_requests" },
+//         (payload) => {
+//           console.log("Change received: 111111", payload);
+
+//           if (payload.eventType === "INSERT" && payload.new.receiver_id === userId) {
+//             // 新增好友邀請
+//             setFriendRequests((prev) => [...prev, payload.new]);
+//           } else if (payload.eventType === "UPDATE") {
+//             // 更新好友邀請狀態
+//             setFriendRequests((prev) =>
+//               prev.map((req) =>
+//                 req.id === payload.new.id ? payload.new : req
+//               )
+//             );
+//           } else if (payload.eventType === "DELETE") {
+//             // 刪除好友邀請
+//             setFriendRequests((prev) =>
+//               prev.filter((req) => req.id !== payload.old.id)
+//             );
+//           }
+//         }
+//       )
+//       .subscribe();
+
+//     return () => {
+//       supabase.removeChannel(subscription); // 清理訂閱
+//     };
+//   }, [userId]);
+
+
+//   console.log('friendRequests 111111', friendRequests)
+
+//   return { friendRequests, loading };
+// };
+
+
+
 export const useFriendRequests = (userId: string) => {
-  console.log('userId', userId)
   const [friendRequests, setFriendRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
-      // 初始載入好友邀請
+      // 初始載入好友邀請，僅獲取狀態為 pending 的記錄
       const { data, error } = await supabase
         .from("friend_requests")
         .select("*")
-        .eq("receiver_id", userId);
-
-
-      console.log('data 11111111', data)
+        .eq("receiver_id", userId)
+        .eq("status", "pending"); // 僅選擇狀態為 pending 的邀請
 
       if (error) {
         console.error("Error fetching friend requests:", error);
@@ -69,20 +135,27 @@ export const useFriendRequests = (userId: string) => {
         (payload) => {
           console.log("Change received:", payload);
 
-          if (payload.eventType === "INSERT" && payload.new.receiver_id === userId) {
-            // 新增好友邀請
+          if (payload.eventType === "INSERT" && 
+              payload.new.receiver_id === userId &&
+              payload.new.status === "pending") {
+            // 新增好友邀請，且狀態為 pending
             setFriendRequests((prev) => [...prev, payload.new]);
-          } else if (payload.eventType === "UPDATE") {
-            // 更新好友邀請狀態
+          } else if (payload.eventType === "UPDATE" && 
+                     payload.new.receiver_id === userId &&
+                     payload.new.status === "pending") {
+            // 更新好友邀請狀態為 pending
             setFriendRequests((prev) =>
               prev.map((req) =>
                 req.id === payload.new.id ? payload.new : req
               )
             );
-          } else if (payload.eventType === "DELETE") {
-            // 刪除好友邀請
+          } else if (
+            payload.eventType === "DELETE" || 
+            (payload.eventType === "UPDATE" && payload.new.status !== "pending")
+          ) {
+            // 刪除好友邀請或狀態改變（非 pending）
             setFriendRequests((prev) =>
-              prev.filter((req) => req.id !== payload.old.id)
+              prev.filter((req) => req.id !== payload.old?.id)
             );
           }
         }
@@ -94,8 +167,7 @@ export const useFriendRequests = (userId: string) => {
     };
   }, [userId]);
 
-
-  console.log('friendRequests 111111', friendRequests)
+  console.log("friendRequests:", friendRequests);
 
   return { friendRequests, loading };
 };

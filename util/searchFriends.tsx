@@ -14,6 +14,57 @@ interface FriendProps {
 */
 // 1. 查詢 A1 和 A2 的好友關係
 
+
+
+//取得(單一)好友詳細資料
+export const getFriendDetail = async (friendId: string) => {
+  // 查詢 users
+  const { data, error } = await supabase
+    .from("users")
+    .select(
+      `
+      id, 
+      name, 
+      gender, 
+      introduce, 
+      birthday, 
+      email, 
+      created_at, 
+      updated_at,
+      user_head_shot(image_url, image_type),
+      user_selected_option(interests, favorite_food, disliked_food)
+      `
+    )
+    .eq("id", friendId)
+    .single(); // 單筆記錄，因為 friendId 是唯一的
+
+  if (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+
+  return {
+    userId: data.id,
+    name: data.name,
+    gender: data.gender,
+    introduce: data.introduce,
+    birthday: data.birthday,
+    email: data.email,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    headShot: {
+      imageUrl: data.user_head_shot?.image_url || null,
+      imageType: data.user_head_shot?.image_type || null,
+    },
+    selectedOption: {
+      interests: data.user_selected_option?.interests || [],
+      favoriteFood: data.user_selected_option?.favorite_food || [],
+      dislikedFood: data.user_selected_option?.disliked_food || [],
+    },
+  };
+};
+
+
 // 取得可以成為好友的用戶
 export const getAllUsers = async (currentUserId: string) => {
   try {
@@ -38,18 +89,6 @@ export const getAllUsers = async (currentUserId: string) => {
       req.sender_id,
       req.receiver_id,
     ]);
-
-    // 整理已發送好友邀請的 userId
-    // const sentRequestIds = sentRequests.map((req) => req.receiver_id);
-
-    // // 查詢 `users` 表，排除自己的資料和已發送好友邀請的用戶
-    // const { data: usersData, error: usersError } = await supabase
-    //   .from("users")
-    //   .select(
-    //     "id, name, gender, introduce, birthday, email, created_at, updated_at"
-    //   )
-    //   .neq("id", currentUserId) // 排除自己的 userId
-    //   .not("id", "in", `(${sentRequestIds.join(",")})`); // 排除已發送好友邀請的用戶
 
     // 查詢 `users` 表，排除自己和所有已經有好友邀請關係的用戶
     const { data: usersData, error: usersError } = await supabase
@@ -198,12 +237,44 @@ const updateFriendRequestStatus = async ({
 };
 
 // 取得好友列表
-const getFriendList = async (currentUserId: string) => {
-  
+export const getFriendList = async (currentUserId: string) => {
+  try {
+    const { data: friendsData, error: friendsError } = await supabase
+      .from("friends")
+      .select("friend_id")
+      .eq("user_id", currentUserId);
+
+    if (friendsError) {
+      console.error("Error fetching friends:", friendsError);
+      return [];
+    }
+
+    if (!friendsData || friendsData.length === 0) {
+      console.log("No friends found for the user.");
+      return [];
+    }
+
+    // 獲取每個好友的詳細資料
+    const allFriendsDetails = await Promise.all(
+      friendsData.map(async (friend) => {
+        const friendDetail = await getFriendDetail(friend.friend_id);
+        return friendDetail; // 返回每個好友的詳細資料
+      })
+    );
+
+    // 過濾掉返回為空的好友數據
+    return allFriendsDetails.filter((friendDetail) => friendDetail !== null);
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    return []
+  }
 };
 
 // 新增 好友資訊到 friends 表
-const insertFriend = async ({ userId, friendId }:{
+const insertFriend = async ({
+  userId,
+  friendId,
+}: {
   userId: string;
   friendId: string;
 }) => {
@@ -228,15 +299,13 @@ const insertFriend = async ({ userId, friendId }:{
       console.error("Error inserting friend record 2:", insertError2);
       throw insertError2; // 拋出錯誤
     }
-
-    console.log("Friendship successfully added!");
   } catch (error) {
     console.error("Error inserting friend:", error);
   }
 };
 
 // 確認交友邀請
-export const confirmFriendRequest = async ({
+export const acceptedFriendRequest = async ({
   senderId,
   receiverId,
 }: FriendProps) => {
@@ -271,7 +340,7 @@ export const confirmFriendRequest = async ({
 };
 
 // 拒絕交友邀請
-export const rejectFriendRequest = async ({
+export const rejectedFriendRequest = async ({
   senderId,
   receiverId,
 }: FriendProps) => {
@@ -297,56 +366,4 @@ export const rejectFriendRequest = async ({
       message: "An error occurred. Please try again later.",
     };
   }
-};
-
-// 取得寄出交友邀請的 好友資訊(單一)
-export const getSenderFriendData = async (friendId: string) => {
-  console.log("friendId 1111111", friendId);
-
-  // 查詢 users
-  const { data, error } = await supabase
-    .from("users")
-    .select(
-      `
-      id, 
-      name, 
-      gender, 
-      introduce, 
-      birthday, 
-      email, 
-      created_at, 
-      updated_at,
-      user_head_shot(image_url, image_type),
-      user_selected_option(interests, favorite_food, disliked_food)
-      `
-    )
-    .eq("id", friendId)
-    .single(); // 單筆記錄，因為 friendId 是唯一的
-
-  if (error) {
-    console.error("Error fetching users:", error);
-    return [];
-  }
-
-  console.log("data  ===>111111", data);
-
-  return {
-    userId: data.id,
-    name: data.name,
-    gender: data.gender,
-    introduce: data.introduce,
-    birthday: data.birthday,
-    email: data.email,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-    headShot: {
-      imageUrl: data.user_head_shot?.image_url || null,
-      imageType: data.user_head_shot?.image_type || null,
-    },
-    selectedOption: {
-      interests: data.user_selected_option?.interests || [],
-      favoriteFood: data.user_selected_option?.favorite_food || [],
-      dislikedFood: data.user_selected_option?.disliked_food || [],
-    },
-  };
 };
