@@ -2,28 +2,25 @@ import React, { useState } from "react";
 import { ListItem } from "@rneui/themed";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { gender, optionList, tabs } from "../../shared/static";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { Snackbar } from "react-native-paper";
+import { User } from "../../shared/types";
 
-//TODO: 要傳入user value 個人資料清單
 
 interface UserCollapseProps {
   navigation: NavigationProp<any>;
+  user: User;
 }
 
-const UserCollapse: React.FC<UserCollapseProps> = ({ navigation }) => {
+const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
   const [expanded, setExpanded] = useState(false);
   // 顯示 Snackbar
   const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   // 顯示 Snackbar文字
   const [snackbarText, setSnackbarText] = useState("");
-
-  const user = useSelector((state: RootState) => state.user.user);
 
   const onToggleSnackBar = (text: string) => {
     setSnackbarText(text);

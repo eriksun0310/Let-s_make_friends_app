@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  ImageSourcePropType,
 } from "react-native";
 import { Colors } from "../../constants/style";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
@@ -15,12 +16,9 @@ import { Text, Card, Avatar } from "@rneui/themed";
 import {
   acceptedFriendRequest,
   rejectedFriendRequest,
-  sendFriendRequest,
 } from "../../util/searchFriends";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { useFriendRequests } from "../hooks/useFriendRequests";
-
 type FriendActionType = "accepted" | "rejected";
 
 interface FriendCardProps {
@@ -41,7 +39,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
   const user = useSelector((state: RootState) => state.user.user);
   // 點擊 好友資訊
   const clickSearch = () => {
-    navigation.navigate?.("userInfoFriend", { mode: "friend" });
+    navigation.navigate?.("userInfoFriend", { mode: "friend", friend: friend });
   };
 
   //
@@ -103,7 +101,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
         rounded
         size="medium"
         containerStyle={styles.avatar}
-        source={friend.headShot.imageUrl}
+        source={friend.headShot.imageUrl as ImageSourcePropType}
       />
 
       <Card.Title>{friend.name}</Card.Title>

@@ -1,15 +1,13 @@
 import { ChevronRight } from "lucide-react-native";
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
 import { Avatar } from "react-native-elements";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
+import { User } from "../../shared/types";
 
-interface Friend {
-  name: string;
-}
 interface FriendItemProps {
-  friend: Friend;
+  friend: User;
   navigation: NavigationProp<any>;
 }
 const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
@@ -18,6 +16,7 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
       onPress={() => {
         navigation.navigate("userInfoFriend", {
             mode: "friend",
+            friend: friend
         });
       }}
     >
@@ -26,7 +25,7 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
           <Avatar
             rounded
             size="medium"
-            source={require("../../assets/animal/ostrich.png")}
+            source={friend.headShot.imageUrl as ImageSourcePropType}
           />
           <Text style={styles.friendName}>{friend.name}</Text>
         </View>

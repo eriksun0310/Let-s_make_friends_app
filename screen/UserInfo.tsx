@@ -9,13 +9,13 @@ import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
-import { UserState } from "../shared/types";
+import { User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 
 interface UserInfoProps {
-  route: { params: { mode: UserState } };
+  route: { params: { mode: UserState; friend: User } };
   navigation: NavigationProp<any>;
 }
 
@@ -23,11 +23,13 @@ export const postList = Array(14).fill({
   date: "2024/08/02",
 });
 
-// TODO: user 資料要用傳的
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
-  const { mode } = route.params || { mode: "personal" };
+  const { mode, friend } = route.params || { mode: "personal" };
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user.user);
+  const personal = useSelector((state: RootState) => state.user.user);
+
+  // 判斷是 個人還是好友
+  const user = mode === "personal" ? personal : friend;
 
   const handleLogout = () => {
     dispatch(logout()).then(() => {
@@ -58,7 +60,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             headShot={user.headShot}
           />
 
-          <UserCollapse navigation={navigation} />
+          <UserCollapse navigation={navigation} user={user} />
           <View
             style={{
               marginTop: 10,

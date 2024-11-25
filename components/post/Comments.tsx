@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Card, Avatar, Icon } from "@rneui/themed";
 
 // 留言
+// TODO: 到時候要傳 哪個 user 留的言 
 const Comments = () => {
   return (
     <Card containerStyle={styles.cardContainer}>

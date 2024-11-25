@@ -1,6 +1,6 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
-import { UserState } from "../../shared/types";
+import { View, StyleSheet, Text, ImageSourcePropType } from "react-native";
+import { User, UserState } from "../../shared/types";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
@@ -9,12 +9,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 interface PostProps {
   mode: UserState;
   date: string;
-  user: {
-    name: string;
-    headShot: {
-      imageUrl: any;
-    };
-  };
+  user: User;
 }
 export const tagList = Array(5).fill({
   text: "大家好",
@@ -24,7 +19,7 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
-        <Avatar rounded source={user.headShot?.imageUrl} size="medium" />
+        <Avatar rounded source={user.headShot?.imageUrl as ImageSourcePropType} size="medium" />
         <View style={styles.headerText}>
           <Text style={styles.username}>{user.name}</Text>
           <Text style={styles.timestamp}>{date}</Text>
