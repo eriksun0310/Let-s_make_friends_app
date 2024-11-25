@@ -12,6 +12,7 @@ import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { useNewFriend } from "../components/hooks/useNewFriend";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -26,6 +27,9 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
+  // 取得新的好友
+  const { newFriend, loading: newFriendLoading } = useNewFriend(user.userId);
+  //取得交友邀請
   const { friendRequests, loading } = useFriendRequests(user.userId);
 
   // 所有的用戶資料
@@ -59,13 +63,21 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
+    console.log("friendRequests", friendRequests);
 
-  console.log("friendRequests",friendRequests);
+    //  TODO: 點了好友列表後 newFriend 的length 歸0
     // 設置導航選項
     navigation.setOptions({
       headerLeft: () => (
         <CustomIcon onPress={() => navigation.navigate("FriendList")}>
-          <Users color={Colors.icon} size={25} />
+          <View style={styles.bellRingContainer}>
+            {Object.keys(newFriend).length > 0 && (
+              <Badge style={styles.badge}>
+                {Object.keys(newFriend).length}
+              </Badge>
+            )}
+            <Users color={Colors.icon} size={25} />
+          </View>
         </CustomIcon>
       ),
       headerRight: () => (
@@ -83,7 +95,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     });
 
     fetchAllUsers(); // 調用 API 獲取資料
-  }, [navigation, friendRequests]);
+  }, [navigation, friendRequests, newFriend]);
 
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;
   return (
