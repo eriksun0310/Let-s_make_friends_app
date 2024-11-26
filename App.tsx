@@ -29,6 +29,10 @@ import UserInfo from "./screen/UserInfo";
 import PostContent from "./screen/PostContent";
 import Search from "./screen/Search";
 import AddPost from "./screen/AddPost";
+import 'react-native-gesture-handler';
+
+
+
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
