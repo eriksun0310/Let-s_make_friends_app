@@ -1,20 +1,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
 
-
-
-
+// 監聽 成為新好友
 export const useNewFriend = (userId: string) => {
   const [newFriend, setNewFriend] = useState([]);
+  const [newFriendsNumber, setNewFriendsNumber] = useState(0); // 新好友数量
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFriendRequests = async () => {
-      // 初始載入好友邀請，僅獲取狀態為 pending 的記錄
+    const fetchFriends = async () => {
       const { data, error } = await supabase
         .from("friends")
         .select("*")
         .eq("user_id", userId)
+        .eq("notified", false); // 仅获取未通知的记录
 
       if (error) {
         console.error("Error fetching friends :", error);
@@ -23,10 +22,11 @@ export const useNewFriend = (userId: string) => {
       }
 
       setNewFriend(data || []);
+      setNewFriendsNumber((data || []).length); // 统计未通知的数量
       setLoading(false);
     };
 
-    fetchFriendRequests();
+    fetchFriends();
 
     // 即時監聽好友邀請的變化
     const subscription = supabase
@@ -37,9 +37,13 @@ export const useNewFriend = (userId: string) => {
         (payload) => {
           console.log("Change received friends :", payload);
 
-          if (payload.eventType === "INSERT" && 
-              payload.new.user_id === userId) {
+          if (
+            payload.eventType === "INSERT" &&
+            payload.new.user_id === userId &&
+            !payload.new.notified // 確保是未通知的紀錄
+          ) {
             setNewFriend((prev) => [...prev, payload.new]);
+            setNewFriendsNumber((prev) => prev + 1); // 更新新好友数量
           }
         }
       )
@@ -50,7 +54,24 @@ export const useNewFriend = (userId: string) => {
     };
   }, [userId]);
 
-  console.log("newFriend:", newFriend);
+  // 標記所有新好友為已通知
+  const markAllAsNotified = async () => {
+    try {
+      const { error } = await supabase
+        .from("friends")
+        .update({ notified: true }) // 更新为已通知
+        .eq("user_id", userId)
+        .eq("notified", false); // 仅更新未通知的记录
 
-  return { newFriend, loading };
+      if (error) {
+        console.error("Error updating notified status:", error);
+      } else {
+        setNewFriendsNumber(0); // 重置本地状态
+      }
+    } catch (err) {
+      console.error("Error marking friends as notified:", err);
+    }
+  };
+
+  return { newFriend, loading, newFriendsNumber, markAllAsNotified };
 };

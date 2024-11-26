@@ -14,8 +14,6 @@ interface FriendProps {
 */
 // 1. 查詢 A1 和 A2 的好友關係
 
-
-
 //取得(單一)好友詳細資料
 export const getFriendDetail = async (friendId: string) => {
   // 查詢 users
@@ -63,7 +61,6 @@ export const getFriendDetail = async (friendId: string) => {
     },
   };
 };
-
 
 // 取得可以成為好友的用戶
 export const getAllUsers = async (currentUserId: string) => {
@@ -187,6 +184,7 @@ export const sendFriendRequest = async ({
       sender_id: senderId,
       receiver_id: receiverId,
       status: "pending",
+      is_read: false, // 設置為未讀
     });
     if (error) {
       console.error("Error sending friend request:", error);
@@ -266,7 +264,7 @@ export const getFriendList = async (currentUserId: string) => {
     return allFriendsDetails.filter((friendDetail) => friendDetail !== null);
   } catch (error) {
     console.error("Error fetching friends:", error);
-    return []
+    return [];
   }
 };
 
@@ -283,6 +281,7 @@ const insertFriend = async ({
     const { error: insertError1 } = await supabase.from("friends").insert({
       user_id: userId,
       friend_id: friendId,
+      notified: false,
     });
     if (insertError1) {
       console.error("Error inserting friend record 1:", insertError1);
@@ -293,6 +292,7 @@ const insertFriend = async ({
     const { error: insertError2 } = await supabase.from("friends").insert({
       user_id: friendId,
       friend_id: userId,
+      notified: false,
     });
 
     if (insertError2) {

@@ -5,6 +5,7 @@ import { supabase } from "../../util/supabaseClient";
 export const useFriendRequests = (userId: string) => {
   const [friendRequests, setFriendRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newFriendRequestNumber, setNewFriendRequestNumber] = useState(0); // 新好友数量
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -13,7 +14,7 @@ export const useFriendRequests = (userId: string) => {
         .from("friend_requests")
         .select("*")
         .eq("receiver_id", userId)
-        .eq("status", "pending"); // 僅選擇狀態為 pending 的邀請
+        .eq("status", "pending");
 
       if (error) {
         console.error("Error fetching friend requests:", error);
@@ -21,7 +22,11 @@ export const useFriendRequests = (userId: string) => {
         return;
       }
 
+      // 更新本地的好友邀请数据，包括未读和已读的
       setFriendRequests(data || []);
+      setNewFriendRequestNumber(
+        (data || []).filter((req) => req.is_read === false).length
+      );
       setLoading(false);
     };
 
@@ -43,23 +48,8 @@ export const useFriendRequests = (userId: string) => {
           ) {
             // 新增好友邀請，且狀態為 pending
             setFriendRequests((prev) => [...prev, payload.new]);
-          }
-
-          // 這裡目前用不到
-          // else if (payload.eventType === "UPDATE" &&
-          //            payload.new.receiver_id === userId &&
-          //            payload.new.status === "pending") {
-
-          //             // TODO: payload.new.status === "accepted" 可以寄一個 newFriend 的狀態?
-          //             console.log(222222222222222222222222)
-          //   // 更新好友邀請狀態為 pending
-          //   setFriendRequests((prev) =>
-          //     prev.map((req) =>
-          //       req.id === payload.new.id ? payload.new : req
-          //     )
-          //   );
-          // }
-          else if (
+            setNewFriendRequestNumber((prev) => prev + 1); // 更新交友邀請數量
+          } else if (
             payload.eventType === "DELETE" ||
             (payload.eventType === "UPDATE" && payload.new.status !== "pending")
           ) {
@@ -77,7 +67,25 @@ export const useFriendRequests = (userId: string) => {
     };
   }, [userId]);
 
-  console.log("friendRequests:", friendRequests);
+  // 標記所有交友邀請為已讀
+  const markInvitationsAsRead = async () => {
+    const { error } = await supabase
+      .from("friend_requests")
+      .update({ is_read: true })
+      .eq("receiver_id", userId)
+      .eq("is_read", false); // 只更新尚未讀取的邀請
 
-  return { friendRequests, loading };
+    if (error) {
+      console.error("Error updating invitation read status:", error);
+    } else {
+      setNewFriendRequestNumber(0);
+    }
+  };
+
+  return {
+    friendRequests,
+    loading,
+    newFriendRequestNumber,
+    markInvitationsAsRead,
+  };
 };

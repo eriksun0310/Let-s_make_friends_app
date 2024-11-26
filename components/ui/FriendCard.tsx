@@ -35,7 +35,11 @@ const FriendCard: React.FC<FriendCardProps> = ({
   navigation,
   onAddFriend,
 }) => {
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState({
+    add: false,
+    accepted: false,
+    rejected: false,
+  });
   const user = useSelector((state: RootState) => state.user.user);
   // 點擊 好友資訊
   const clickSearch = () => {
@@ -50,8 +54,11 @@ const FriendCard: React.FC<FriendCardProps> = ({
     actionType: FriendActionType;
     targetUserId: string;
   }) => {
-    console.log("actionType", actionType);
-    setButtonLoading(true);
+    setButtonLoading((prev) => ({
+      ...prev,
+      [actionType]: true,
+    }));
+
     try {
       let result;
       switch (actionType) {
@@ -60,6 +67,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
             senderId: targetUserId,
             receiverId: user.userId,
           });
+
           break;
 
         case "rejected":
@@ -67,6 +75,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
             senderId: targetUserId,
             receiverId: user.userId,
           });
+
           break;
 
         default:
@@ -79,7 +88,10 @@ const FriendCard: React.FC<FriendCardProps> = ({
     } catch (error) {
       console.error(`Error while performing ${actionType} action:`, error);
     } finally {
-      setButtonLoading(false);
+      setButtonLoading((prev) => ({
+        ...prev,
+        [actionType]: false,
+      }));
     }
   };
 
@@ -93,8 +105,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
             targetUserId: friend.userId,
           });
         }}
+        disabled={buttonLoading['rejected']}
       >
-        <X color={Colors.icon} />
+        {buttonLoading['rejected'] ? (
+          <ActivityIndicator size="small" color={Colors.icon} />
+        ) : (
+          <X color={Colors.icon} />
+        )}
       </CustomIcon>
 
       <Avatar
@@ -113,13 +130,19 @@ const FriendCard: React.FC<FriendCardProps> = ({
           <Search color={Colors.icon} />
         </TouchableOpacity>
         <TouchableOpacity
-          disabled={buttonLoading}
+          disabled={buttonLoading[friendState]}
           style={styles.actionButton}
           onPress={async () => {
             if (friendState === "add") {
-              setButtonLoading(true);
+              setButtonLoading((prev) => ({
+                ...prev,
+                [friendState]: true,
+              }));
               await onAddFriend?.(friend.userId);
-              setButtonLoading(false);
+              setButtonLoading((prev) => ({
+                ...prev,
+                [friendState]: false,
+              }));
             } else {
               handleFriendAction({
                 actionType: "accepted",
@@ -128,7 +151,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
             }
           }}
         >
-          {buttonLoading ? (
+          {buttonLoading[friendState] ? (
             <ActivityIndicator size="small" color={Colors.icon} /> // 加載動畫
           ) : friendState === "add" ? (
             <UserRoundPlus color={Colors.icon} />

@@ -13,6 +13,7 @@ import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
+import { set } from "firebase/database";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -26,11 +27,18 @@ interface AddFriendProps {
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
-
   // 取得新的好友
-  const { newFriend, loading: newFriendLoading } = useNewFriend(user.userId);
+  const { newFriend, newFriendsNumber, markAllAsNotified } = useNewFriend(
+    user.userId
+  );
+
   //取得交友邀請
-  const { friendRequests, loading } = useFriendRequests(user.userId);
+  const {
+    friendRequests,
+    loading,
+    newFriendRequestNumber,
+    markInvitationsAsRead,
+  } = useFriendRequests(user.userId);
 
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -63,30 +71,34 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log("friendRequests", friendRequests);
-
     //  TODO: 點了好友列表後 newFriend 的length 歸0
     // 設置導航選項
     navigation.setOptions({
       headerLeft: () => (
-        <CustomIcon onPress={() => navigation.navigate("FriendList")}>
+        <CustomIcon
+          onPress={async () => {
+            navigation.navigate("FriendList");
+            await markAllAsNotified(); // 標記所有新好友為已通知
+          }}
+        >
           <View style={styles.bellRingContainer}>
-            {Object.keys(newFriend).length > 0 && (
-              <Badge style={styles.badge}>
-                {Object.keys(newFriend).length}
-              </Badge>
+            {newFriendsNumber > 0 && (
+              <Badge style={styles.badge}>{newFriendsNumber}</Badge>
             )}
             <Users color={Colors.icon} size={25} />
           </View>
         </CustomIcon>
       ),
       headerRight: () => (
-        <CustomIcon onPress={() => navigation.navigate("friendInvitation")}>
+        <CustomIcon
+          onPress={async () => {
+            navigation.navigate("friendInvitation");
+            await markInvitationsAsRead(); // 標記所有交友邀請為已讀
+          }}
+        >
           <View style={styles.bellRingContainer}>
-            {Object.keys(friendRequests).length > 0 && (
-              <Badge style={styles.badge}>
-                {Object.keys(friendRequests).length}
-              </Badge>
+            {newFriendRequestNumber > 0 && (
+              <Badge style={styles.badge}>{newFriendRequestNumber}</Badge>
             )}
             <BellRing color={Colors.icon} size={25} />
           </View>
@@ -95,7 +107,13 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     });
 
     fetchAllUsers(); // 調用 API 獲取資料
-  }, [navigation, friendRequests, newFriend]);
+  }, [
+    navigation,
+    newFriendRequestNumber,
+    newFriendsNumber,
+    friendRequests,
+    newFriend,
+  ]);
 
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;
   return (
