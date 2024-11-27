@@ -362,7 +362,7 @@ export const rejectedFriendRequest = async ({
   }
 };
 
-//刪除好友
+//刪除(單一)好友
 export const deleteFriend = async ({
   userId,
   friendId,
@@ -375,10 +375,9 @@ export const deleteFriend = async ({
     const { error } = await supabase
       .from("friends")
       .delete()
+      // 刪除兩筆紀錄(user_id 和 friend_id 互為好友的紀錄)
       .or(
-        // 删除两条互为好友的记录
-        `user_id.eq.${userId},friend_id.eq.${friendId}`
-        .or(`user_id.eq.${friendId},friend_id.eq.${userId}`)
+        `and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`
       );
 
     if (error) {

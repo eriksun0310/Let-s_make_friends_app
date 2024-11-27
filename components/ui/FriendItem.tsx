@@ -13,11 +13,12 @@ import { RootState } from "../../store/store";
 interface FriendItemProps {
   friend: User;
   navigation: NavigationProp<any>;
+  onDeleteSuccess: () => Promise<void>;
 }
 const FriendItem: React.FC<FriendItemProps> = ({
   friend,
   navigation,
-  // onPressDelete,
+  onDeleteSuccess,
 }) => {
   // 取得個人資料
   const personal = useSelector((state: RootState) => state.user.user);
@@ -25,8 +26,6 @@ const FriendItem: React.FC<FriendItemProps> = ({
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
   const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
-
- 
 
   // 刪除好友 事件
   const handleDeleteFriend = async (mode: "delete" | "cancel") => {
@@ -37,10 +36,17 @@ const FriendItem: React.FC<FriendItemProps> = ({
 
     if (mode === "delete") {
       console.log("delete");
-      const {success, message} = await deleteFriend({
+      const { success } = await deleteFriend({
         userId: personal.userId,
         friendId: friend.userId,
       });
+
+      if (success) {
+        await onDeleteSuccess()
+        console.log("delete success");
+      } else {
+        console.log("delete error");
+      }
     }
   };
   return (
@@ -68,7 +74,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
                 mode: "friend",
                 friend: friend,
               });
-              reset()
+              reset();
             }}
           />
         )}

@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { getFriendList } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 interface FriendListProps {
   navigation: NavigationProp<any>;
@@ -28,18 +29,28 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const [friendList, setFriendList] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+
   // 取得好友列表
   const fetchFriendList = async () => {
+    setLoading(true);
     try {
       const data = await getFriendList(user.userId);
       setFriendList(data);
     } catch (error) {
       console.log("取得好友列表 錯誤", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const renderFriendItem = ({ item }: { item: User }) => (
-    <FriendItem key={item.userId} friend={item} navigation={navigation} />
+    <FriendItem
+      key={item.userId}
+      friend={item}
+      navigation={navigation}
+      onDeleteSuccess={fetchFriendList}
+    />
   );
 
   useEffect(() => {
@@ -51,14 +62,11 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
     fetchFriendList();
   }, [navigation, user]);
+
+  if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
+
   return (
     <View style={styles.screen}>
-      {/* <ScrollView>
-        {testFriendList?.map((friend, index) => (
-          <FriendItem key={index} friend={friend} navigation={navigation} />
-        ))}
-      </ScrollView> */}
-
       <FlatList
         data={friendList}
         renderItem={renderFriendItem}
