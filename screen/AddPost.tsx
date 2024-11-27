@@ -79,10 +79,13 @@ const AddPost = ({ navigation }) => {
   return (
     <>
       <AlertDialog
-        label="文章"
+        alertTitle="如果現在捨棄，系統將不會儲存這則文章"
+        leftBtnText="捨棄文章"
+        rightBtnText="繼續編輯"
         isVisible={isAlertVisible}
-        onCloseAlert={handleCloseAlert}
-        onClosePost={handleClosePost}
+        leftBtnOnPress={handleClosePost}
+        rightBtnOnPress={handleCloseAlert}
+        onBackdropPress={handleCloseAlert}
       />
 
       <>

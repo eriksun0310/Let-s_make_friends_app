@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getFriendDetail } from "../../util/searchFriends";
+import { getFriendDetail } from "../../util/handleFriendsEvent";
 import FriendCard from "../ui/FriendCard";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendRequest, User } from "../../shared/types";

@@ -65,12 +65,6 @@ export const getFriendDetail = async (friendId: string) => {
 // 取得可以成為好友的用戶
 export const getAllUsers = async (currentUserId: string) => {
   try {
-    // 取得已發送的好友邀請對象
-    // const { data: sentRequests, error: sentRequestsError } = await supabase
-    //   .from("friend_requests")
-    //   .select("receiver_id") // 查詢接收者的 ID
-    //   .eq("sender_id", currentUserId); // 只查詢當前用戶發送的邀請
-
     const { data: friendRequests, error: friendRequestsError } = await supabase
       .from("friend_requests")
       .select("sender_id, receiver_id")
@@ -365,5 +359,36 @@ export const rejectedFriendRequest = async ({
       success: false,
       message: "An error occurred. Please try again later.",
     };
+  }
+};
+
+//刪除好友
+export const deleteFriend = async ({
+  userId,
+  friendId,
+}: {
+  userId: string;
+  friendId: string;
+}) => {
+  try {
+    // 删除 user_id 和 friend_id 组成的记录
+    const { error } = await supabase
+      .from("friends")
+      .delete()
+      .or(
+        // 删除两条互为好友的记录
+        `user_id.eq.${userId},friend_id.eq.${friendId}`
+        .or(`user_id.eq.${friendId},friend_id.eq.${userId}`)
+      );
+
+    if (error) {
+      console.error("Error deleting friend:", error);
+      return { success: false, message: "Failed to delete friend." };
+    }
+
+    return { success: true, message: "Friend deleted successfully!" };
+  } catch (error) {
+    console.error("deleteFriend error:", error);
+    return { success: false, message: "An error occurred." };
   }
 };

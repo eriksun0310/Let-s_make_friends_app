@@ -1,53 +1,102 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import { User } from "../../shared/types";
 import { ListItem } from "@rneui/themed";
+import AlertDialog from "./AlertDialog";
+import { deleteFriend } from "../../util/handleFriendsEvent";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface FriendItemProps {
   friend: User;
   navigation: NavigationProp<any>;
 }
-const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
+const FriendItem: React.FC<FriendItemProps> = ({
+  friend,
+  navigation,
+  // onPressDelete,
+}) => {
+  // 取得個人資料
+  const personal = useSelector((state: RootState) => state.user.user);
+  // 警告視窗 開啟狀態
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+
+  const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
+
+ 
+
+  // 刪除好友 事件
+  const handleDeleteFriend = async (mode: "delete" | "cancel") => {
+    setIsAlertVisible(false); // 關閉警告視窗
+    if (resetRef.current) {
+      resetRef.current(); // 執行 `reset`
+    }
+
+    if (mode === "delete") {
+      console.log("delete");
+      const {success, message} = await deleteFriend({
+        userId: personal.userId,
+        friendId: friend.userId,
+      });
+    }
+  };
   return (
-    <ListItem.Swipeable
-      style={styles.container}
-      leftContent={(reset) => (
-        <Button
-          title="查看好友"
-          icon={{ name: "search", color: "white" }}
-          buttonStyle={{ height: 100 }}
-          onPress={() => {
-            navigation.navigate("userInfoFriend", {
-              mode: "friend",
-              friend: friend,
-            });
-          }}
-        />
-      )}
-      rightContent={(reset) => (
-        <Button
-          title="刪除好友"
-          onPress={() => reset()}
-          icon={{ name: "delete", color: "white" }}
-          buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
-        />
-      )}
-    >
-      <View style={styles.AvatarContainer}>
-        <Avatar
-          rounded
-          size="medium"
-          source={friend.headShot.imageUrl as ImageSourcePropType}
-        />
-      </View>
-      <ListItem.Content>
-        <Text style={styles.friendName}>{friend.name}</Text>
-      </ListItem.Content>
-      <ListItem.Chevron color={Colors.icon} />
-    </ListItem.Swipeable>
+    <>
+      <AlertDialog
+        alertTitle={`確認刪除 ${friend.name} 好友，聊天紀錄將永久刪除，是否繼續?`}
+        leftBtnText="刪除"
+        rightBtnText="取消"
+        isVisible={isAlertVisible}
+        // 刪除好友
+        leftBtnOnPress={() => handleDeleteFriend("delete")} //確認刪除
+        rightBtnOnPress={() => handleDeleteFriend("cancel")} //取消
+        onBackdropPress={() => handleDeleteFriend("cancel")}
+      />
+
+      <ListItem.Swipeable
+        style={styles.container}
+        leftContent={(reset) => (
+          <Button
+            title="查看好友"
+            icon={{ name: "search", color: "white" }}
+            buttonStyle={{ height: 100 }}
+            onPress={() => {
+              navigation.navigate("userInfoFriend", {
+                mode: "friend",
+                friend: friend,
+              });
+              reset()
+            }}
+          />
+        )}
+        rightContent={(reset) => (
+          <Button
+            title="刪除好友"
+            onPress={() => {
+              resetRef.current = reset; // 存儲 `reset`
+              setIsAlertVisible(true);
+            }}
+            icon={{ name: "delete", color: "white" }}
+            buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
+          />
+        )}
+      >
+        <View style={styles.AvatarContainer}>
+          <Avatar
+            rounded
+            size="medium"
+            source={friend.headShot.imageUrl as ImageSourcePropType}
+          />
+        </View>
+        <ListItem.Content>
+          <Text style={styles.friendName}>{friend.name}</Text>
+        </ListItem.Content>
+        <ListItem.Chevron color={Colors.icon} />
+      </ListItem.Swipeable>
+    </>
   );
 };
 

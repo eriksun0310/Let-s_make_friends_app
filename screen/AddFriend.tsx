@@ -6,7 +6,7 @@ import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
-import { getAllUsers, sendFriendRequest } from "../util/searchFriends";
+import { getAllUsers, sendFriendRequest } from "../util/handleFriendsEvent";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";

@@ -6,7 +6,7 @@ import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { getFriendList } from "../util/searchFriends";
+import { getFriendList } from "../util/handleFriendsEvent";
 
 interface FriendListProps {
   navigation: NavigationProp<any>;
@@ -16,6 +16,22 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const [friendList, setFriendList] = useState([]);
 
+
+  // const renderFre
+
+
+
+
+  // 取得好友列表
+  const fetchFriendList = async () => {
+    try {
+      const data = await getFriendList(user.userId);
+      setFriendList(data);
+    } catch (error) {
+      console.log("取得好友列表 錯誤", error);
+    }
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: "好友列表",
@@ -23,19 +39,10 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
       headerLeft: () => <BackButton navigation={navigation} />,
     });
 
-    const fetchFriendList = async () => {
-      // 取得好友列表
-      try {
-        const data = await getFriendList(user.userId);
-        setFriendList(data);
-      } catch (error) {
-        console.log("取得好友列表 錯誤", error);
-      }
-    };
-
     fetchFriendList();
   }, [navigation, user]);
 
+  // TODO: ScrollView -> FlatList
   return (
     <View style={styles.screen}>
       <ScrollView>

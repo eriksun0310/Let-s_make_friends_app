@@ -16,7 +16,7 @@ import { Text, Card, Avatar } from "@rneui/themed";
 import {
   acceptedFriendRequest,
   rejectedFriendRequest,
-} from "../../util/searchFriends";
+} from "../../util/handleFriendsEvent";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 type FriendActionType = "accepted" | "rejected";
@@ -105,9 +105,9 @@ const FriendCard: React.FC<FriendCardProps> = ({
             targetUserId: friend.userId,
           });
         }}
-        disabled={buttonLoading['rejected']}
+        disabled={buttonLoading["rejected"]}
       >
-        {buttonLoading['rejected'] ? (
+        {buttonLoading["rejected"] ? (
           <ActivityIndicator size="small" color={Colors.icon} />
         ) : (
           <X color={Colors.icon} />
