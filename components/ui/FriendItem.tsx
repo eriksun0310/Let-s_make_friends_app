@@ -1,10 +1,10 @@
-import { ChevronRight } from "lucide-react-native";
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
-import { Avatar } from "react-native-elements";
+import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
+import { Avatar, Button } from "react-native-elements";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import { User } from "../../shared/types";
+import { ListItem } from "@rneui/themed";
 
 interface FriendItemProps {
   friend: User;
@@ -12,29 +12,42 @@ interface FriendItemProps {
 }
 const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate("userInfoFriend", {
-            mode: "friend",
-            friend: friend
-        });
-      }}
+    <ListItem.Swipeable
+      style={styles.container}
+      leftContent={(reset) => (
+        <Button
+          title="查看好友"
+          icon={{ name: "search", color: "white" }}
+          buttonStyle={{ height: 100 }}
+          onPress={() => {
+            navigation.navigate("userInfoFriend", {
+              mode: "friend",
+              friend: friend,
+            });
+          }}
+        />
+      )}
+      rightContent={(reset) => (
+        <Button
+          title="刪除好友"
+          onPress={() => reset()}
+          icon={{ name: "delete", color: "white" }}
+          buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
+        />
+      )}
     >
-      <View style={styles.container}>
-        <View style={styles.AvatarContainer}>
-          <Avatar
-            rounded
-            size="medium"
-            source={friend.headShot.imageUrl as ImageSourcePropType}
-          />
-          <Text style={styles.friendName}>{friend.name}</Text>
-        </View>
-
-        <TouchableOpacity>
-          <ChevronRight color={Colors.icon} />
-        </TouchableOpacity>
+      <View style={styles.AvatarContainer}>
+        <Avatar
+          rounded
+          size="medium"
+          source={friend.headShot.imageUrl as ImageSourcePropType}
+        />
       </View>
-    </TouchableOpacity>
+      <ListItem.Content>
+        <Text style={styles.friendName}>{friend.name}</Text>
+      </ListItem.Content>
+      <ListItem.Chevron color={Colors.icon} />
+    </ListItem.Swipeable>
   );
 };
 
@@ -49,9 +62,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    margin: 8,
+    marginBottom: 8,
     height: 100,
-    padding: 12,
   },
   AvatarContainer: {
     display: "flex",

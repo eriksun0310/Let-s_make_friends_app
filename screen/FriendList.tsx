@@ -27,7 +27,6 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
       // 取得好友列表
       try {
         const data = await getFriendList(user.userId);
-        console.log("data", data);
         setFriendList(data);
       } catch (error) {
         console.log("取得好友列表 錯誤", error);
@@ -36,8 +35,6 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
     fetchFriendList();
   }, [navigation, user]);
-
-  console.log("friendList", friendList);
 
   return (
     <View style={styles.screen}>
@@ -53,6 +50,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.background,
+    paddingTop: 8,
   },
   headerIcon: {
     marginHorizontal: 10,
