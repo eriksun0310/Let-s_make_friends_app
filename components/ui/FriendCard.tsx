@@ -43,7 +43,10 @@ const FriendCard: React.FC<FriendCardProps> = ({
   const user = useSelector((state: RootState) => state.user.user);
   // 點擊 好友資訊
   const clickSearch = () => {
-    navigation.navigate?.("userInfoFriend", { mode: "friend", friend: friend });
+    navigation.navigate?.("userInfoFriend", {
+      userState: "friend",
+      friend: friend,
+    });
   };
 
   //

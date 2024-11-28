@@ -7,7 +7,7 @@ import { Colors } from "../../constants/style";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface PostProps {
-  mode: UserState;
+  userState: UserState;
   date: string;
   user: User;
 }
@@ -15,7 +15,7 @@ export const tagList = Array(5).fill({
   text: "大家好",
 });
 
-const Post: React.FC<PostProps> = ({ mode, user, date }) => {
+const Post: React.FC<PostProps> = ({ userState, user, date }) => {
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
@@ -24,12 +24,12 @@ const Post: React.FC<PostProps> = ({ mode, user, date }) => {
           <Text style={styles.username}>{user.name}</Text>
           <Text style={styles.timestamp}>{date}</Text>
         </View>
-        {mode === "personal" && <CustomMenu />}
+        {userState === "personal" && <CustomMenu />}
       </View>
 
       <Text style={styles.content}>這是我的第一篇文章</Text>
 
-      {mode !== "visitor" && (
+      {userState !== "visitor" && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
             <Icon name="heart" type="material-community" color="#ff6666" />

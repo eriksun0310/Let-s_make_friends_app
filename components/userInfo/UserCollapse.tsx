@@ -6,15 +6,22 @@ import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import { calculateAge, getZodiacSign } from "../../shared/funcs";
 import { Snackbar } from "react-native-paper";
-import { User } from "../../shared/types";
-
+import { User, UserState } from "../../shared/types";
 
 interface UserCollapseProps {
+  userState: UserState;
   navigation: NavigationProp<any>;
   user: User;
 }
 
-const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
+const UserCollapse: React.FC<UserCollapseProps> = ({
+  userState,
+  navigation,
+  user,
+}) => {
+  // 是個人
+  const isPersonal = userState === "personal";
+
   const [expanded, setExpanded] = useState(false);
   // 顯示 Snackbar
   const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -51,6 +58,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
           <ListItem.Content>
             <TouchableOpacity
               onPress={() =>
+                isPersonal &&
                 navigation.navigate("editUserInfo", {
                   mode: "introduce",
                   defaultValue: user.introduce,
@@ -66,7 +74,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
           <ListItem.Content>
             <TouchableOpacity
               onPress={() => {
-                onToggleSnackBar("性別");
+                isPersonal && onToggleSnackBar("性別");
               }}
             >
               <Text>性別: {gender[user.gender]}</Text>
@@ -78,7 +86,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
           <ListItem.Content>
             <TouchableOpacity
               onPress={() => {
-                onToggleSnackBar("生日");
+                isPersonal && onToggleSnackBar("生日");
               }}
             >
               <Text>生日: {user.birthday}</Text>
@@ -90,7 +98,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
           <ListItem.Content>
             <TouchableOpacity
               onPress={() => {
-                onToggleSnackBar("年齡");
+                isPersonal && onToggleSnackBar("年齡");
               }}
             >
               <Text>年齡 :{calculateAge(user.birthday)}</Text>
@@ -117,6 +125,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({ navigation, user }) => {
                 <TouchableOpacity
                   style={styles.listItemContainer}
                   onPress={() =>
+                    isPersonal &&
                     navigation.navigate("aboutMeSelectOption", {
                       currentTab: key,
                       screen: "userInfo",

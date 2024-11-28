@@ -80,7 +80,7 @@ const MainTabNavigator = () => {
         name="userInfoPersonal"
         options={({ route }) => ({
           title: "個人資料",
-          mode: "personal",
+          userState: "personal",
         })}
         component={UserInfo}
       />
@@ -175,7 +175,7 @@ const AuthenticatedStack = () => {
         name="userInfoFriend"
         options={({ route }) => ({
           title: "好友資料",
-          mode: "friend",
+          userState: "friend",
         })}
         component={UserInfo}
       />

@@ -98,6 +98,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 大頭貼 */}
         <HeadShot
+          userState="personal"
           screen="aboutMe"
           navigation={navigation}
           headShot={form.headShot}

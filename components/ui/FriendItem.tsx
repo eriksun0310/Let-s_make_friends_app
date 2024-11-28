@@ -42,7 +42,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
       });
 
       if (success) {
-        await onDeleteSuccess()
+        await onDeleteSuccess();
         console.log("delete success");
       } else {
         console.log("delete error");
@@ -64,20 +64,20 @@ const FriendItem: React.FC<FriendItemProps> = ({
 
       <ListItem.Swipeable
         style={styles.container}
-        leftContent={(reset) => (
-          <Button
-            title="查看好友"
-            icon={{ name: "search", color: "white" }}
-            buttonStyle={{ height: 100 }}
-            onPress={() => {
-              navigation.navigate("userInfoFriend", {
-                mode: "friend",
-                friend: friend,
-              });
-              reset();
-            }}
-          />
-        )}
+        // leftContent={(reset) => (
+        //   <Button
+        //     title="查看好友"
+        //     icon={{ name: "search", color: "white" }}
+        //     buttonStyle={{ height: 100 }}
+        //     onPress={() => {
+        //       navigation.navigate("userInfoFriend", {
+        //         mode: "friend",
+        //         friend: friend,
+        //       });
+        //       reset();
+        //     }}
+        //   />
+        // )}
         rightContent={(reset) => (
           <Button
             title="刪除好友"
@@ -89,6 +89,12 @@ const FriendItem: React.FC<FriendItemProps> = ({
             buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
           />
         )}
+        onPress={() => {
+          navigation.navigate("userInfoFriend", {
+            userState: "friend",
+            friend: friend,
+          });
+        }}
       >
         <View style={styles.AvatarContainer}>
           <Avatar

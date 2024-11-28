@@ -15,7 +15,7 @@ import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 
 interface UserInfoProps {
-  route: { params: { mode: UserState; friend: User } };
+  route: { params: { userState: UserState; friend: User } };
   navigation: NavigationProp<any>;
 }
 
@@ -24,12 +24,13 @@ export const postList = Array(14).fill({
 });
 
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
-  const { mode, friend } = route.params || { mode: "personal" };
+  const { userState, friend } = route.params || { userState: "personal" };
   const dispatch = useDispatch();
   const personal = useSelector((state: RootState) => state.user.user);
 
+  console.log("userState 1111111", userState);
   // 判斷是 個人還是好友
-  const user = mode === "personal" ? personal : friend;
+  const user = userState === "personal" ? personal : friend;
 
   const handleLogout = () => {
     dispatch(logout()).then(() => {
@@ -39,10 +40,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: mode === "personal" ? "個人資料" : "好友資料",
+      title: userState === "personal" ? "個人資料" : "好友資料",
       headerTitleAlign: "center",
       headerLeft: () => {
-        if (mode === "friend") {
+        if (userState === "friend") {
           return <BackButton navigation={navigation} />;
         } else return null;
       },
@@ -54,20 +55,25 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* 大頭貼 */}
           <HeadShot
+            userState={userState}
             screen="userInfo"
             nameValue={user.name}
             navigation={navigation}
             headShot={user.headShot}
           />
 
-          <UserCollapse navigation={navigation} user={user} />
+          <UserCollapse
+            userState={userState}
+            navigation={navigation}
+            user={user}
+          />
           <View
             style={{
               marginTop: 10,
             }}
           />
 
-          {mode === "personal" && <PostPermissionsSettings />}
+          {userState === "personal" && <PostPermissionsSettings />}
 
           <View style={{ marginTop: 10 }} />
 
@@ -75,11 +81,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => navigation.navigate("postContent")}
             >
-              <Post mode="personal" date={post.date} user={user} />
+              <Post userState="personal" date={post.date} user={user} />
             </TouchableOpacity>
           ))}
 
-          {mode === "personal" && (
+          {userState === "personal" && (
             <View style={styles.formContainer}>
               <Button
                 style={{
