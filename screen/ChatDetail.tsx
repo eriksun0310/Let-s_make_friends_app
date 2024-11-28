@@ -10,9 +10,11 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  ImageSourcePropType,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/style";
+import { Avatar } from "react-native-elements";
 const ChatDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [messages, setMessages] = useState([
@@ -65,7 +67,13 @@ const ChatDetail = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={24} color="black" />
           </TouchableOpacity>
-          <Image source={{ uri: item.icon }} style={styles.avatar} />
+          {/* <Image source={{ uri: item.icon }} style={styles.avatar} /> */}
+          <Avatar
+            style={styles.avatar}
+            rounded
+            size="medium"
+            source={item?.headShot?.imageUrl as ImageSourcePropType}
+          />
           <Text style={styles.headerTitle}>{item.name}</Text>
         </View>
         <FlatList

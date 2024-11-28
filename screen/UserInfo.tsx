@@ -13,6 +13,8 @@ import { User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
+import { MessageCircle, MessageCircleMore } from "lucide-react-native";
+import CustomIcon from "../components/ui/button/CustomIcon";
 
 interface UserInfoProps {
   route: { params: { userState: UserState; friend: User } };
@@ -28,8 +30,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const personal = useSelector((state: RootState) => state.user.user);
 
-  console.log("userState 1111111", userState);
-  // 判斷是 個人還是好友
+  // 判斷 要取 個人還是好友 資料
   const user = userState === "personal" ? personal : friend;
 
   const handleLogout = () => {
@@ -45,6 +46,23 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       headerLeft: () => {
         if (userState === "friend") {
           return <BackButton navigation={navigation} />;
+        } else return null;
+      },
+      headerRight: () => {
+        if (userState === "friend") {
+          return (
+            <CustomIcon
+              onPress={() => {
+                // TODO:進到個人聊天頁面
+                console.log("click chat");
+                navigation.navigate("chatDetail", {
+                  item: user,
+                });
+              }}
+            >
+              <MessageCircleMore color={Colors.icon} />
+            </CustomIcon>
+          );
         } else return null;
       },
     });
