@@ -1,9 +1,12 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import userReducer from "./userSlice";
+import chatReducer from "./chatSlice";
 import { useDispatch as useReduxDispatch } from "react-redux";
+
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    chat: chatReducer,
   },
 });
 

@@ -110,7 +110,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({
           <ListItem.Content>
             <TouchableOpacity
               onPress={() => {
-                onToggleSnackBar("星座");
+                isPersonal && onToggleSnackBar("星座");
               }}
             >
               <Text>星座 :{getZodiacSign(user.birthday)}</Text>

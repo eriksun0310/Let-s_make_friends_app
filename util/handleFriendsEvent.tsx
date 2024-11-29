@@ -5,14 +5,7 @@ interface FriendProps {
   receiverId: string;
 }
 
-/*
-總共有四個用戶 A1、A2 、A3 、A4  
-1. A1 跟A2 互為好友 
-2.A3 寄好友邀請給A1,A1 的好友確認頁看得到A3送的邀請, 也看得到A3的個人資訊  
-3.A1 在加好友頁可以看到A4 (看不到 A2 A3) 而A4 可以看到A1、A2 、A3  
-4.A1的好友列表有A2 , A2的好友列表有A1
-*/
-// 1. 查詢 A1 和 A2 的好友關係
+// 處理 所有 加好友的 db 操作(friend_requests、friends)
 
 //取得(單一)好友詳細資料
 export const getFriendDetail = async (friendId: string) => {

@@ -91,6 +91,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
         )}
         onPress={() => {
           navigation.navigate("userInfoFriend", {
+            isShowMsgIcon: true,
             userState: "friend",
             friend: friend,
           });

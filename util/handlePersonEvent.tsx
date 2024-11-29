@@ -1,6 +1,9 @@
 import { User } from "../shared/types";
 import { supabase } from "./supabaseClient";
 
+
+// 處理 個人資料 db 操作(users、user_selected_option、user_head_shot)
+
 // 取得用戶資料
 export const getUserData = async ({
   userId,

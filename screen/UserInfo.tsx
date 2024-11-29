@@ -13,11 +13,17 @@ import { User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
-import { MessageCircle, MessageCircleMore } from "lucide-react-native";
+import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 
 interface UserInfoProps {
-  route: { params: { userState: UserState; friend: User } };
+  route: {
+    params: {
+      userState: UserState;
+      friend: User;
+      isShowMsgIcon: boolean; // 是否顯示聊天按鈕(只有成為好友才顯示)
+    };
+  };
   navigation: NavigationProp<any>;
 }
 
@@ -26,7 +32,11 @@ export const postList = Array(14).fill({
 });
 
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
-  const { userState, friend } = route.params || { userState: "personal" };
+  const {
+    userState,
+    friend,
+    isShowMsgIcon = false,
+  } = route.params || { userState: "personal" };
   const dispatch = useDispatch();
   const personal = useSelector((state: RootState) => state.user.user);
 
@@ -49,14 +59,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
         } else return null;
       },
       headerRight: () => {
-        if (userState === "friend") {
+        if (isShowMsgIcon) {
           return (
             <CustomIcon
               onPress={() => {
-                // TODO:進到個人聊天頁面
-                console.log("click chat");
                 navigation.navigate("chatDetail", {
-                  item: user,
+                  user: user,
                 });
               }}
             >

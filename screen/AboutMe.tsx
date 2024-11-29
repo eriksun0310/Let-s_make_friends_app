@@ -13,7 +13,7 @@ import { checkRequired } from "../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
-import { saveAboutMe } from "../util/person";
+import { saveAboutMe } from "../util/handlePersonEvent";
 import { userInit } from "../shared/static";
 
 interface AboutMeProps {

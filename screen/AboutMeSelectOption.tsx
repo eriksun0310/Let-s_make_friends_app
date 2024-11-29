@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
-import { saveUserSelectedOption } from "../util/person";
+import { saveUserSelectedOption } from "../util/handlePersonEvent";
 import { tabs } from "../shared/static";
 import { Screen } from "../shared/types";
 

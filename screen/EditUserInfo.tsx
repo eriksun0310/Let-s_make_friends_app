@@ -6,7 +6,7 @@ import { setUser } from "../store/userSlice";
 import { RootState } from "../store/store";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
-import { updateUser } from "../util/person";
+import { updateUser } from "../util/handlePersonEvent";
 import { updateUserTitle } from "../shared/static";
 
 interface EditUserInfoProps {

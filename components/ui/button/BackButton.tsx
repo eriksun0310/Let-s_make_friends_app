@@ -1,17 +1,18 @@
 import { ChevronLeft } from "lucide-react-native";
 import React from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Colors } from "../../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 
 interface BackButtonProps {
+  style?: StyleProp<ViewStyle>;
   navigation: NavigationProp<any, any>;
 }
-const BackButton: React.FC<BackButtonProps> = ({ navigation }) => {
+const BackButton: React.FC<BackButtonProps> = ({ style, navigation }) => {
   return (
     <TouchableOpacity
       onPress={() => navigation.goBack()}
-      style={styles.headerIcon}
+      style={style ? style : styles.headerIcon}
     >
       <ChevronLeft size={30} color={Colors.icon} />
     </TouchableOpacity>

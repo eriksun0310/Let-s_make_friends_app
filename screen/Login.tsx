@@ -8,7 +8,7 @@ import type { LoginForm, LoginIsValid } from "../shared/types";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";
-import { getUserData } from "../util/person";
+import { getUserData } from "../util/handlePersonEvent";
 
 interface LoginEmailProps {
   navigation: NavigationProp<any>;

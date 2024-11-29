@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
-import { getUserData } from "../util/person";
+import { getUserData } from "../util/handlePersonEvent";
 import { supabase } from "../util/supabaseClient";
 
 interface InitialStateProps {
@@ -93,7 +93,7 @@ const userSlice = createSlice({
 // 將 logout 定義為一個 thunk，用來登出用戶(因為非同步操作，所以用 thunk)
 export const logout = (): AppThunk => async (dispatch) => {
   try {
-    await supabase.auth.signOut()
+    await supabase.auth.signOut();
     dispatch(userSlice.actions.setUser(initialState.user)); // 清除用戶信息
     dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置為未認證
 
@@ -103,7 +103,6 @@ export const logout = (): AppThunk => async (dispatch) => {
     return Promise.reject(error);
   }
 };
-
 
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Supabase 認證狀態
 export const initializeAuth = (): AppThunk => async (dispatch) => {

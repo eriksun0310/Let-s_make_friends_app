@@ -15,8 +15,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/style";
 import { Avatar } from "react-native-elements";
+import Message from "../components/chat/Message";
+import BackButton from "../components/ui/button/BackButton";
 const ChatDetail = ({ route, navigation }) => {
-  const { item } = route.params;
+  const { user } = route.params;
   const [messages, setMessages] = useState([
     { id: "1", text: "能來公司一趟嗎", sender: "them", time: "上午 10:15" },
     { id: "2", text: "支援一下現場", sender: "them", time: "上午 10:16" },
@@ -32,49 +34,31 @@ const ChatDetail = ({ route, navigation }) => {
   ]);
   const [inputText, setInputText] = useState("");
 
-  const renderMessage = ({ item }) => (
-    <View
-      style={{
-        // borderBottomWidth: 1,
-        display: "flex",
-        flexDirection: item.sender === "me" ? "row-reverse" : "row",
-        alignItems: "center",
-      }}
-    >
-      <View
-        style={[
-          styles.messageBubble,
-          item.sender === "me" ? styles.myMessage : styles.theirMessage,
-        ]}
-      >
-        <Text style={styles.messageText}>{item.text}</Text>
-      </View>
-      <View
-        style={{
-          // marginHorizontal: 10,
-          marginRight: item.sender === "me" ? 5 : 0,
-          marginLeft: item.sender !== "me" ? 5 : 0,
-        }}
-      >
-        <Text style={styles.messageTime}>{item.time}</Text>
-      </View>
-    </View>
-  );
+  const renderMessage = ({ item }) => <Message user={item} />;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="black" />
-          </TouchableOpacity>
-          {/* <Image source={{ uri: item.icon }} style={styles.avatar} /> */}
+          <BackButton
+            navigation={navigation}
+            style={{
+              marginRight: 15,
+            }}
+          />
           <Avatar
             style={styles.avatar}
             rounded
             size="medium"
-            source={item?.headShot?.imageUrl as ImageSourcePropType}
+            source={user?.headShot?.imageUrl as ImageSourcePropType}
+            onPress={() => {
+              navigation.navigate("userInfoFriend", {
+                userState: "friend",
+                friend: user,
+              });
+            }}
           />
-          <Text style={styles.headerTitle}>{item.name}</Text>
+          <Text style={styles.headerTitle}>{user.name}</Text>
         </View>
         <FlatList
           data={messages}
@@ -115,6 +99,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "white",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
+  },
+  avatarContainer: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    // marginLeft: 10,
+    // borderWidth: 1,
   },
   avatar: {
     width: 40,
