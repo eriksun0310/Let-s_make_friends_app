@@ -36,6 +36,8 @@ const ChatDetail = ({ route, navigation }) => {
 
   const renderMessage = ({ item }) => <Message user={item} />;
 
+
+  // TODO: KeyboardAvoidingView
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
