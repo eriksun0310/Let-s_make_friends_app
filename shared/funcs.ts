@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { User } from "./types";
 // 計算年齡的函數
 export const calculateAge = (date: Date | string) => {
@@ -74,4 +75,11 @@ export const checkRequired = (user: User) => {
     isRequired: isRequired,
     requiredText: "請填寫必填項目",
   };
+};
+
+
+// 格式化時間
+export const formatTimeWithDayjs = (isoString) => {
+  const formattedTime = dayjs(isoString).format("A hh:mm");
+  return formattedTime.replace("AM", "上午").replace("PM", "下午");
 };
