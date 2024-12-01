@@ -17,12 +17,25 @@ import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { getMessages, sendMessage } from "../util/handleChatEvent";
+import {
+  createNewChatRoom,
+  getMessages,
+  sendMessage,
+} from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
+import { addChatRoom } from "../store/chatSlice";
+import { useNewMessages } from "../components/hooks/useNewMessages";
 
+// 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const { user: friend } = route.params;
+  const { chatItem } = route.params;
+  // const [chatItem, setChatItem] = useState({
+  //   id: null, // 初始為空，稍後更新
+  //   friend: {},
+  // });
+  const friend = chatItem?.friend;
+
   const personal = useSelector((state: RootState) => state.user.user);
   const chatRooms = useSelector((state: RootState) => state.chat.chatRooms);
   const [messages, setMessages] = useState([]);
@@ -31,8 +44,38 @@ const ChatDetail = ({ route, navigation }) => {
 
   const renderMessage = ({ item }) => <Message item={item} />;
 
+  // 當有新訊息時,更新本地訊息列表
+  const handleNewMessage = (newMessage) => {
+    setMessages((preMessage) => [...preMessage, newMessage]);
+  };
+
+  // 使用監聽 hook
+  // useNewMessages({
+  //   chatRoomId: chatItem.id,
+  //   handleNewMessage: handleNewMessage,
+  // });
+
+  // 發送訊息
   const handleSend = async () => {
     if (inputText.trim()) {
+      let chatRoomId = chatItem.id;
+      // 聊天室不存在的話, 創建一個新的聊天室
+      if (!chatRoomId) {
+        // 創建聊天室
+        const newChatRoom = await createNewChatRoom(
+          personal.userId,
+          friend.userId
+        );
+
+        if (newChatRoom.error) {
+          console.log(newChatRoom.error);
+          return;
+        }
+
+        chatRoomId = newChatRoom.id; // 創建新的聊天室的id
+        dispatch(addChatRoom(newChatRoom)); // 更新到redux
+      }
+
       // 本地即時新增臨時訊息
       const tempMessage = {
         id: `temp_${Date.now()}`,
@@ -41,41 +84,36 @@ const ChatDetail = ({ route, navigation }) => {
         content: inputText,
         created_at: new Date().toISOString(),
         text: inputText,
+        isTemporary: true, // 標記為臨時訊息
       };
 
-      setMessages((prev) => [...prev, tempMessage]);
+      // setMessages((prevMessages) => [...prevMessages, tempMessage]);
 
       // 傳送訊息
       const result = await sendMessage({
         userId: personal.userId,
         friendId: friend.userId,
         message: inputText,
-        chatRooms: chatRooms,
-        dispatch: dispatch,
+        chatRoomId,
       });
 
+      console.log("result sendMessage", result);
       // 如果傳送訊息失敗(存到db失敗), 刪除臨時訊息
       if (result.error) {
-        console.log(result.error);
-        setMessages((prev) => prev.filter((msg) => msg.id !== tempMessage.id));
+        console.log("Failed to send message:", result.error);
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === tempMessage.id ? { ...msg, isTemporary: false } : msg
+          )
+        );
       } else {
-        // 如果成功(訊息存到db), 重新加載訊息
-        const messageData = await getMessages(result.chatRoom.id);
-
-        if (messageData) {
-          setMessages(messageData);
+        // 傳送成功，刷新訊息列表
+        const messagesData = await getMessages(chatRoomId);
+        console.log("messagesData 111111111", messagesData);
+        if (messagesData.success) {
+          setMessages(messagesData.data);
         }
       }
-
-      // setMessages((prevMessages) => [
-      //   ...prevMessages,
-      //   {
-      //     id: `${prevMessages.length + 1}`,
-      //     text: inputText,
-      //     sender: "me",
-      //     time: "現在",
-      //   },
-      // ]);
       setInputText("");
     }
   };
@@ -86,26 +124,34 @@ const ChatDetail = ({ route, navigation }) => {
     }
   }, [messages]);
 
-  const fetchMessages = async () => {
-    const chatRoom = chatRooms.find(
-      (room) =>
-        (room.user1_id === personal.userId &&
-          room.user2_id === friend.userId) ||
-        (room.user1_id === friend.userId && room.user2_id === personal.userId)
-    );
-
-    // 聊天室存在的話
-    if (chatRoom) {
-      const messagesData = await getMessages(chatRoom.id);
-      setMessages(messagesData);
-    }
-  };
-
   // 加載聊天記錄(如果聊天室已存在)
   useEffect(() => {
-    fetchMessages();
-  }, [chatRooms, personal, friend]);
-  console.log("messages 111111", messages);
+  
+    const fetchMessages = async () => {
+      const messagesData = await getMessages(chatItem.id);
+      console.log("fetchMessages", messagesData);
+      if (messagesData.success) {
+        setMessages(messagesData.data);
+      }
+    };
+
+    if (chatItem.id) {
+      fetchMessages();
+    }
+  }, [chatItem]);
+
+  // useEffect(() => {
+  //   console.log("defaultChatItem 1111111", defaultChatItem);
+  //   if (defaultChatItem) {
+  //     console.log("defaultChatItem 222222222", defaultChatItem);
+  //     setChatItem({
+  //       id: defaultChatItem.id, // 初始化時處理可能的 null 值
+  //       friend: defaultChatItem.friend || {},
+  //     });
+  //   }
+  // }, [defaultChatItem]);
+
+  console.log("messages ", messages);
 
   return (
     <>
@@ -135,7 +181,7 @@ const ChatDetail = ({ route, navigation }) => {
                   });
                 }}
               />
-              <Text style={styles.headerTitle}>{friend.name}</Text>
+              <Text style={styles.headerTitle}>{friend?.name}</Text>
             </View>
             <FlatList
               ref={flatListRef}

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
 const Message = ({ item }) => {
+  console.log("msg item", item);
   const personal = useSelector((state: RootState) => state.user.user);
   return (
     <View
@@ -15,7 +16,12 @@ const Message = ({ item }) => {
           : styles.messageContainerRecipient,
       ]}
     >
-      <Text>{formatTimeWithDayjs(item.created_at)}</Text>
+      {item.sender_id === personal.userId && (
+        <Text style={styles.senderTime}>
+          {formatTimeWithDayjs(item.created_at)}
+        </Text>
+      )}
+
       <View
         style={[
           styles.messageBubble,
@@ -26,6 +32,11 @@ const Message = ({ item }) => {
       >
         <Text>{item.content}</Text>
       </View>
+      {item.recipient_id === personal.userId && (
+        <Text style={styles.recipientTime}>
+          {formatTimeWithDayjs(item.created_at)}
+        </Text>
+      )}
     </View>
   );
 };
@@ -67,5 +78,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     marginTop: 5,
   },
+  senderTime: {
+    marginRight: 8,
+  },
+  recipientTime: {
+    marginLeft: 8,
+  },
 });
+
 export default Message;

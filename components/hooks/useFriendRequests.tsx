@@ -39,7 +39,7 @@ export const useFriendRequests = (userId: string) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "friend_requests" },
         (payload) => {
-          console.log("Change received:", payload);
+   
 
           if (
             payload.eventType === "INSERT" &&

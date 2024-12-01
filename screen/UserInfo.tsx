@@ -15,6 +15,7 @@ import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
+import { getChatRoom } from "../util/handleChatEvent";
 
 interface UserInfoProps {
   route: {
@@ -62,9 +63,16 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
         if (isShowMsgIcon) {
           return (
             <CustomIcon
-              onPress={() => {
+              onPress={async () => {
+                const chatRoom = await getChatRoom({
+                  userId: personal.userId,
+                  friendId: friend.userId,
+                });
                 navigation.navigate("chatDetail", {
-                  user: user,
+                  chatItem: {
+                    id: chatRoom?.id,
+                    friend: friend,
+                  },
                 });
               }}
             >

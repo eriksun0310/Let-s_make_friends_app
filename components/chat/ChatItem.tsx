@@ -10,9 +10,10 @@ import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
 
+const ChatItem = ({ chatItem, navigation }) => {
+  // 好友資料
+  const friend = chatItem.friend;
 
-
-const ChatItem = ({ user, navigation }) => {
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
@@ -27,24 +28,14 @@ const ChatItem = ({ user, navigation }) => {
 
     if (mode === "delete") {
       console.log("delete");
-      //   const { success } = await deleteFriend({
-      //     userId: personal.userId,
-      //     friendId: friend.userId,
-      //   });
-
-      //   if (success) {
-      //     await onDeleteSuccess();
-      //     console.log("delete success");
-      //   } else {
-      //     console.log("delete error");
-      //   }
     }
   };
+
 
   return (
     <>
       <AlertDialog
-        alertTitle={`確定要刪除與 ${user.name} 的聊天紀錄嗎？此操作無法恢復，是否繼續？`}
+        alertTitle={`確定要刪除與 ${friend?.name} 的聊天紀錄嗎？此操作無法恢復，是否繼續？`}
         leftBtnText="刪除"
         rightBtnText="取消"
         isVisible={isAlertVisible}
@@ -68,19 +59,28 @@ const ChatItem = ({ user, navigation }) => {
           />
         )}
         onPress={() => {
-          navigation.navigate("chatDetail", { user: user });
+          // 更新已讀狀態
+          navigation.navigate("chatDetail", { chatItem: chatItem });
         }}
       >
         <Avatar
           style={styles.chatIcon}
           rounded
           size="medium"
-          source={user?.headShot?.imageUrl as ImageSourcePropType}
-        //   onPress={() => console.log('click pppppp')}
+          source={friend?.headShot?.imageUrl as ImageSourcePropType}
         />
         <View style={styles.chatInfo}>
-          <Text style={styles.chatName}>{user.name}</Text>
-          <Text style={styles.chatMessage}>{user.message}</Text>
+          <View style={styles.chatMessageContainer}>
+            <Text style={styles.chatName}>{friend?.name}</Text>
+            <Text style={styles.chatTime}>{chatItem?.last_time}</Text>
+          </View>
+
+          <View style={styles.chatMessageContainer}>
+            <Text style={styles.chatMessage}>{chatItem?.last_message}</Text>
+            {chatItem?.unread_count > 0 && (
+              <Text style={styles.unreadCount}>{chatItem?.unread_count}</Text>
+            )}
+          </View>
         </View>
       </ListItem.Swipeable>
     </>
@@ -103,10 +103,30 @@ const styles = StyleSheet.create({
   },
   chatName: {
     fontWeight: "bold",
-    marginBottom: 5,
+    fontSize: 18,
+  },
+  chatMessageContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   chatMessage: {
     color: "#7e7e7e",
+    fontSize: 16,
+  },
+  chatTime: {
+    color: "#7e7e7e",
+    fontSize: 10,
+  },
+  unreadCount: {
+    backgroundColor: "#A1D6EC",
+    color: "#ffffff",
+    width: 25,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: "100%",
+    // borderWidth: 1,
   },
 });
 export default ChatItem;

@@ -11,7 +11,7 @@ import { Colors } from "../constants/style";
 import { Avatar } from "react-native-elements";
 import ChatItem from "../components/chat/ChatItem";
 import { useEffect } from "react";
-import { getChatRooms } from "../util/handleChatEvent";
+import { getAllChatRooms } from "../util/handleChatEvent";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { setChatRooms } from "../store/chatSlice";
@@ -123,27 +123,27 @@ const Chat = ({ navigation }) => {
 
   const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
-  const renderChatItem = ({ item }) => (
-    <ChatItem user={item} navigation={navigation} />
-  );
+  const renderChatItem = ({ item }) => {
+    console.log("item", item);
+    return <ChatItem chatItem={item} navigation={navigation} />;
+  };
 
   useEffect(() => {
     const fetchChatData = async () => {
-      const rooms = await getChatRooms(user.userId);
+      const rooms = await getAllChatRooms(user.userId);
+      console.log('rooms', rooms)
       dispatch(setChatRooms(rooms));
     };
 
     fetchChatData();
   }, [user.userId]);
 
-
-  console.log('chatRoomsData', chatRoomsData);
   return (
     <View style={styles.screen}>
       <FlatList
         data={chatRoomsData}
         renderItem={renderChatItem}
-        keyExtractor={(item) => item?.userId}
+        keyExtractor={(item) => item?.id}
       />
     </View>
   );
