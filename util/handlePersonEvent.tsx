@@ -29,7 +29,7 @@ export const getUserData = async ({
 
   // 新用戶
   if (userCount === 0) {
-    console.log("新用戶");
+    //console.log("新用戶");
     return null;
   }
 

@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { formatTimeWithDayjs } from "../../shared/funcs";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { Colors } from "../../constants/style";
 
 const Message = ({ item }) => {
-  console.log("msg item", item);
+  
   const personal = useSelector((state: RootState) => state.user.user);
+
+  
   return (
     <View
       style={[
@@ -17,9 +20,12 @@ const Message = ({ item }) => {
       ]}
     >
       {item.sender_id === personal.userId && (
-        <Text style={styles.senderTime}>
-          {formatTimeWithDayjs(item.created_at)}
-        </Text>
+        <View>
+          <Text style={styles.senderIsRead}>{item.is_read && "已讀"}</Text>
+          <Text style={styles.senderTime}>
+            {formatTimeWithDayjs(item.created_at)}
+          </Text>
+        </View>
       )}
 
       <View
@@ -33,9 +39,11 @@ const Message = ({ item }) => {
         <Text>{item.content}</Text>
       </View>
       {item.recipient_id === personal.userId && (
-        <Text style={styles.recipientTime}>
-          {formatTimeWithDayjs(item.created_at)}
-        </Text>
+        <View>
+          <Text style={styles.recipientTime}>
+            {formatTimeWithDayjs(item.created_at)}
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -81,8 +89,18 @@ const styles = StyleSheet.create({
   senderTime: {
     marginRight: 8,
   },
+  senderIsRead: {
+    alignSelf: "flex-end",
+    marginRight: 8,
+  },
   recipientTime: {
+    fontSize: 12,
     marginLeft: 8,
+    color: Colors.msgGray,
+  },
+  recipientIsRead: {
+    //  alignSelf: "flex-start",
+    marginLeft: 10,
   },
 });
 

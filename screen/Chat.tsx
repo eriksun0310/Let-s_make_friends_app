@@ -124,14 +124,14 @@ const Chat = ({ navigation }) => {
   const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
   const renderChatItem = ({ item }) => {
-    console.log("item", item);
+    //console.log("item", item);
     return <ChatItem chatItem={item} navigation={navigation} />;
   };
 
   useEffect(() => {
     const fetchChatData = async () => {
       const rooms = await getAllChatRooms(user.userId);
-      console.log('rooms', rooms)
+      //console.log('rooms', rooms)
       dispatch(setChatRooms(rooms));
     };
 

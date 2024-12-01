@@ -86,3 +86,13 @@ export type EditUserFieldName =
   | "selectedOption";
 
 export type Screen = "userInfo" | "aboutMe";
+
+export type Message = {
+  chat_room_id: string;
+  content: string;
+  created_at: string;
+  id: string;
+  is_read: boolean;
+  recipient_id: string;
+  sender_id: string;
+};

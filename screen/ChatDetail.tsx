@@ -20,138 +20,400 @@ import { RootState } from "../store/store";
 import {
   createNewChatRoom,
   getMessages,
+  markChatRoomMessagesAsRead,
+  markMessageAsRead,
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
 import { addChatRoom } from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
+import { Message as MessageType } from "../shared/types";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
   const dispatch = useDispatch();
+
   const { chatItem } = route.params;
-  // const [chatItem, setChatItem] = useState({
-  //   id: null, // 初始為空，稍後更新
-  //   friend: {},
-  // });
+
+  const [tempId, setTempId] = useState("");
+  const { newMessage } = useNewMessages({
+    chatRoomId: chatItem?.id,
+    tempId: tempId,
+  });
+
   const friend = chatItem?.friend;
 
   const personal = useSelector((state: RootState) => state.user.user);
-  const chatRooms = useSelector((state: RootState) => state.chat.chatRooms);
-  const [messages, setMessages] = useState([]);
+  //const chatRooms = useSelector((state: RootState) => state.chat.chatRooms);
+
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
 
-  const renderMessage = ({ item }) => <Message item={item} />;
-
-  // 當有新訊息時,更新本地訊息列表
-  const handleNewMessage = (newMessage) => {
-    setMessages((preMessage) => [...preMessage, newMessage]);
-  };
-
-  // 使用監聽 hook
-  // useNewMessages({
-  //   chatRoomId: chatItem.id,
-  //   handleNewMessage: handleNewMessage,
-  // });
+  const renderMessage = ({ item }) => <Message key={item.id} item={item} />;
 
   // 發送訊息
+  // const handleSend = async () => {
+  //   if (inputText.trim()) {
+  //     let chatRoomId = chatItem.id;
+  //     // 聊天室不存在的話, 創建一個新的聊天室
+  //     if (!chatRoomId) {
+  //       // 創建聊天室
+  //       const newChatRoom = await createNewChatRoom(
+  //         personal.userId,
+  //         friend.userId
+  //       );
+
+  //       if (newChatRoom.error) {
+  //         //console.log(newChatRoom.error);
+  //         return;
+  //       }
+
+  //       chatRoomId = newChatRoom.id; // 創建新的聊天室的id
+  //       dispatch(addChatRoom(newChatRoom)); // 更新到redux
+  //     }
+
+  //     setTempId(`temp_${Date.now()}`);
+  //     let tempId = `temp_${Date.now()}`;
+  //     // 本地即時新增臨時訊息
+  //     const tempMessage = {
+  //       id: `temp_${Date.now()}`,
+  //       sender_id: personal.userId,
+  //       recipient_id: friend.userId,
+  //       content: inputText,
+  //       created_at: new Date().toISOString(),
+  //       text: inputText,
+  //       isTemporary: true, // 標記為臨時訊息
+  //     };
+
+  //     setMessages((prevMessages) => [...prevMessages, tempMessage]);
+  //     setInputText(""); // 清空輸入框
+
+  //     // 傳送訊息至後端
+  //     const result = await sendMessage({
+  //       userId: personal.userId,
+  //       friendId: friend.userId,
+  //       message: inputText,
+  //       chatRoomId,
+  //       tempId,
+  //     });
+
+  //     // console.log("result sendMessage", result);
+  //     //如果傳送訊息失敗(存到db失敗), 將臨時訊息標記為失敗
+  //     if (result.error) {
+  //       console.error("Failed to send message:", result.error);
+  //       setMessages((prevMessages) =>
+  //         prevMessages.map((msg) =>
+  //           msg.id === tempId
+  //             ? { ...msg, isTemporary: false, failed: true }
+  //             : msg
+  //         )
+  //       );
+  //     } else {
+  //       // 更新本地訊息，將臨時id替換為後端返回的正式id
+  //       setMessages((prevMessages) =>
+  //         prevMessages.map((msg) => {
+  //           console.log("msg", msg);
+  //           return msg.id === tempId
+  //             ? { ...result.data, isTemporary: false }
+  //             : msg;
+  //         })
+  //       );
+  //     }
+  //   }
+  // };
+
   const handleSend = async () => {
-    if (inputText.trim()) {
-      let chatRoomId = chatItem.id;
-      // 聊天室不存在的話, 創建一個新的聊天室
-      if (!chatRoomId) {
-        // 創建聊天室
-        const newChatRoom = await createNewChatRoom(
-          personal.userId,
-          friend.userId
-        );
+    if (!inputText.trim()) return;
 
-        if (newChatRoom.error) {
-          console.log(newChatRoom.error);
-          return;
-        }
+    let chatRoomId = chatItem.id;
+    if (!chatRoomId) {
+      // 嘗試創建新聊天室
+      const newChatRoom = await createNewChatRoom(
+        personal.userId,
+        friend.userId
+      );
 
-        chatRoomId = newChatRoom.id; // 創建新的聊天室的id
-        dispatch(addChatRoom(newChatRoom)); // 更新到redux
+      if (newChatRoom.error) {
+        console.log(newChatRoom.error);
+        return;
       }
 
-      // 本地即時新增臨時訊息
-      const tempMessage = {
-        id: `temp_${Date.now()}`,
-        sender_id: personal.userId,
-        recipient_id: friend.userId,
-        content: inputText,
-        created_at: new Date().toISOString(),
-        text: inputText,
-        isTemporary: true, // 標記為臨時訊息
-      };
+      chatRoomId = newChatRoom.id;
+      dispatch(addChatRoom(newChatRoom)); // 更新到redux
+    }
 
-      // setMessages((prevMessages) => [...prevMessages, tempMessage]);
+    // 本地即時新增臨時訊息
+    const tempMessage = {
+      id: `temp_${Date.now()}`, // 使用暫時ID
+      sender_id: personal.userId,
+      recipient_id: friend.userId,
+      content: inputText,
+      created_at: new Date().toISOString(),
+      isTemporary: true, // 臨時狀態標記
+    };
 
-      // 傳送訊息
-      const result = await sendMessage({
-        userId: personal.userId,
-        friendId: friend.userId,
-        message: inputText,
-        chatRoomId,
-      });
+    setMessages((prevMessages) => [...prevMessages, tempMessage]);
+    setInputText(""); // 清空輸入框
 
-      console.log("result sendMessage", result);
-      // 如果傳送訊息失敗(存到db失敗), 刪除臨時訊息
-      if (result.error) {
-        console.log("Failed to send message:", result.error);
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === tempMessage.id ? { ...msg, isTemporary: false } : msg
-          )
-        );
-      } else {
-        // 傳送成功，刷新訊息列表
-        const messagesData = await getMessages(chatRoomId);
-        console.log("messagesData 111111111", messagesData);
-        if (messagesData.success) {
-          setMessages(messagesData.data);
-        }
-      }
-      setInputText("");
+    // 傳送訊息至後端
+    const result = await sendMessage({
+      userId: personal.userId,
+      friendId: friend.userId,
+      message: inputText,
+      chatRoomId,
+    });
+
+    if (result.error) {
+      console.error("Failed to send message:", result.error);
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === tempMessage.id
+            ? { ...msg, isTemporary: false, failed: true }
+            : msg
+        )
+      );
+    } else {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === tempMessage.id
+            ? { ...result.data, isTemporary: false }
+            : msg
+        )
+      );
     }
   };
-  // 確保 FlatList 自動滾動到底部
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
+
+  // const fetchMessages = async () => {
+  //   const messagesData = await getMessages(chatItem.id);
+  //   if (messagesData.success) {
+  //     setMessages((prevMessages) => {
+  //       const updatedMessages = messagesData.data.map((message) => {
+  //         const existingMessage = prevMessages.find((m) => m.id === message.id);
+  //         return {
+  //           ...message,
+  //           isTemporary: existingMessage?.isTemporary || false, // 保留臨時狀態
+  //           failed: existingMessage?.failed || false,
+  //         };
+  //       });
+  //       return updatedMessages;
+  //     });
+  //   }
+  // };
+
+  const fetchMessages = async () => {
+    const messagesData = await getMessages(chatItem.id);
+
+    if (messagesData.success) {
+      setMessages(messagesData.data);
     }
-  }, [messages]);
+  };
 
   // 加載聊天記錄(如果聊天室已存在)
   useEffect(() => {
-  
-    const fetchMessages = async () => {
-      const messagesData = await getMessages(chatItem.id);
-      console.log("fetchMessages", messagesData);
-      if (messagesData.success) {
-        setMessages(messagesData.data);
-      }
-    };
-
     if (chatItem.id) {
       fetchMessages();
     }
   }, [chatItem]);
 
-  // useEffect(() => {
-  //   console.log("defaultChatItem 1111111", defaultChatItem);
-  //   if (defaultChatItem) {
-  //     console.log("defaultChatItem 222222222", defaultChatItem);
-  //     setChatItem({
-  //       id: defaultChatItem.id, // 初始化時處理可能的 null 值
-  //       friend: defaultChatItem.friend || {},
-  //     });
-  //   }
-  // }, [defaultChatItem]);
+  // 加載聊天記錄(如果聊天室已存在)
+  useEffect(() => {
+    if (chatItem.id) {
+      fetchMessages();
+    }
+  }, [chatItem]);
 
-  console.log("messages ", messages);
+  // 進入聊天室時標記訊息已讀
+  useEffect(() => {
+    const markMessagesAsRead = async () => {
+      if (chatItem.id) {
+        await markChatRoomMessagesAsRead({
+          chatRoomId: chatItem.id,
+          userId: personal.userId,
+        });
+      }
+    };
+
+    markMessagesAsRead();
+  }, [chatItem, personal.userId]);
+
+  // 監聽新訊息
+  // useEffect(() => {
+  //   const handleNewMessage = async (message) => {
+  //     if (message.recipient_id === personal.userId) {
+  //       const success = await markMessageAsRead(message.id);
+  //       if (success) {
+  //         message.is_read = true;
+  //       }
+  //     }
+
+  //     setMessages((prevMessages) => {
+  //       console.log("prevMessages 111111", prevMessages);
+  //       console.log("messagen2222322", message);
+  //       const existMessage = prevMessages.find(
+  //         (m) => m.id === message.tempId || m.id === message.id
+  //       );
+  //       console.log("existMessage", existMessage);
+  //       if (existMessage) {
+  //         return prevMessages.map((msg) =>
+  //           msg.id === (message.tempId || message.id)
+  //             ? { ...msg, ...message, isTemporary: false } // 更新已有訊息
+  //             : msg
+  //         );
+  //       } else {
+  //         return [...prevMessages, message];
+  //       }
+  //     });
+  //   };
+
+  //   if (newMessage) {
+  //     console.log('newMessage',)
+  //     handleNewMessage(newMessage);
+  //   }
+  // }, [newMessage, personal.userId]);
+
+  // 監聽新訊息
+  // useEffect(() => {
+  //   const markNewMessageRead = async (message) => {
+  //     if (message.recipient_id === personal.userId) {
+  //       const success = await markMessageAsRead(message.id); // 單條更新已讀
+
+  //       console.log('success', success);
+  //       if (success) {
+  //         // 更新本地訊息的狀態
+  //         setMessages((prevMessages) =>
+  //           prevMessages.map((msg) =>
+  //            {
+  //             console.log("msg", msg);
+  //             console.log("message", message);
+  //             return  msg.id === message.id ? { ...msg, is_read: true } : msg
+  //            }
+  //           )
+  //         );
+  //       }
+  //     }
+  //   };
+
+  //   if (newMessage) {
+  //     console.log('newMessage', newMessage);
+  //     markNewMessageRead(newMessage);
+
+  //     // 更新本地訊息,避免漏掉新訊息
+  //     //setMessages((preMessage) => [...preMessage, newMessage]);
+  //   }
+  // }, [newMessage, personal.userId]);
+
+  // 監聽新訊息
+  // useEffect(() => {
+  //   const markNewMessageRead = async (message) => {
+  //     if (message.recipient_id === personal.userId) {
+  //       const success = await markMessageAsRead(message.id); // 單條更新已讀
+  //       if (success) {
+  //         // 更新本地訊息的狀態
+  //         setMessages((prevMessages) =>
+  //           prevMessages.map((msg) => {
+  //             console.log("msg", msg);
+  //             console.log("message", message);
+  //             return msg.id === message.id ? { ...msg, is_read: true } : msg;
+  //           })
+  //         );
+  //       }
+  //     }
+  //   };
+
+  //   if (newMessage) {
+  //     markNewMessageRead(newMessage);
+
+  //     // 更新訊息列表，避免漏掉新訊息
+  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
+  //   }
+  // }, [newMessage, personal.userId]);
+
+  // useEffect(() => {
+  //   const handleNewMessage = async (message) => {
+  //     let updatedMessage = { ...message };
+
+  //     //  // 如果是收件人，嘗試標記已讀
+  //     if (message.recipient_id === personal.userId) {
+  //       const success = await markMessageAsRead(message.id);
+  //       if (success) {
+  //         updatedMessage.is_read = true; // 更新已讀狀態
+  //       }
+  //     }
+
+  //     setMessages((prevMessages) => {
+  //       // 檢查是否已有該訊息（根據 ID）
+  //       const existMessage = prevMessages.find((msg) => msg.id === message.id);
+
+  //       if (existMessage) {
+  //         // 如果訊息已存在,更新訊息
+  //         return prevMessages.map((msg) => {
+  //           console.log("msg", msg);
+  //           console.log("message", message);
+  //           return msg.id === message.id ? { ...msg, ...updatedMessage } : msg;
+  //         });
+  //       } else {
+  //         // 如果是新訊息，則加入新的訊息
+  //         return [...prevMessages, updatedMessage];
+  //       }
+  //     });
+  //   };
+
+  //   if (newMessage) {
+  //     handleNewMessage(newMessage);
+  //   }
+  // }, [newMessage, personal.userId]);
+
+  useEffect(() => {
+    const handleNewMessage = async (message) => {
+      let updatedMessage = { ...message };
+
+      // 如果是收件人，嘗試標記已讀
+      if (message.recipient_id === personal.userId) {
+        const success = await markMessageAsRead(message.id); // 單條更新已讀
+        if (success) {
+          updatedMessage.is_read = true; // 更新已讀狀態
+        }
+      }
+
+      // console.log('messages', messages)
+      setMessages((prevMessages) => {
+        console.log('prevMessages', prevMessages)
+        // 檢查是否已有該訊息（根據 ID）
+        const existMessage = prevMessages.find((msg) => {
+          console.log('msg', msg)
+          console.log('message', message)
+          return msg.id === message.id
+        });
+
+        if (existMessage) {
+          // 如果訊息已存在，更新訊息
+          return prevMessages.map((msg) =>
+            msg.id === message.id ? { ...msg, ...updatedMessage } : msg
+          );
+        } else {
+          // 如果是新訊息，則加入新的訊息
+          return [...prevMessages, updatedMessage];
+        }
+      });
+    };
+
+    if (newMessage) {
+      console.log('newMessage', newMessage)
+      //setMessages((prevMessages) => [...prevMessages, newMessage]);
+      handleNewMessage(newMessage);
+    }
+  }, [newMessage, personal.userId]);
+
+  // 確保 FlatList 自動滾動到底部
+  useEffect(() => {
+    // console.log("messages", messages);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
+  // console.log("tempId", tempId);
 
   return (
     <>

@@ -12,4 +12,5 @@ export const Colors = {
   iconBlue: "#66b2ff",
   tag: "#b8b8b8",
   textWhite: "#fff",
+  msgGray: "#7e7e7e",
 };

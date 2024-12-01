@@ -11,7 +11,7 @@ const EnterComments = () => {
         placeholder="留言..."
         placeholderTextColor="#999"
         onPress={() => {
-          console.log(1111);
+          //console.log(1111);
         }}
       />
 
