@@ -143,13 +143,11 @@ export const sendMessage = async ({
   friendId,
   message,
   chatRoomId,
-  // tempId,
 }: {
   userId: string;
   friendId: string;
   message: string;
   chatRoomId: string;
-  // tempId: string;
 }) => {
   // 發送訊息
   const { data: messageData, error: messageError } = await supabase
@@ -190,7 +188,6 @@ export const sendMessage = async ({
     success: true,
     data: {
       ...messageData, // 後端返回的正式訊息資料
-      // tempId: tempId, // 前端的臨時ID
     },
   };
 };

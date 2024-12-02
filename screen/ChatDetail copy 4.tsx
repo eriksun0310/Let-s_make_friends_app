@@ -28,7 +28,6 @@ import Message from "../components/chat/Message";
 import { addChatRoom } from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
-import { useReadMessages } from "../components/hooks/useReadMessages";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
@@ -36,30 +35,13 @@ const ChatDetail = ({ route, navigation }) => {
   const { chatItem } = route.params;
   const friend = chatItem?.friend;
   const personal = useSelector((state: RootState) => state.user.user);
-  // 監聽有新訊息的狀態變化
-  const { newMessage } = useNewMessages({ chatRoomId: chatItem.id });
-  const { readMessages } = useReadMessages(chatItem.id);
 
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
 
-  // 當訊息渲染時自動標記為已讀
-  const handleMessageView = async (messageId) => {
-    if (messageId && messageId !== personal.userId) {
-      await markMessageAsRead(messageId);
-    }
-  };
+  const renderMessage = ({ item }) => <Message key={item.id} item={item} />;
 
-  const renderMessage = ({ item }) => (
-    <Message
-      key={item.id}
-      item={item}
-      onView={(messageId) => handleMessageView(messageId)}
-    />
-  );
-
-  // 發送訊息
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
@@ -94,6 +76,7 @@ const ChatDetail = ({ route, navigation }) => {
       friendId: friend.userId,
       message: inputText,
       chatRoomId,
+      tempId,
     });
 
     if (result.error) {
@@ -116,44 +99,6 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
-  const fetchMessages = async () => {
-    const messagesData = await getMessages(chatItem.id);
-
-    if (messagesData.success) {
-      setMessages(messagesData.data);
-    }
-  };
-
-  // 加載聊天記錄(如果聊天室已存在)
-  useEffect(() => {
-    if (chatItem.id) {
-      fetchMessages();
-    }
-  }, [chatItem]);
-
-  // 標記單條訊息已讀
-  useEffect(() => {
-    if (readMessages) {
-      console.log("readMessages", readMessages);
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          readMessages.includes(msg.id) ? { ...msg, is_read: true } : msg
-        )
-      );
-    }
-  }, [readMessages]);
-
-  // 監聽新訊息
-  useEffect(() => {
-    if (newMessage && newMessage.recipient_id === personal.userId) {
-      setMessages((prevMessages) => {
-        const isDuplicate = prevMessages.some(
-          (msg) => msg.id === newMessage.id
-        );
-        return isDuplicate ? prevMessages : [...prevMessages, newMessage];
-      });
-    }
-  }, [newMessage, personal.userId]);
 
   // 確保 FlatList 自動滾動到底部
   useEffect(() => {
@@ -162,30 +107,6 @@ const ChatDetail = ({ route, navigation }) => {
     }
   }, [messages]);
 
-  // 進入聊天室時標記全部訊息已讀
-  useEffect(() => {
-    const markAllMessagesRead = async () => {
-      if (chatItem.id && personal.userId) {
-        const success = await markChatRoomMessagesAsRead({
-          chatRoomId: chatItem.id,
-          userId: personal.userId,
-        });
-
-        if (success) {
-          // 更新本地訊息狀態為已讀
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => ({
-              ...msg,
-              is_read:
-                msg.recipient_id === personal.userId ? true : msg.is_read,
-            }))
-          );
-        }
-      }
-    };
-
-    markAllMessagesRead();
-  }, [chatItem.id, personal.userId]);
 
   return (
     <>
@@ -224,6 +145,9 @@ const ChatDetail = ({ route, navigation }) => {
               renderItem={renderMessage}
               contentContainerStyle={styles.messageList}
               onContentSizeChange={() =>
+                flatListRef.current?.scrollToEnd({ animated: true })
+              }
+              onLayout={() =>
                 flatListRef.current?.scrollToEnd({ animated: true })
               }
             />

@@ -12,41 +12,62 @@ const initialMessage = {
   sender_id: "",
 };
 
-export const useNewMessages = ({
-  chatRoomId,
-  tempId,
-}: {
-  chatRoomId: string;
-  tempId: string;
-}) => {
+// export const useNewMessages = ({ chatRoomId }: { chatRoomId: string }) => {
+//   const [newMessage, setNewMessage] = useState<Message>();
+
+//   useEffect(() => {
+//     if (!chatRoomId) return;
+
+//     const subscription = supabase
+//       .channel("public:messages")
+//       .on(
+//         "postgres_changes",
+//         { event: "*", schema: "public", table: "messages" },
+//         (payload) => {
+//           if (payload.eventType === "INSERT") {
+//             setNewMessage(payload.new);
+//           }
+//         }
+//       )
+//       .subscribe();
+
+//     return () => {
+//       // 確保在組件卸載時取消訂閱
+//       supabase.removeChannel(subscription); // 清理訂閱
+//     };
+//   }, [chatRoomId]);
+
+//   return {
+//     newMessage,
+//   };
+// };
+
+export const useNewMessages = ({ chatRoomId }: { chatRoomId: string }) => {
   const [newMessage, setNewMessage] = useState<Message>();
 
   useEffect(() => {
     if (!chatRoomId) return;
 
     const subscription = supabase
-      .channel("public:messages")
+      .channel(`chat_room:${chatRoomId}`) // Specific channel for this chat room
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chat_room_id=eq.${chatRoomId}`,
+        },
         (payload) => {
-          if (payload.eventType === "INSERT") {
-            setNewMessage({
-              ...payload.new,
-              tempId: tempId,
-            });
-          }
+          setNewMessage(payload.new);
         }
       )
       .subscribe();
 
     return () => {
-      // 確保在組件卸載時取消訂閱
-      supabase.removeChannel(subscription); // 清理訂閱
+      supabase.removeChannel(subscription);
     };
   }, [chatRoomId]);
 
-  return {
-    newMessage,
-  };
+  return { newMessage };
 };

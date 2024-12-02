@@ -5,11 +5,16 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Colors } from "../../constants/style";
 
-const Message = ({ item }) => {
-  
+const Message = ({ item, onView }) => {
   const personal = useSelector((state: RootState) => state.user.user);
 
-  
+  useEffect(() => {
+    // 當組件掛載且是接收者的訊息時，觸發已讀
+    if (item.recipient_id === personal.userId && !item.is_read) {
+      onView?.(item.id);
+    }
+  }, []);
+
   return (
     <View
       style={[
