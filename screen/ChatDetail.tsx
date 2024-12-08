@@ -25,7 +25,11 @@ import {
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-import { addChatRoom, updateChatRoom } from "../store/chatSlice";
+import {
+  addChatRoom,
+  resetUnreadUser,
+  updateChatRoom,
+} from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
@@ -175,12 +179,24 @@ const ChatDetail = ({ route, navigation }) => {
   // 監聽新訊息
   useEffect(() => {
     if (newMessage && newMessage.recipient_id === personal.userId) {
+      // 更新消息列表，避免重複插入
       setMessages((prevMessages) => {
         const isDuplicate = prevMessages.some(
           (msg) => msg.id === newMessage.id
         );
         return isDuplicate ? prevMessages : [...prevMessages, newMessage];
       });
+
+      // 如果新訊息屬於當前聊天室,清零未讀數量
+      if (newMessage.chat_room_id === chatRoom.id) {
+        dispatch(
+          resetUnreadUser({
+            chatRoomId: chatRoom.id,
+            resetUnreadUser1: chatRoom.userId1 === personal.userId,
+            resetUnreadUser2: chatRoom.userId2 === personal.userId,
+          })
+        );
+      }
     }
   }, [newMessage, personal.userId]);
 
