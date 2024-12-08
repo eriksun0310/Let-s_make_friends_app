@@ -27,12 +27,16 @@ export const getAllChatRooms = async (userId: string) => {
       const lastMessageData = await getLastMessage(room.id);
 
       return {
-        ...room,
-        last_time: formatTimeWithDayjs(lastMessageData?.created_at),
-        last_message: lastMessageData?.content,
-        unread_count: isUser1
-          ? room.unread_count_user1
-          : room.unread_count_user2,
+        lastTime: formatTimeWithDayjs(lastMessageData?.created_at),
+        lastMessage: lastMessageData?.content,
+        id: room.id,
+        created_at: room.created_at,
+        userId1: room.user1_id,
+        userId2: room.user2_id,
+        user1Deleted: room.user1_deleted,
+        user2Deleted: room.user2_deleted,
+        unreadCountUser1: room.unread_count_user1,
+        unreadCountUser2: room.unread_count_user2,
         friend: {
           ...friend,
         },
@@ -83,15 +87,20 @@ export const getLastMessage = async (chatRoomId: string) => {
     .select("content, created_at")
     .eq("chat_room_id", chatRoomId)
     .order("created_at", { ascending: false }) // 按照時間降序排列
-    .limit(1) //只取最後一條訊息
-    .single(); // 獲取單條記錄
+    .limit(1); //只取最後一條訊息
 
   if (error) {
     console.error("Error fetching last message:", error);
     return null;
   }
 
-  return data;
+  //如果data 是空數組, 返回null
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  // 返回第一條訊息
+  return data[0];
 };
 
 // 建立新聊天室
@@ -113,15 +122,11 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
 
 // 取得聊天室訊息
 export const getMessages = async (chatRoomId: string) => {
-  //console.log("chatRoomId 1111111", chatRoomId);
-
   const { data, error } = await supabase
     .from("messages")
     .select("*")
     .eq("chat_room_id", chatRoomId)
     .order("created_at", { ascending: true }); // 根據 created_at 排序，確保先發的訊息在上
-
-  // console.log("data getMessages", data);
 
   if (error) {
     console.error("Error fetching messages:", error);
@@ -169,19 +174,19 @@ export const sendMessage = async ({
     };
   }
 
-  // 更新 聊天室 未讀數量
-  const result = await updateUnreadCount({
-    chatRoomId: chatRoomId,
-    userId: userId,
-  });
+  //TODO:先關 應該用不到  更新 聊天室 未讀數量
+  // const result = await updateUnreadCount({
+  //   chatRoomId: chatRoomId,
+  //   userId: userId,
+  // });
 
-  if (result.error) {
-    console.error("Error updating unread count:", result.error);
-    return {
-      success: false,
-      error: result.error,
-    };
-  }
+  // if (result.error) {
+  //   console.error("Error updating unread count:", result.error);
+  //   return {
+  //     success: false,
+  //     error: result.error,
+  //   };
+  // }
 
   // 返回成功訊息與創建的資料，並附帶 tempId 來更新前端
   return {
@@ -193,7 +198,13 @@ export const sendMessage = async ({
 };
 
 // 更新 聊天室 未讀數量
-export const updateUnreadCount = async ({ chatRoomId, userId }) => {
+export const updateUnreadCount = async ({
+  chatRoomId,
+  userId,
+}: {
+  chatRoomId: string;
+  userId: string;
+}) => {
   const { data: chatRoom } = await supabase
     .from("chat_rooms")
     .select("*")
@@ -201,7 +212,7 @@ export const updateUnreadCount = async ({ chatRoomId, userId }) => {
     .single();
 
   const unreadColumn =
-    chatRoom.user1_id === userId ? "unread_count_user2" : "unread_count_user1";
+    chatRoom.user1_id === userId ? "unread_count_user1" : "unread_count_user2";
 
   const { error } = await supabase
     .from("chat_rooms")
@@ -232,27 +243,84 @@ export const markMessageAsRead = async (messageId) => {
     return false;
   }
 
-  console.log("Message marked as read:", messageId);
   return true;
 };
 
-// 標記整個聊天室的消息為已讀
-export const markChatRoomMessagesAsRead = async ({ chatRoomId, userId }) => {
-  //console.log("chatRoomId:", chatRoomId, "userId:", userId);
+// TODO: 到時候用不到刪掉
+// // 標記整個聊天室的消息為已讀
+// export const markChatRoomMessagesAsRead = async ({ chatRoomId, userId }) => {
+//   //console.log("chatRoomId:", chatRoomId, "userId:", userId);
 
-  const { error } = await supabase
-    .from("messages")
-    .update({ is_read: true })
-    .eq("chat_room_id", chatRoomId)
-    .eq("recipient_id", userId); // 僅標記該用戶接收的訊息為已讀
+//   const { error } = await supabase
+//     .from("messages")
+//     .update({ is_read: true })
+//     .eq("chat_room_id", chatRoomId)
+//     .eq("recipient_id", userId); // 僅標記該用戶接收的訊息為已讀
 
-  if (error) {
-    console.error("Failed to mark messages as read:", error);
+//   if (error) {
+//     console.error("Failed to mark messages as read:", error);
+//     return false;
+//   }
+
+//   // console.log("Messages in chat room marked as read:", chatRoomId);
+//   return true;
+// };
+
+export const markChatRoomMessagesAsRead = async ({
+  chatRoomId,
+  userId,
+}: {
+  chatRoomId: string;
+  userId: string;
+}) => {
+  try {
+    // 確定當前用戶是 user1 或 user2
+    const { data: chatRoom, error: roomError } = await supabase
+      .from("chat_rooms")
+      .select("*")
+      .eq("id", chatRoomId)
+      .single();
+
+    if (roomError || !chatRoom) {
+      console.error("Error fetching chat room:", roomError);
+      return false;
+    }
+
+    const unreadColumn =
+      chatRoom.user1_id === userId
+        ? "unread_count_user1"
+        : "unread_count_user2";
+
+    // 更新聊未讀數量為0
+    const { error: updateError } = await supabase
+      .from("chat_rooms")
+      .update({ [unreadColumn]: 0 })
+      .eq("id", chatRoomId);
+
+    if (updateError) {
+      console.error("Error updating unread count:", updateError);
+      return false;
+    }
+
+    // 將該聊天室中屬於當前用戶的訊息標記為已讀
+    const { error: updateMessageError } = await supabase
+      .from("messages")
+      .update({
+        is_read: true,
+      })
+      .eq("chat_room_id", chatRoomId)
+      .eq("recipient_id", userId); // 僅更新屬於當前用戶的訊息
+
+    if (updateMessageError) {
+      console.error("Error updating messages:", updateMessageError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Unexpected error:", error);
     return false;
   }
-
-  // console.log("Messages in chat room marked as read:", chatRoomId);
-  return true;
 };
 
 // 刪除聊天室

@@ -42,6 +42,7 @@ const initialMessage = {
 //   };
 // };
 
+// 新訊息的監聽
 export const useNewMessages = ({ chatRoomId }: { chatRoomId: string }) => {
   const [newMessage, setNewMessage] = useState<Message>();
 

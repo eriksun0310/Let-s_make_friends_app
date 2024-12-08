@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import {
-  TouchableOpacity,
   View,
   Text,
   StyleSheet,
@@ -9,10 +8,15 @@ import {
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
+import { useDispatch, useSelector } from "react-redux";
+import { resetUnreadUser } from "../../store/chatSlice";
+import { RootState } from "../../store/store";
 
-const ChatItem = ({ chatItem, navigation }) => {
+const ChatRoom = ({ chatRoom, navigation }) => {
+  const personal = useSelector((state: RootState) => state.user.user);
+  const dispatch = useDispatch();
   // 好友資料
-  const friend = chatItem.friend;
+  const friend = chatRoom.friend;
 
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
@@ -31,6 +35,30 @@ const ChatItem = ({ chatItem, navigation }) => {
     }
   };
 
+  // 點擊聊天室
+  const handleChatRoomPress = () => {
+    navigation.navigate("chatDetail", { chatRoom: chatRoom });
+
+    //TODO: 2024/12/08 加載聊天記錄? 要不要在這裡做, 因為載入聊天室的時候訊息顯示上會慢一拍
+
+    // 清零未讀訊息
+    dispatch(
+      resetUnreadUser({
+        chatRoomId: chatRoom.id,
+        resetUnreadUser1: chatRoom.userId1 === personal.userId,
+        resetUnreadUser2: chatRoom.userId2 === personal.userId,
+      })
+    );
+  };
+
+  const getUnreadCount = (chatRoom, userId) => {
+    if (!chatRoom) return 0;
+    return chatRoom.userId1 === userId
+      ? chatRoom.unreadCountUser1
+      : chatRoom.unreadCountUser2;
+  };
+
+  const unreadCount = getUnreadCount(chatRoom, personal.userId);
 
   return (
     <>
@@ -58,10 +86,7 @@ const ChatItem = ({ chatItem, navigation }) => {
             buttonStyle={{ height: 78, backgroundColor: "red" }}
           />
         )}
-        onPress={() => {
-          // 更新已讀狀態
-          navigation.navigate("chatDetail", { chatItem: chatItem });
-        }}
+        onPress={handleChatRoomPress}
       >
         <Avatar
           style={styles.chatIcon}
@@ -72,13 +97,15 @@ const ChatItem = ({ chatItem, navigation }) => {
         <View style={styles.chatInfo}>
           <View style={styles.chatMessageContainer}>
             <Text style={styles.chatName}>{friend?.name}</Text>
-            <Text style={styles.chatTime}>{chatItem?.last_time}</Text>
+            <Text style={styles.chatTime}>{chatRoom?.lastTime}</Text>
           </View>
 
           <View style={styles.chatMessageContainer}>
-            <Text style={styles.chatMessage}>{chatItem?.last_message}</Text>
-            {chatItem?.unread_count > 0 && (
-              <Text style={styles.unreadCount}>{chatItem?.unread_count}</Text>
+            <Text style={styles.chatMessage}>{chatRoom?.lastMessage}</Text>
+            {unreadCount > 0 && (
+              <View>
+                <Text style={styles.unreadCount}>{unreadCount}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -109,7 +136,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    // alignItems: "center",
   },
   chatMessage: {
     color: "#7e7e7e",
@@ -120,13 +147,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   unreadCount: {
+    textAlign: "center",
     backgroundColor: "#A1D6EC",
     color: "#ffffff",
-    width: 25,
     paddingHorizontal: 8,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: "100%",
     // borderWidth: 1,
   },
 });
-export default ChatItem;
+export default ChatRoom;

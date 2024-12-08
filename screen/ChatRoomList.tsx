@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import { Colors } from "../constants/style";
 import { Avatar } from "react-native-elements";
-import ChatItem from "../components/chat/ChatItem";
+import ChatRoom from "../components/chat/ChatRoom";
 import { useEffect } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { setChatRooms } from "../store/chatSlice";
+import { useUnreadCount } from "../components/hooks/useUnreadCount";
 const chatData = [
   // {
   //   birthday: "1998-11-03",
@@ -117,32 +118,35 @@ const chatData = [
   //   message: "LINE台灣團隊：感謝您的支持！",
   // },
 ];
-const Chat = ({ navigation }) => {
+// 聊天室列表
+const ChatRoomList = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
   const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
-  const renderChatItem = ({ item }) => {
-    //console.log("item", item);
-    return <ChatItem chatItem={item} navigation={navigation} />;
+  // 監聽未讀數量的變化
+  useUnreadCount(user.userId);
+
+  const renderChatRoom = ({ item }) => {
+    return <ChatRoom chatRoom={item} navigation={navigation} />;
   };
 
   useEffect(() => {
     const fetchChatData = async () => {
       const rooms = await getAllChatRooms(user.userId);
-      //console.log('rooms', rooms)
       dispatch(setChatRooms(rooms));
     };
 
     fetchChatData();
-  }, [user.userId]);
+  }, [user.userId, dispatch]);
+
 
   return (
     <View style={styles.screen}>
       <FlatList
         data={chatRoomsData}
-        renderItem={renderChatItem}
+        renderItem={renderChatRoom}
         keyExtractor={(item) => item?.id}
       />
     </View>
@@ -178,4 +182,4 @@ const styles = StyleSheet.create({
     color: "#7e7e7e",
   },
 });
-export default Chat;
+export default ChatRoomList;

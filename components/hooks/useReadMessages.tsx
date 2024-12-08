@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../util/supabaseClient";
 
-// 監聽已讀更新的Hook
+// 監聽 已讀狀態的更新 Hook
 export const useReadMessages = (chatRoomId) => {
   const [readMessages, setReadMessages] = useState<string[]>([]);
 
@@ -19,7 +19,7 @@ export const useReadMessages = (chatRoomId) => {
           filter: `chat_room_id=eq.${chatRoomId}`,
         },
         (payload) => {
-            console.log('payload', payload.new);
+            //console.log('payload', payload.new);
           setReadMessages((prev) => [...prev, payload.new.id]);
         }
       )

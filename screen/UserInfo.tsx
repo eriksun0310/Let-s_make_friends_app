@@ -69,7 +69,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
                   friendId: friend.userId,
                 });
                 navigation.navigate("chatDetail", {
-                  chatItem: {
+                  chatRoom: {
                     id: chatRoom?.id,
                     friend: friend,
                   },

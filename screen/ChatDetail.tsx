@@ -25,20 +25,22 @@ import {
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-import { addChatRoom } from "../store/chatSlice";
+import { addChatRoom, updateChatRoom } from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
+  const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
+
   const dispatch = useDispatch();
-  const { chatItem } = route.params;
-  const friend = chatItem?.friend;
+  const { chatRoom } = route.params;
+  const friend = chatRoom?.friend;
   const personal = useSelector((state: RootState) => state.user.user);
   // 監聽有新訊息的狀態變化
-  const { newMessage } = useNewMessages({ chatRoomId: chatItem.id });
-  const { readMessages } = useReadMessages(chatItem.id);
+  const { newMessage } = useNewMessages({ chatRoomId: chatRoom.id });
+  const { readMessages } = useReadMessages(chatRoom.id);
 
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputText, setInputText] = useState("");
@@ -63,7 +65,7 @@ const ChatDetail = ({ route, navigation }) => {
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    let chatRoomId = chatItem.id;
+    let chatRoomId = chatRoom.id;
     if (!chatRoomId) {
       const newChatRoom = await createNewChatRoom(
         personal.userId,
@@ -117,7 +119,7 @@ const ChatDetail = ({ route, navigation }) => {
   };
 
   const fetchMessages = async () => {
-    const messagesData = await getMessages(chatItem.id);
+    const messagesData = await getMessages(chatRoom.id);
 
     if (messagesData.success) {
       setMessages(messagesData.data);
@@ -126,15 +128,14 @@ const ChatDetail = ({ route, navigation }) => {
 
   // 加載聊天記錄(如果聊天室已存在)
   useEffect(() => {
-    if (chatItem.id) {
+    if (chatRoom.id) {
       fetchMessages();
     }
-  }, [chatItem]);
+  }, [chatRoom]);
 
   // 標記單條訊息已讀
   useEffect(() => {
     if (readMessages) {
-      console.log("readMessages", readMessages);
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           readMessages.includes(msg.id) ? { ...msg, is_read: true } : msg
@@ -165,14 +166,15 @@ const ChatDetail = ({ route, navigation }) => {
   // 進入聊天室時標記全部訊息已讀
   useEffect(() => {
     const markAllMessagesRead = async () => {
-      if (chatItem.id && personal.userId) {
+      if (chatRoom.id && personal.userId) {
+        // 更新資料庫：將自己相關的未讀訊息標記為已讀
         const success = await markChatRoomMessagesAsRead({
-          chatRoomId: chatItem.id,
+          chatRoomId: chatRoom.id,
           userId: personal.userId,
         });
 
         if (success) {
-          // 更新本地訊息狀態為已讀
+          // 本地更新訊息列表：只標記屬於自己的訊息為已讀
           setMessages((prevMessages) =>
             prevMessages.map((msg) => ({
               ...msg,
@@ -185,7 +187,7 @@ const ChatDetail = ({ route, navigation }) => {
     };
 
     markAllMessagesRead();
-  }, [chatItem.id, personal.userId]);
+  }, [chatRoom.id, personal.userId]);
 
   return (
     <>

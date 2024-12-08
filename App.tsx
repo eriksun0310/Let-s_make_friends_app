@@ -10,7 +10,7 @@ import {
   UserRound,
   UserRoundPlus,
 } from "lucide-react-native";
-import Chat from "./screen/Chat";
+import ChatRoomList from "./screen/ChatRoomList";
 import Login from "./screen/Login";
 import Register from "./screen/Register";
 import AboutMe from "./screen/AboutMe";
@@ -46,7 +46,7 @@ const MainTabNavigator = () => {
       // initialRouteName="map"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          if (route.name === "chat") {
+          if (route.name === "chatRoomList") {
             return <MessageCircle color={color} size={size} />;
           } else if (route.name === "addFriend") {
             return <UserRoundPlus color={color} size={size} />;
@@ -61,9 +61,9 @@ const MainTabNavigator = () => {
       })}
     >
       <Tab.Screen
-        name="chat"
+        name="chatRoomList"
         options={{ title: "聊天室", headerTitleAlign: "center" }}
-        component={Chat}
+        component={ChatRoomList}
       />
       <Tab.Screen
         name="home"
