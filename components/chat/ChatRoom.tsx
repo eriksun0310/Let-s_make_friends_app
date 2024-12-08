@@ -1,16 +1,12 @@
 import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageSourcePropType,
-} from "react-native";
+import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { resetUnreadUser } from "../../store/chatSlice";
 import { RootState } from "../../store/store";
+import { getMessages } from "../../util/handleChatEvent";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useSelector((state: RootState) => state.user.user);
@@ -35,11 +31,15 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     }
   };
 
-  // 點擊聊天室
-  const handleChatRoomPress = () => {
-    navigation.navigate("chatDetail", { chatRoom: chatRoom });
+  // 進入1對1 聊天室
+  const handleChatRoomPress = async () => {
+    // 開始加載聊天紀錄
+    const messages = await getMessages(chatRoom.id);
 
-    //TODO: 2024/12/08 加載聊天記錄? 要不要在這裡做, 因為載入聊天室的時候訊息顯示上會慢一拍
+    navigation.navigate("chatDetail", {
+      chatRoom: chatRoom,
+      messages: messages.data, // 預加載的聊天記錄
+    });
 
     // 清零未讀訊息
     dispatch(

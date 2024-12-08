@@ -29,20 +29,28 @@ import { addChatRoom, updateChatRoom } from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
+import { set } from "firebase/database";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
-  const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
-
   const dispatch = useDispatch();
-  const { chatRoom } = route.params;
+  const { chatRoom, messages: preloadedMessages } = route.params;
   const friend = chatRoom?.friend;
   const personal = useSelector((state: RootState) => state.user.user);
   // 監聽有新訊息的狀態變化
   const { newMessage } = useNewMessages({ chatRoomId: chatRoom.id });
+  // 監聽有 已讀訊息的狀態變化
   const { readMessages } = useReadMessages(chatRoom.id);
 
-  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>(
+    preloadedMessages || []
+  );
+
+  const [loading, setLoading] = useState(!preloadedMessages); // 如果有預加載數據，就不需要加載狀態
+
+  const [error, setError] = useState(null);
+
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
 
@@ -118,20 +126,40 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
-  const fetchMessages = async () => {
-    const messagesData = await getMessages(chatRoom.id);
+  // const fetchMessagesIfNeeded = async () => {
+  //   const messagesData = await getMessages(chatRoom.id);
 
-    if (messagesData.success) {
-      setMessages(messagesData.data);
+  //   if (messagesData.success) {
+  //     setMessages(messagesData.data);
+  //   }
+  // };
+
+  const fetchMessagesIfNeeded = async () => {
+    if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
+
+    try {
+      setLoading(true);
+      const messageData = await getMessages(chatRoom.id);
+
+      if (messageData.success) {
+        setMessages(messageData.data);
+      } else {
+        setError("取得訊息失敗，請稍後再試");
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setError("發生錯誤，請稍後再試");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 加載聊天記錄(如果聊天室已存在)
+  // 加載聊天記錄(如果聊天室已存在且沒有預加載數據)
   useEffect(() => {
     if (chatRoom.id) {
-      fetchMessages();
+      fetchMessagesIfNeeded();
     }
-  }, [chatRoom]);
+  }, [chatRoom.id, preloadedMessages]);
 
   // 標記單條訊息已讀
   useEffect(() => {
@@ -189,6 +217,7 @@ const ChatDetail = ({ route, navigation }) => {
     markAllMessagesRead();
   }, [chatRoom.id, personal.userId]);
 
+  if (loading) return <LoadingOverlay message="loading ..." />;
   return (
     <>
       <KeyboardAvoidingView
