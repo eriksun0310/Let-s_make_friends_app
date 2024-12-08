@@ -57,7 +57,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     navigation.setOptions({
       title: "好友列表",
       headerTitleAlign: "center",
-      headerLeft: () => <BackButton navigation={navigation} />,
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
 
     fetchFriendList();

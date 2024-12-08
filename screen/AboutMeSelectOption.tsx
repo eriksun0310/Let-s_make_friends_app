@@ -105,7 +105,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
     navigation.setOptions({
       title: "更多關於我的設定",
       headerTitleAlign: "center",
-      headerLeft: () => <BackButton navigation={navigation} />,
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, selectedOption]);

@@ -25,15 +25,13 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
     navigation.setOptions({
       title: "交友邀請",
       headerTitleAlign: "center",
-      headerLeft: () => <BackButton navigation={navigation} />,
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
   }, [navigation]);
-
 
   if (loading) {
     return <LoadingOverlay message="交友邀請 loading ..." />;
   }
-
 
   return (
     <View style={styles.screen}>
@@ -41,7 +39,7 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
         {Object.entries(friendRequests).map(([requestId, friendRequest]) => {
           return (
             <FriendInvitationItem
-            loading={loading}
+              loading={loading}
               key={requestId}
               friendRequest={friendRequest}
               navigation={navigation}

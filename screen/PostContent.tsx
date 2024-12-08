@@ -22,7 +22,7 @@ const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
     navigation.setOptions({
       title: null,
 
-      headerLeft: () => <BackButton navigation={navigation} />,
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
   }, [navigation]);
   return (

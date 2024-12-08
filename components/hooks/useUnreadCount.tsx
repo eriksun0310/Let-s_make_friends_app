@@ -5,7 +5,13 @@ import { updateChatRoom } from "../../store/chatSlice";
 import { updateUnreadCount } from "../../util/handleChatEvent";
 
 // 監聽所有聊天室的新訊息, 並根據訊息狀態,更新未讀訊息數量
-export const useUnreadCount = (userId) => {
+export const useUnreadCount = ({
+  userId,
+  currentChatRoomId,
+}: {
+  userId: string;
+  currentChatRoomId: string | null;
+}) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (!userId) return;
@@ -44,17 +50,40 @@ export const useUnreadCount = (userId) => {
           );
 
           // 當訊息是發給自己的, 更新supabase 未讀數量
-          if (newMessage.recipient_id === userId) {
-            const result = await updateUnreadCount({
-              chatRoomId: newMessage.chat_room_id,
-              userId,
-            });
+          // if (newMessage.recipient_id === userId) {
+          //   const result = await updateUnreadCount({
+          //     chatRoomId: newMessage.chat_room_id,
+          //     userId,
+          //   });
 
-            if (!result.success) {
-              console.error(
-                "Failed to update unread count in DB:",
-                result.error
-              );
+          //   if (!result.success) {
+          //     console.error(
+          //       "Failed to update unread count in DB:",
+          //       result.error
+          //     );
+          //   }
+          // }
+
+          //console.log("newMessage 111111", newMessage);
+          // 當訊息是發給自己的
+          if (newMessage.recipient_id === userId) {
+            // 判斷是否當前聊天室
+            const isInSameChatRoom =
+              currentChatRoomId === newMessage.chat_room_id;
+
+            // 只有在不在同一聊天室時，才更新資料庫的未讀數量
+            if (!isInSameChatRoom) {
+              const result = await updateUnreadCount({
+                chatRoomId: newMessage.chat_room_id,
+                userId,
+              });
+
+              if (!result.success) {
+                console.error(
+                  "Failed to update unread count in DB:",
+                  result.error
+                );
+              }
             }
           }
         }

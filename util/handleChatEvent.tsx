@@ -197,7 +197,7 @@ export const sendMessage = async ({
   };
 };
 
-// 更新 聊天室 未讀數量
+// 更新 聊天室 未讀數量 +1
 export const updateUnreadCount = async ({
   chatRoomId,
   userId,
@@ -229,6 +229,75 @@ export const updateUnreadCount = async ({
   return {
     success: true,
   };
+};
+
+// 更新 聊天室 未讀數量歸0
+export const resetUnreadCount = async ({
+  chatRoomId,
+  userId,
+}: {
+  chatRoomId: string;
+  userId: string;
+}) => {
+  try {
+    // 獲取聊天室資料
+    const { data: chatRoom, error } = await supabase
+      .from("chat_rooms")
+      .select("user1_id, user2_id, unread_count_user1, unread_count_user2")
+      .eq("id", chatRoomId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching chat room:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    // 判斷哪個用戶的未讀數量要歸0
+    let unreadColumn = "";
+    if (chatRoom.user1_id === userId) {
+      unreadColumn = "unread_count_user1";
+    } else if (chatRoom.user2_id === userId) {
+      unreadColumn = "unread_count_user2";
+    }
+
+    // 如果找到了對應的用戶,將未讀數量歸0
+    if(unreadColumn){
+      const { error: updateError } = await supabase
+      .from('chat_rooms')
+      .update({ [unreadColumn]: 0 })
+      .eq('id', chatRoomId);
+
+      if(updateError){
+        console.error("Error resetting unread count:", updateError);
+        return {
+          success: false,
+          error: updateError.message,
+        };
+      }
+      
+      return{
+        success: true
+      }
+    }else{
+      console.error("Error resetting unread count: No matching user found");
+      return {
+        success: false,
+        error: "No matching user found",
+      };
+
+    }
+
+
+  } catch (error) {
+    console.error("Error resetting unread count:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
 };
 
 // 單條訊息的更新已讀

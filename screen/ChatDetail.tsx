@@ -22,6 +22,7 @@ import {
   getMessages,
   markChatRoomMessagesAsRead,
   markMessageAsRead,
+  resetUnreadCount,
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
@@ -35,6 +36,7 @@ import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
 import { set } from "firebase/database";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { useUnreadCount } from "../components/hooks/useUnreadCount";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
@@ -42,6 +44,13 @@ const ChatDetail = ({ route, navigation }) => {
   const { chatRoom, messages: preloadedMessages } = route.params;
   const friend = chatRoom?.friend;
   const personal = useSelector((state: RootState) => state.user.user);
+
+  // 監聽未讀數量的變化
+  useUnreadCount({
+    userId: personal.userId,
+    currentChatRoomId: chatRoom.id,
+  });
+
   // 監聽有新訊息的狀態變化
   const { newMessage } = useNewMessages({ chatRoomId: chatRoom.id });
   // 監聽有 已讀訊息的狀態變化
@@ -188,15 +197,15 @@ const ChatDetail = ({ route, navigation }) => {
       });
 
       // 如果新訊息屬於當前聊天室,清零未讀數量
-      if (newMessage.chat_room_id === chatRoom.id) {
-        dispatch(
-          resetUnreadUser({
-            chatRoomId: chatRoom.id,
-            resetUnreadUser1: chatRoom.userId1 === personal.userId,
-            resetUnreadUser2: chatRoom.userId2 === personal.userId,
-          })
-        );
-      }
+      // if (newMessage.chat_room_id === chatRoom.id) {
+      //   dispatch(
+      //     resetUnreadUser({
+      //       chatRoomId: chatRoom.id,
+      //       resetUnreadUser1: chatRoom.userId1 === personal.userId,
+      //       resetUnreadUser2: chatRoom.userId2 === personal.userId,
+      //     })
+      //   );
+      // }
     }
   }, [newMessage, personal.userId]);
 
@@ -233,6 +242,30 @@ const ChatDetail = ({ route, navigation }) => {
     markAllMessagesRead();
   }, [chatRoom.id, personal.userId]);
 
+  // 返回聊天列表
+  const handleReturnToChatList = async () => {
+    //更新 本地未讀數量歸0
+    dispatch(
+      resetUnreadUser({
+        chatRoomId: chatRoom.id,
+        resetUnreadUser1: chatRoom.userId1 === personal.userId,
+        resetUnreadUser2: chatRoom.userId2 === personal.userId,
+      })
+    );
+
+    // 更新資料庫的未讀數量歸0
+    const result = await resetUnreadCount({
+      chatRoomId: chatRoom.id,
+      userId: personal.userId,
+    });
+    if (!result.success) {
+      console.error("更新未讀數量失敗", result.error);
+    }
+
+    console.log("返回聊天列表", chatRoom);
+    navigation.goBack();
+  };
+
   if (loading) return <LoadingOverlay message="loading ..." />;
   return (
     <>
@@ -245,7 +278,7 @@ const ChatDetail = ({ route, navigation }) => {
           <View style={styles.container}>
             <View style={styles.header}>
               <BackButton
-                navigation={navigation}
+                onPress={handleReturnToChatList}
                 style={{
                   marginRight: 15,
                 }}

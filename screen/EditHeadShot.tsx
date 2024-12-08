@@ -61,7 +61,7 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
     navigation.setOptions({
       title: "編輯大頭貼",
       headerTitleAlign: "center",
-      headerLeft: () => <BackButton navigation={navigation} />,
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [navigation, headShot]);

@@ -56,7 +56,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       headerTitleAlign: "center",
       headerLeft: () => {
         if (userState === "friend") {
-          return <BackButton navigation={navigation} />;
+          return <BackButton onPress={() => navigation.goBack()} />;
         } else return null;
       },
       headerRight: () => {

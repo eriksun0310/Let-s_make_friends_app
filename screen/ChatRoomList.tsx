@@ -123,10 +123,13 @@ const ChatRoomList = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
-  const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
-
   // 監聽未讀數量的變化
-  useUnreadCount(user.userId);
+  useUnreadCount({
+    userId: user.userId,
+    currentChatRoomId: null,
+  });
+
+  const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
   const renderChatRoom = ({ item }) => {
     return <ChatRoom chatRoom={item} navigation={navigation} />;
@@ -141,6 +144,7 @@ const ChatRoomList = ({ navigation }) => {
     fetchChatData();
   }, [user.userId, dispatch]);
 
+  console.log("chatRoomsData is chatRoomList", chatRoomsData);
 
   return (
     <View style={styles.screen}>
