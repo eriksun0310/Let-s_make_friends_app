@@ -97,7 +97,9 @@ const ChatRoom = ({ chatRoom, navigation }) => {
         <View style={styles.chatInfo}>
           <View style={styles.chatMessageContainer}>
             <Text style={styles.chatName}>{friend?.name}</Text>
-            <Text style={styles.chatTime}>{chatRoom?.lastTime}</Text>
+            {chatRoom?.lastMessage && (
+              <Text style={styles.chatTime}>{chatRoom?.lastTime}</Text>
+            )}
           </View>
 
           <View style={styles.chatMessageContainer}>
