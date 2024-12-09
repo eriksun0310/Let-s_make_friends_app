@@ -51,13 +51,8 @@ const chatSlice = createSlice({
 
     // 更新聊天室(未讀訊息數量、最後一則訊息、最後一則訊息時間)
     updateChatRoom(state, action) {
-      const {
-        id,
-        lastMessage,
-        lastTime,
-        incrementUser1,
-        incrementUser2,
-      } = action.payload;
+      const { id, lastMessage, lastTime, incrementUser1, incrementUser2 } =
+        action.payload;
 
       // 找出對應的聊天室
       const chatRoom = state.chatRooms.find((room) => room.id === id);
@@ -142,7 +137,7 @@ export const updateOrCreateChatRoom =
           user1Id,
           user2Id,
           lastMessage,
-          lastTime,
+          lastTime: formatTimeWithDayjs(lastTime),
           unreadCountUser1: incrementUser1 || 0,
           unreadCountUser2: incrementUser2 || 0,
           friend,

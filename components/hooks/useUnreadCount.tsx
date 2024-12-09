@@ -50,9 +50,8 @@ export const useUnreadCount = ({
               //   newMessage.sender_id === userId
               //     ? 0
               //     : 1,
-
               incrementUser1: newMessage.recipient_id === userId ? 1 : 0,
-              incrementUser2: newMessage.sender_id === userId ? 1 : 0,
+              incrementUser2: newMessage.recipient_id !== userId ? 0 : 1,
             })
           );
 
