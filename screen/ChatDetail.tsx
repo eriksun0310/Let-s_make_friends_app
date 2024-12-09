@@ -60,7 +60,7 @@ const ChatDetail = ({ route, navigation }) => {
     preloadedMessages || []
   );
 
-  const [loading, setLoading] = useState(!preloadedMessages); // 如果有預加載數據，就不需要加載狀態
+  const [loading, setLoading] = useState(); // 如果有預加載數據，就不需要加載狀態
 
   const [error, setError] = useState(null);
 

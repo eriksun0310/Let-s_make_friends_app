@@ -132,19 +132,23 @@ const ChatRoomList = ({ navigation }) => {
   const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
   const renderChatRoom = ({ item }) => {
+    console.log('item is chatRoomList', item);
     return <ChatRoom chatRoom={item} navigation={navigation} />;
   };
 
   useEffect(() => {
     const fetchChatData = async () => {
       const rooms = await getAllChatRooms(user.userId);
+      console.log('rooms is chatRoomList', rooms);
       dispatch(setChatRooms(rooms));
     };
 
     fetchChatData();
   }, [user.userId, dispatch]);
 
-  console.log("chatRoomsData is chatRoomList", chatRoomsData);
+  useEffect(() => {
+    console.log("chatRoomsData is chatRoomList", chatRoomsData);
+  }, [chatRoomsData]);
 
   return (
     <View style={styles.screen}>

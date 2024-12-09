@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { supabase } from "../../util/supabaseClient";
-import { updateChatRoom } from "../../store/chatSlice";
+import { updateChatRoom, updateOrCreateChatRoom } from "../../store/chatSlice";
 import { updateUnreadCount } from "../../util/handleChatEvent";
 
 // 監聽所有聊天室的新訊息, 並根據訊息狀態,更新未讀訊息數量
@@ -29,23 +29,30 @@ export const useUnreadCount = ({
         async (payload) => {
           const newMessage = payload.new;
 
+          console.log("newMessage is useUnreadCount", newMessage);
+
           // 更新本地 chat Redux
           dispatch(
-            updateChatRoom({
-              chatRoomId: newMessage.chat_room_id,
+            updateOrCreateChatRoom({
+              user1Id: newMessage.sender_id,
+              user2Id: newMessage.recipient_id,
+              id: newMessage.chat_room_id,
               lastMessage: newMessage.content,
               lastTime: newMessage.created_at,
 
-              incrementUser1:
-                newMessage.recipient_id === userId &&
-                newMessage.sender_id !== userId
-                  ? 1
-                  : 0,
-              incrementUser2:
-                newMessage.recipient_id !== userId &&
-                newMessage.sender_id === userId
-                  ? 0
-                  : 1,
+              // incrementUser1:
+              //   newMessage.recipient_id === userId &&
+              //   newMessage.sender_id !== userId
+              //     ? 1
+              //     : 0,
+              // incrementUser2:
+              //   newMessage.recipient_id !== userId &&
+              //   newMessage.sender_id === userId
+              //     ? 0
+              //     : 1,
+
+              incrementUser1: newMessage.recipient_id === userId ? 1 : 0,
+              incrementUser2: newMessage.sender_id === userId ? 1 : 0,
             })
           );
 
@@ -93,5 +100,5 @@ export const useUnreadCount = ({
     return () => {
       supabase.removeChannel(subscription); // 清理監聽
     };
-  }, [userId, dispatch]);
+  }, [userId, dispatch, currentChatRoomId]);
 };

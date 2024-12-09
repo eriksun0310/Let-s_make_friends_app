@@ -37,13 +37,11 @@ export const getAllChatRooms = async (userId: string) => {
         user2Deleted: room.user2_deleted,
         unreadCountUser1: room.unread_count_user1,
         unreadCountUser2: room.unread_count_user2,
-        friend: {
-          ...friend,
-        },
+        friend: friend,
       };
     })
   );
-
+  console.log("chatRoomsDetails", chatRoomsDetails);
   return chatRoomsDetails;
 };
 
@@ -105,7 +103,7 @@ export const getLastMessage = async (chatRoomId: string) => {
 
 // 建立新聊天室
 export const createNewChatRoom = async (userId: string, friendId: string) => {
-  const { data, error } = await supabase
+  const { data: room, error } = await supabase
     .from("chat_rooms")
     .insert({
       user1_id: userId,
@@ -117,7 +115,25 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
     console.error("Error creating chat room:", error);
     return {};
   }
-  return data;
+  console.log("createNewChatRoom room", room);
+
+  // const isUser1 = room.user1_id === userId;
+  // const friendId = isUser1 ? room.user2_id : room.user1_id;
+  const friend = await getFriendDetail(friendId);
+  const lastMessageData = await getLastMessage(room.id);
+  return {
+    id: room.id,
+    created_at: room.created_at,
+    userId1: room.user1_id,
+    userId2: room.user2_id,
+    user1Deleted: room.user1_deleted,
+    user2Deleted: room.user2_deleted,
+    unreadCountUser1: room.unread_count_user1,
+    unreadCountUser2: room.unread_count_user2,
+    friend: friend,
+    lastTime: formatTimeWithDayjs(lastMessageData?.created_at),
+    lastMessage: lastMessageData?.content,
+  };
 };
 
 // 取得聊天室訊息
@@ -264,33 +280,30 @@ export const resetUnreadCount = async ({
     }
 
     // 如果找到了對應的用戶,將未讀數量歸0
-    if(unreadColumn){
+    if (unreadColumn) {
       const { error: updateError } = await supabase
-      .from('chat_rooms')
-      .update({ [unreadColumn]: 0 })
-      .eq('id', chatRoomId);
+        .from("chat_rooms")
+        .update({ [unreadColumn]: 0 })
+        .eq("id", chatRoomId);
 
-      if(updateError){
+      if (updateError) {
         console.error("Error resetting unread count:", updateError);
         return {
           success: false,
           error: updateError.message,
         };
       }
-      
-      return{
-        success: true
-      }
-    }else{
+
+      return {
+        success: true,
+      };
+    } else {
       console.error("Error resetting unread count: No matching user found");
       return {
         success: false,
         error: "No matching user found",
       };
-
     }
-
-
   } catch (error) {
     console.error("Error resetting unread count:", error);
     return {
