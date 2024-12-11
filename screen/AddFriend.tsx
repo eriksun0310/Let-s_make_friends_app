@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { BellRing, Users } from "lucide-react-native";
+import { BellRing, Dot, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
@@ -71,6 +71,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
+    // 判斷是否顯示紅點
+    const showBadge = newFriendRequestNumber > 0 || newFriendsNumber > 0;
+
     //  TODO: 點了好友列表後 newFriend 的length 歸0
     // 設置導航選項
     navigation.setOptions({
@@ -104,6 +107,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
           </View>
         </CustomIcon>
       ),
+      // 動態設置底部導航的 tabBarBadge
+      tabBarBadge: showBadge ? <Dot size="5" /> : null,
     });
 
     fetchAllUsers(); // 調用 API 獲取資料

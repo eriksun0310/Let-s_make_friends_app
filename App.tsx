@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -9,6 +9,7 @@ import {
   House,
   UserRound,
   UserRoundPlus,
+  Dot,
 } from "lucide-react-native";
 import ChatRoomList from "./screen/ChatRoomList";
 import Login from "./screen/Login";
@@ -29,10 +30,7 @@ import UserInfo from "./screen/UserInfo";
 import PostContent from "./screen/PostContent";
 import Search from "./screen/Search";
 import AddPost from "./screen/AddPost";
-import 'react-native-gesture-handler';
-
-
-
+import "react-native-gesture-handler";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -41,6 +39,8 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainTabNavigator = () => {
+  const user = useSelector((state: RootState) => state.user.user);
+
   return (
     <Tab.Navigator
       // initialRouteName="map"
@@ -72,7 +72,10 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen
         name="addFriend"
-        options={{ title: "加好友", headerTitleAlign: "center" }}
+        options={{
+          title: "加好友",
+          headerTitleAlign: "center",
+        }}
         component={AddFriend}
       />
 

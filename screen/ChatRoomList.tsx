@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  ImageSourcePropType,
-} from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import { Avatar } from "react-native-elements";
 import ChatRoom from "../components/chat/ChatRoom";
@@ -16,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { setChatRooms } from "../store/chatSlice";
 import { useUnreadCount } from "../components/hooks/useUnreadCount";
+import { NavigationProp } from "@react-navigation/native";
+import { Dot } from "lucide-react-native";
 const chatData = [
   // {
   //   birthday: "1998-11-03",
@@ -37,89 +31,14 @@ const chatData = [
   //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
   //   message: "LINE台灣團隊：感謝您的支持！",
   // },
-  // {
-  //   birthday: "1998-11-03",
-  //   createdAt: "2024-11-27T02:47:07.164+00:00",
-  //   email: "444@gmail.com",
-  //   gender: "male",
-  //   headShot: {
-  //     imageType: "animal",
-  //     imageUrl: "11",
-  //   },
-  //   introduce: "Dddd 4444",
-  //   name: "444",
-  //   selectedOption: {
-  //     dislikedFood: ["onion"],
-  //     favoriteFood: ["chocolate"],
-  //     interests: ["reading"],
-  //   },
-  //   updatedAt: "2024-11-27T02:47:07.164+00:00",
-  //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
-  //   message: "LINE台灣團隊：感謝您的支持！",
-  // },
-  // {
-  //   birthday: "1998-11-03",
-  //   createdAt: "2024-11-27T02:47:07.164+00:00",
-  //   email: "444@gmail.com",
-  //   gender: "male",
-  //   headShot: {
-  //     imageType: "animal",
-  //     imageUrl: "11",
-  //   },
-  //   introduce: "Dddd 4444",
-  //   name: "444",
-  //   selectedOption: {
-  //     dislikedFood: ["onion"],
-  //     favoriteFood: ["chocolate"],
-  //     interests: ["reading"],
-  //   },
-  //   updatedAt: "2024-11-27T02:47:07.164+00:00",
-  //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
-  //   message: "LINE台灣團隊：感謝您的支持！",
-  // },
-  // {
-  //   birthday: "1998-11-03",
-  //   createdAt: "2024-11-27T02:47:07.164+00:00",
-  //   email: "444@gmail.com",
-  //   gender: "male",
-  //   headShot: {
-  //     imageType: "animal",
-  //     imageUrl: "11",
-  //   },
-  //   introduce: "Dddd 4444",
-  //   name: "444",
-  //   selectedOption: {
-  //     dislikedFood: ["onion"],
-  //     favoriteFood: ["chocolate"],
-  //     interests: ["reading"],
-  //   },
-  //   updatedAt: "2024-11-27T02:47:07.164+00:00",
-  //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
-  //   message: "LINE台灣團隊：感謝您的支持！",
-  // },
-  // {
-  //   birthday: "1998-11-03",
-  //   createdAt: "2024-11-27T02:47:07.164+00:00",
-  //   email: "444@gmail.com",
-  //   gender: "male",
-  //   headShot: {
-  //     imageType: "animal",
-  //     imageUrl: "11",
-  //   },
-  //   introduce: "Dddd 4444",
-  //   name: "444",
-  //   selectedOption: {
-  //     dislikedFood: ["onion"],
-  //     favoriteFood: ["chocolate"],
-  //     interests: ["reading"],
-  //   },
-  //   updatedAt: "2024-11-27T02:47:07.164+00:00",
-  //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
-  //   message: "LINE台灣團隊：感謝您的支持！",
-  // },
 ];
+
+interface ChatRoomListProps {
+  navigation: NavigationProp<any>;
+}
+
 // 聊天室列表
-const ChatRoomList = ({ navigation }) => {
+const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -132,14 +51,14 @@ const ChatRoomList = ({ navigation }) => {
   const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
 
   const renderChatRoom = ({ item }) => {
-    console.log('item is chatRoomList', item);
+    console.log("item is chatRoomList", item);
     return <ChatRoom chatRoom={item} navigation={navigation} />;
   };
 
   useEffect(() => {
     const fetchChatData = async () => {
       const rooms = await getAllChatRooms(user.userId);
-      console.log('rooms is chatRoomList', rooms);
+      console.log("rooms is chatRoomList", rooms);
       dispatch(setChatRooms(rooms));
     };
 
@@ -148,7 +67,21 @@ const ChatRoomList = ({ navigation }) => {
 
   useEffect(() => {
     console.log("chatRoomsData is chatRoomList", chatRoomsData);
-  }, [chatRoomsData]);
+
+    // 判斷是否有未讀訊息
+    const hasUnreadMessages = chatRoomsData?.some((room) => {
+      const unreadCount =
+        room.userId1 === user.userId
+          ? room.unreadCountUser1
+          : room.unreadCountUser2;
+      return unreadCount > 0;
+    });
+
+    navigation.setOptions({
+      // 動態設置底部導航的 tabBarBadge
+      tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,
+    });
+  }, [navigation, chatRoomsData, user.userId]);
 
   return (
     <View style={styles.screen}>

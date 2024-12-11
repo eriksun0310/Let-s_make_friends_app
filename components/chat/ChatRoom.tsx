@@ -77,7 +77,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
         style={styles.chatItem}
         rightContent={(reset) => (
           <Button
-            title="刪除好友"
+            title="刪除聊天室"
             onPress={() => {
               resetRef.current = reset; // 存儲 `reset`
               setIsAlertVisible(true);
