@@ -37,6 +37,8 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
 } from "../store";
+import { useChatListeners } from "../components/hooks/useChatListeners";
+import { useChatContext } from "../shared/ChatContext";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
@@ -47,10 +49,12 @@ const ChatDetail = ({ route, navigation }) => {
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
+  const {newMessage , readMessages } = useChatContext()
+
   // 監聽有新訊息的狀態變化
-  const { newMessage } = useNewMessages({ chatRoomId: currentChatRoomId });
+  // const { newMessage } = useNewMessages({ chatRoomId: currentChatRoomId });
   // 監聽有 已讀訊息的狀態變化
-  const { readMessages } = useReadMessages(currentChatRoomId);
+  // const { readMessages } = useReadMessages(currentChatRoomId);
 
   const [messages, setMessages] = useState<MessageType[]>(
     preloadedMessages || []
