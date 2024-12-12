@@ -53,7 +53,7 @@ const LoginContent: React.FC<LoginContentProps> = ({ getValue, isValid }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>歡迎回來</Text>
+        <Text style={styles.title}>會員登入</Text>
 
         <CustomTextInput
           isValid={emailIsValid}
