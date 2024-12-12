@@ -3,7 +3,7 @@ import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useEffect } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
-import { useUnreadCount } from "../components/hooks/useUnreadCount";
+
 import { NavigationProp } from "@react-navigation/native";
 import { Dot } from "lucide-react-native";
 import {
@@ -12,7 +12,10 @@ import {
   useAppSelector,
   selectChatRooms,
   setChatRooms,
+  selectCurrentChatRoomId,
 } from "../store";
+import React from "react";
+import { useUnreadCount } from "../components/hooks/useUnreadCount";
 const chatData = [
   // {
   //   birthday: "1998-11-03",
@@ -45,18 +48,18 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
-  // const [currentChatRoomId, setCurrentChatRoomId] = useState("");
+  const chatRoomsData = useAppSelector(selectChatRooms);
+
+  const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
   // 監聽未讀數量的變化
   useUnreadCount({
     userId: personal.userId,
-    currentChatRoomId: null,
+    currentChatRoomId: currentChatRoomId!,
   });
 
-  const chatRoomsData = useAppSelector(selectChatRooms);
-
   const renderChatRoom = ({ item }) => {
-    console.log("item is chatRoomList", item);
+    // console.log("item is chatRoomList", item);
     return <ChatRoom chatRoom={item} navigation={navigation} />;
   };
 
@@ -71,8 +74,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   }, [personal.userId, dispatch]);
 
   useEffect(() => {
-    console.log("chatRoomsData is chatRoomList", chatRoomsData);
-
     // 判斷是否有未讀訊息
     const hasUnreadMessages = chatRoomsData?.some((room) => {
       const unreadCount =
@@ -87,27 +88,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,
     });
   }, [navigation, chatRoomsData, personal.userId]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      console.log("focus");
-      console.log("chatRoomsData", chatRoomsData);
-      // setCurrentChatRoomId(null);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  //  useEffect(()=>{
-  //   console.log(1111111111111)
-  //   setCurrentChatRoomId('1111');
-  //  }, [])
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log("222222");
-  //   }, [])
-  // );
 
   return (
     <View style={styles.screen}>

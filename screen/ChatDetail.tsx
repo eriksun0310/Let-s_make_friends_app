@@ -24,16 +24,19 @@ import {
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-import {
-  addChatRoom,
-  resetUnreadUser,
-} from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { useUnreadCount } from "../components/hooks/useUnreadCount";
-import { selectUser, useAppSelector, useAppDispatch } from "../store";
+import {
+  selectUser,
+  useAppSelector,
+  useAppDispatch,
+  addChatRoom,
+  resetUnreadUser,
+  selectCurrentChatRoomId,
+  setCurrentChatRoomId,
+} from "../store";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
@@ -42,16 +45,12 @@ const ChatDetail = ({ route, navigation }) => {
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
 
-  // 監聽未讀數量的變化
-  useUnreadCount({
-    userId: personal.userId,
-    currentChatRoomId: chatRoom.id,
-  });
+  const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
   // 監聽有新訊息的狀態變化
-  const { newMessage } = useNewMessages({ chatRoomId: chatRoom.id });
+  const { newMessage } = useNewMessages({ chatRoomId: currentChatRoomId });
   // 監聽有 已讀訊息的狀態變化
-  const { readMessages } = useReadMessages(chatRoom.id);
+  const { readMessages } = useReadMessages(currentChatRoomId);
 
   const [messages, setMessages] = useState<MessageType[]>(
     preloadedMessages || []
@@ -83,7 +82,7 @@ const ChatDetail = ({ route, navigation }) => {
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    let chatRoomId = chatRoom.id;
+    let chatRoomId = currentChatRoomId;
     if (!chatRoomId) {
       const newChatRoom = await createNewChatRoom(
         personal.userId,
@@ -136,20 +135,13 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
-  // const fetchMessagesIfNeeded = async () => {
-  //   const messagesData = await getMessages(chatRoom.id);
-
-  //   if (messagesData.success) {
-  //     setMessages(messagesData.data);
-  //   }
-  // };
-
+  
   const fetchMessagesIfNeeded = async () => {
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
       setLoading(true);
-      const messageData = await getMessages(chatRoom.id);
+      const messageData = await getMessages(currentChatRoomId);
 
       if (messageData.success) {
         setMessages(messageData.data);
@@ -166,10 +158,10 @@ const ChatDetail = ({ route, navigation }) => {
 
   // 加載聊天記錄(如果聊天室已存在且沒有預加載數據)
   useEffect(() => {
-    if (chatRoom.id) {
+    if (currentChatRoomId) {
       fetchMessagesIfNeeded();
     }
-  }, [chatRoom.id, preloadedMessages]);
+  }, [currentChatRoomId, preloadedMessages]);
 
   // 標記單條訊息已讀
   useEffect(() => {
@@ -216,10 +208,10 @@ const ChatDetail = ({ route, navigation }) => {
   // 進入聊天室時標記全部訊息已讀
   useEffect(() => {
     const markAllMessagesRead = async () => {
-      if (chatRoom.id && personal.userId) {
+      if (currentChatRoomId && personal.userId) {
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
         const success = await markChatRoomMessagesAsRead({
-          chatRoomId: chatRoom.id,
+          chatRoomId: currentChatRoomId,
           userId: personal.userId,
         });
 
@@ -237,14 +229,14 @@ const ChatDetail = ({ route, navigation }) => {
     };
 
     markAllMessagesRead();
-  }, [chatRoom.id, personal.userId]);
+  }, [currentChatRoomId, personal.userId]);
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
     //更新 本地未讀數量歸0
     dispatch(
       resetUnreadUser({
-        chatRoomId: chatRoom.id,
+        chatRoomId: currentChatRoomId,
         resetUnreadUser1: chatRoom.userId1 === personal.userId,
         resetUnreadUser2: chatRoom.userId2 === personal.userId,
       })
@@ -252,7 +244,7 @@ const ChatDetail = ({ route, navigation }) => {
 
     // 更新資料庫的未讀數量歸0
     const result = await resetUnreadCount({
-      chatRoomId: chatRoom.id,
+      chatRoomId: currentChatRoomId!,
       userId: personal.userId,
     });
     if (!result.success) {
@@ -260,6 +252,7 @@ const ChatDetail = ({ route, navigation }) => {
     }
 
     console.log("返回聊天列表", chatRoom);
+    dispatch(setCurrentChatRoomId(null));
     navigation.goBack();
   };
 

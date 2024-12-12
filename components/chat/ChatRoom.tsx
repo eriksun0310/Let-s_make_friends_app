@@ -3,10 +3,9 @@ import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
-import { resetUnreadUser } from "../../store/chatSlice";
+import { resetUnreadUser, setCurrentChatRoomId } from "../../store/chatSlice";
 import { getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
-
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
@@ -36,6 +35,8 @@ const ChatRoom = ({ chatRoom, navigation }) => {
   const handleChatRoomPress = async () => {
     // 開始加載聊天紀錄
     const messages = await getMessages(chatRoom.id);
+    // 記在redux currentChatRoomId
+    dispatch(setCurrentChatRoomId(chatRoom.id));
 
     navigation.navigate("chatDetail", {
       chatRoom: chatRoom,
