@@ -7,8 +7,7 @@ import { User } from "../../shared/types";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "./AlertDialog";
 import { deleteFriend } from "../../util/handleFriendsEvent";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { selectUser, useAppSelector } from "../../store";
 
 interface FriendItemProps {
   friend: User;
@@ -21,7 +20,8 @@ const FriendItem: React.FC<FriendItemProps> = ({
   onDeleteSuccess,
 }) => {
   // 取得個人資料
-  const personal = useSelector((state: RootState) => state.user.user);
+  const personal = useAppSelector(selectUser);
+
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 

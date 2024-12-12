@@ -7,13 +7,11 @@ import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
 import { getAllUsers, sendFriendRequest } from "../util/handleFriendsEvent";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
-import { set } from "firebase/database";
+import { selectUser, useAppSelector } from "../store";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -26,7 +24,8 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
+
   // 取得新的好友
   const { newFriend, newFriendsNumber, markAllAsNotified } = useNewFriend(
     user.userId

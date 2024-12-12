@@ -5,10 +5,9 @@ import { login } from "../util/auth";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
-
-import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/userSlice";
 import { getUserData } from "../util/handlePersonEvent";
+import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {
   navigation: NavigationProp<any>;
@@ -56,7 +55,7 @@ const catchError = ({
 };
 
 const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");

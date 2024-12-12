@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -9,7 +9,6 @@ import {
   House,
   UserRound,
   UserRoundPlus,
-  Dot,
 } from "lucide-react-native";
 import ChatRoomList from "./screen/ChatRoomList";
 import Login from "./screen/Login";
@@ -17,10 +16,8 @@ import Register from "./screen/Register";
 import AboutMe from "./screen/AboutMe";
 import EditUserInfo from "./screen/EditUserInfo";
 import AboutMeSelectOption from "./screen/AboutMeSelectOption";
-import { Provider as ReduxProvider, useSelector } from "react-redux";
-import store, { RootState, useDispatch } from "./store/store";
+import store from "./store/store";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
-import { initializeAuth } from "./store/userSlice";
 import Home from "./screen/Home";
 import ChatDetail from "./screen/ChatDetail";
 import AddFriend from "./screen/AddFriend";
@@ -31,6 +28,15 @@ import PostContent from "./screen/PostContent";
 import Search from "./screen/Search";
 import AddPost from "./screen/AddPost";
 import "react-native-gesture-handler";
+import {
+  useAppDispatch,
+  useAppSelector,
+  initializeAuth,
+  selectInitialized,
+  selectIsAuthenticated,
+  selectIsNewUser,
+  AppReduxProvider,
+} from "./store";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -39,8 +45,6 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainTabNavigator = () => {
-  const user = useSelector((state: RootState) => state.user.user);
-
   return (
     <Tab.Navigator
       // initialRouteName="map"
@@ -62,7 +66,11 @@ const MainTabNavigator = () => {
     >
       <Tab.Screen
         name="chatRoomList"
-        options={{ title: "聊天室", headerTitleAlign: "center" }}
+        options={{
+          title: "聊天室",
+          headerTitleAlign: "center",
+          unmountOnBlur: true,
+        }}
         component={ChatRoomList}
       />
       <Tab.Screen
@@ -118,11 +126,11 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
-  const isNewUser = useSelector((state: RootState) => state.user.isNewUser);
+  const isNewUser = useAppSelector(selectIsNewUser);
+
   // 是否已經登入
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.user.isAuthenticated
-  );
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
   return (
     <Stack.Navigator
       initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}
@@ -195,17 +203,15 @@ const AuthenticatedStack = () => {
 };
 
 const Navigation = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
   }, [dispatch]);
 
   // 應用程式初始化
-  const initialized = useSelector((state: RootState) => state.user.initialized);
+  const initialized = useAppSelector(selectInitialized);
   // 是否已經登入
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.user.isAuthenticated
-  );
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   if (!initialized) {
     return <LoadingOverlay message="loading ..." />; // 顯示載入頁面直到初始化完成
@@ -224,9 +230,9 @@ export default function App() {
   return (
     <>
       <StatusBar style="dark"></StatusBar>
-      <ReduxProvider store={store}>
+      <AppReduxProvider store={store}>
         <Navigation />
-      </ReduxProvider>
+      </AppReduxProvider>
     </>
   );
 }

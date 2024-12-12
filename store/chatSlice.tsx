@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../shared/types";
 import { formatTimeWithDayjs } from "../shared/funcs";
 import { getFriendDetail } from "../util/handleFriendsEvent";
+import { RootState } from "./store";
 
 type ChatRoom = {
   id: string;
@@ -20,17 +21,23 @@ type ChatRoom = {
 
 interface InitialStateProps {
   chatRooms: ChatRoom[];
+  currentChatRoomId?: string | null;
 }
 
 //TODO: 要定義 聊天室的type
 const initialState: InitialStateProps = {
   chatRooms: [],
+  currentChatRoomId: null,
 };
 
 const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
+    setCurrentChatRoomId(state, action) {
+      state.currentChatRoomId = action.payload;
+    },
+
     setChatRooms(state, action) {
       // console.log("setChatRooms 1", action.payload);
       // console.log("setChatRooms 2", state.chatRooms);
@@ -99,8 +106,13 @@ const chatSlice = createSlice({
   },
 });
 
-export const { setChatRooms, addChatRoom, updateChatRoom, resetUnreadUser } =
-  chatSlice.actions;
+export const {
+  setChatRooms,
+  addChatRoom,
+  updateChatRoom,
+  resetUnreadUser,
+  setCurrentChatRoomId,
+} = chatSlice.actions;
 
 export const updateOrCreateChatRoom =
   (payload) => async (dispatch, getState) => {
@@ -146,6 +158,9 @@ export const updateOrCreateChatRoom =
     }
   };
 
-export const selectChatRooms = (state: any) => state.chat;
+export const selectChatRooms = (state: RootState) => state.chat.chatRooms;
+
+export const selectCurrentChatRoomId = (state: RootState) =>
+  state.chat.currentChatRoomId;
 
 export default chatSlice.reducer;

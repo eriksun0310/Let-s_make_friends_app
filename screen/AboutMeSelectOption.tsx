@@ -3,18 +3,17 @@ import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/style";
 import RenderOption from "../components/aboutMe/RenderOption";
-import { SelectedOption, Tabs } from "../shared/types";
+import { SelectedOption } from "../shared/types";
 import { Tab as TabType } from "../shared/types";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { setUser } from "../store/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
+import { selectUser, setUser } from "../store/userSlice";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
 import { saveUserSelectedOption } from "../util/handlePersonEvent";
 import { tabs } from "../shared/static";
 import { Screen } from "../shared/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 type RootStackParamList = {
   aboutMe: undefined;
@@ -39,8 +38,9 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   navigation,
   route,
 }) => {
-  const user = useSelector((state: RootState) => state.user.user);
-  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+
+  const dispatch = useAppDispatch();
   const { currentTab, screen } = route.params;
 
   const [selectedOption, setSelectedOption] = useState<SelectedOption>({});

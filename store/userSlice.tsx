@@ -143,6 +143,16 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
 };
 export const { setUser, setSelectedOption, setIsAuthenticated } =
   userSlice.actions;
-export const selectUser = (state: RootState) => state.user;
+
+
+export const selectUser = (state: RootState) => state.user.user;
+
+export const selectIsNewUser = (state: RootState) => state.user.isNewUser;
+
+export const selectIsAuthenticated = (state: RootState) =>
+  state.user.isAuthenticated;
+
+export const selectInitialized = (state: RootState) => state.user.initialized;
+
 
 export default userSlice.reducer;

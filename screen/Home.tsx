@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Post from "../components/post/Post";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { Search } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Colors } from "../constants/style";
 import CustomFAB from "../components/ui/CustomFAB";
-import { FAB, PaperProvider, Portal } from "react-native-paper";
+import {  PaperProvider } from "react-native-paper";
+import { selectUser, useAppSelector } from "../store";
 
 export const postList = Array(14).fill({
   date: "2024/08/02",
@@ -18,7 +17,8 @@ const Home = ({ navigation }) => {
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
+
 
   useEffect(() => {
     navigation.setOptions({

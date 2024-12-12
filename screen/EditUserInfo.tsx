@@ -1,13 +1,12 @@
 import { View, StyleSheet, Alert } from "react-native";
 import Input from "../components/ui/Input";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../store/userSlice";
-import { RootState } from "../store/store";
+import { selectUser, setUser } from "../store/userSlice";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
 import { updateUser } from "../util/handlePersonEvent";
 import { updateUserTitle } from "../shared/static";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 interface EditUserInfoProps {
   route: {
@@ -22,8 +21,9 @@ interface EditUserInfoProps {
 
 // 編輯個人資料
 const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+
   const { mode, defaultValue } = route.params;
 
   const [value, setValue] = useState("");

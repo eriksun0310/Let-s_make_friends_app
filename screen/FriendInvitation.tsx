@@ -10,6 +10,7 @@ import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { selectUser, useAppSelector } from "../store";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -17,7 +18,7 @@ interface FriendInvitationProps {
 
 //交友邀請
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
 
   const { friendRequests, loading } = useFriendRequests(user.userId);
 

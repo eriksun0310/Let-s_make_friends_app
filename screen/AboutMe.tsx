@@ -5,9 +5,7 @@ import Input from "../components/ui/Input";
 import AgeCalculator from "../components/ui/AgeCalculator";
 import { Gender, HeadShot as HeadShotType, User } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../store/userSlice";
-import { RootState } from "../store/store";
+import { selectUser, setUser } from "../store/userSlice";
 import { useEffect, useState } from "react";
 import { checkRequired } from "../shared/funcs";
 import { NavigationProp } from "@react-navigation/native";
@@ -15,14 +13,16 @@ import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
 import { saveAboutMe } from "../util/handlePersonEvent";
 import { userInit } from "../shared/static";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 interface AboutMeProps {
   navigation: NavigationProp<any>;
 }
 
 const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
-  const user = useSelector((state: RootState) => state.user.user);
-  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+
+  const dispatch = useAppDispatch();
 
   const [form, setForm] = useState<User>(userInit);
 

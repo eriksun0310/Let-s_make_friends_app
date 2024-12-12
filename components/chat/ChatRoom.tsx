@@ -3,14 +3,15 @@ import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
-import { useDispatch, useSelector } from "react-redux";
 import { resetUnreadUser } from "../../store/chatSlice";
-import { RootState } from "../../store/store";
 import { getMessages } from "../../util/handleChatEvent";
+import { selectUser, useAppDispatch, useAppSelector } from "../../store";
+
 
 const ChatRoom = ({ chatRoom, navigation }) => {
-  const personal = useSelector((state: RootState) => state.user.user);
-  const dispatch = useDispatch();
+  const personal = useAppSelector(selectUser);
+
+  const dispatch = useAppDispatch();
   // 好友資料
   const friend = chatRoom.friend;
 

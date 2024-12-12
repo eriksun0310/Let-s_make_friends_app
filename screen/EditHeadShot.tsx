@@ -3,16 +3,13 @@ import { View, StyleSheet } from "react-native";
 import SelectedHeadShot from "../components/editHeadShot/SelectedHeadShot";
 import AllHeadShot from "../components/editHeadShot/AllHeadShot";
 import { HeadShot } from "../shared/types";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { setUser } from "../store/userSlice";
 import { NavigationProp } from "@react-navigation/native";
-
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
 import { saveUserHeadShot } from "../util/handlePersonEvent";
 import { Screen } from "../shared/types";
+import { selectUser, setUser, useAppDispatch, useAppSelector } from "../store";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
@@ -24,11 +21,10 @@ interface AvatarCreatorProps {
 }
 
 const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { screen } = route.params;
-
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
 
   const [headShot, setHeadShot] = useState<HeadShot>({
     imageUrl: "",

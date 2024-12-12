@@ -9,6 +9,7 @@ import { RootState } from "../store/store";
 import { getFriendList } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { selectUser, useAppSelector } from "../store";
 
 interface FriendListProps {
   navigation: NavigationProp<any>;
@@ -26,7 +27,8 @@ const testFriendList = Array(14).fill({
 
 //好友列表
 const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
+
   const [friendList, setFriendList] = useState([]);
 
   const [loading, setLoading] = useState(false);

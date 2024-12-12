@@ -10,13 +10,14 @@ import Post from "../components/post/Post";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import BackButton from "../components/ui/button/BackButton";
+import { selectUser, useAppSelector } from "../store";
 
 interface PostContentProps {
   navigation: NavigationProp<any>;
 }
 //貼文內容
 const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
 
   useEffect(() => {
     navigation.setOptions({

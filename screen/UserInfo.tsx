@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
-import { RootState, useDispatch } from "../store/store";
-import { logout } from "../store/userSlice";
+import { RootState } from "../store/store";
+
 import { useSelector } from "react-redux";
 import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
@@ -16,6 +16,7 @@ import Button from "../components/ui/button/Button";
 import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoom } from "../util/handleChatEvent";
+import { logout, selectUser, useAppDispatch, useAppSelector } from "../store";
 
 interface UserInfoProps {
   route: {
@@ -38,8 +39,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     friend,
     isShowMsgIcon = false,
   } = route.params || { userState: "personal" };
-  const dispatch = useDispatch();
-  const personal = useSelector((state: RootState) => state.user.user);
+  const dispatch = useAppDispatch();
+  const personal = useAppSelector(selectUser);
+
 
   // 判斷 要取 個人還是好友 資料
   const user = userState === "personal" ? personal : friend;

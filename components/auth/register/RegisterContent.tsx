@@ -5,8 +5,9 @@ import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import RegisterForm from "./RegisterForm";
 import type { Form, RegisterIsValid } from "../../../shared/types";
 import { logout } from "../../../store/userSlice";
-import { useDispatch } from "../../../store/store";
+
 import FlatButton from "../../ui/button/FlatButton";
+import { useAppDispatch } from "../../../store/hooks";
 
 const initIsValid = {
   email: { value: false, errorText: "" },
@@ -18,7 +19,7 @@ interface RegisterContentProps {
 }
 
 const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation();
   // 檢查輸入資訊,是否有符合規則
   const [isValid, setIsValid] = useState<RegisterIsValid>(initIsValid);

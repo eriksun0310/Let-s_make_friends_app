@@ -15,8 +15,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import BackButton from "../components/ui/button/BackButton";
 import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import {
   createNewChatRoom,
   getMessages,
@@ -29,21 +27,20 @@ import Message from "../components/chat/Message";
 import {
   addChatRoom,
   resetUnreadUser,
-  updateChatRoom,
 } from "../store/chatSlice";
 import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
 import { useReadMessages } from "../components/hooks/useReadMessages";
-import { set } from "firebase/database";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useUnreadCount } from "../components/hooks/useUnreadCount";
+import { selectUser, useAppSelector, useAppDispatch } from "../store";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { chatRoom, messages: preloadedMessages } = route.params;
   const friend = chatRoom?.friend;
-  const personal = useSelector((state: RootState) => state.user.user);
+  const personal = useAppSelector(selectUser);
 
   // 監聽未讀數量的變化
   useUnreadCount({

@@ -17,8 +17,8 @@ import {
   acceptedFriendRequest,
   rejectedFriendRequest,
 } from "../../util/handleFriendsEvent";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { selectUser, useAppSelector } from "../../store";
+
 type FriendActionType = "accepted" | "rejected";
 
 interface FriendCardProps {
@@ -40,7 +40,9 @@ const FriendCard: React.FC<FriendCardProps> = ({
     accepted: false,
     rejected: false,
   });
-  const user = useSelector((state: RootState) => state.user.user);
+  // const user =/ useSelector((state: RootState) => state.user.user);
+  const user = useAppSelector(selectUser);
+
   // 點擊 好友資訊
   const clickSearch = () => {
     navigation.navigate?.("userInfoFriend", {

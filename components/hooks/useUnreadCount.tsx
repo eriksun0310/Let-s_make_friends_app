@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { supabase } from "../../util/supabaseClient";
-import { updateChatRoom, updateOrCreateChatRoom } from "../../store/chatSlice";
+import {  updateOrCreateChatRoom } from "../../store/chatSlice";
 import { updateUnreadCount } from "../../util/handleChatEvent";
+import { useAppDispatch } from "../../store";
+
 
 // 監聽所有聊天室的新訊息, 並根據訊息狀態,更新未讀訊息數量
 export const useUnreadCount = ({
@@ -12,9 +13,15 @@ export const useUnreadCount = ({
   userId: string;
   currentChatRoomId: string | null;
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    if (!userId) return;
+    console.log("useUnreadCount - userId:", userId);
+    console.log("useUnreadCount - currentChatRoomId:", currentChatRoomId);
+
+    if (!userId) {
+      console.log("useUnreadCount - No userId, returning");
+      return;
+    }
 
     // 監聽新訊息
     const subscription = supabase
@@ -99,5 +106,5 @@ export const useUnreadCount = ({
     return () => {
       supabase.removeChannel(subscription); // 清理監聽
     };
-  }, [userId, dispatch, currentChatRoomId]);
+  }, [dispatch, currentChatRoomId]);
 };

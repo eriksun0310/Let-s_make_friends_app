@@ -1,15 +1,18 @@
 import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
-import { Avatar } from "react-native-elements";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useEffect } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { setChatRooms } from "../store/chatSlice";
 import { useUnreadCount } from "../components/hooks/useUnreadCount";
 import { NavigationProp } from "@react-navigation/native";
 import { Dot } from "lucide-react-native";
+import {
+  selectUser,
+  useAppDispatch,
+  useAppSelector,
+  selectChatRooms,
+  setChatRooms,
+} from "../store";
 const chatData = [
   // {
   //   birthday: "1998-11-03",
@@ -39,8 +42,10 @@ interface ChatRoomListProps {
 
 // 聊天室列表
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+
+  // const [currentChatRoomId, setCurrentChatRoomId] = useState("");
 
   // 監聽未讀數量的變化
   useUnreadCount({
@@ -48,7 +53,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     currentChatRoomId: null,
   });
 
-  const chatRoomsData = useSelector((state: RootState) => state.chat.chatRooms);
+  const chatRoomsData = useAppSelector(selectChatRooms);
 
   const renderChatRoom = ({ item }) => {
     console.log("item is chatRoomList", item);
@@ -82,6 +87,27 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,
     });
   }, [navigation, chatRoomsData, user.userId]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      console.log("focus");
+      console.log("chatRoomsData", chatRoomsData);
+      // setCurrentChatRoomId(null);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  //  useEffect(()=>{
+  //   console.log(1111111111111)
+  //   setCurrentChatRoomId('1111');
+  //  }, [])
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     console.log("222222");
+  //   }, [])
+  // );
 
   return (
     <View style={styles.screen}>
