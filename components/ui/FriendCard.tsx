@@ -40,8 +40,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
     accepted: false,
     rejected: false,
   });
-  // const user =/ useSelector((state: RootState) => state.user.user);
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   // 點擊 好友資訊
   const clickSearch = () => {
@@ -70,7 +69,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
         case "accepted":
           result = await acceptedFriendRequest({
             senderId: targetUserId,
-            receiverId: user.userId,
+            receiverId: personal.userId,
           });
 
           break;
@@ -78,7 +77,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
         case "rejected":
           result = await rejectedFriendRequest({
             senderId: targetUserId,
-            receiverId: user.userId,
+            receiverId: personal.userId,
           });
 
           break;

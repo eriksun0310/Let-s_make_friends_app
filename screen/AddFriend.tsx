@@ -24,11 +24,11 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   // 取得新的好友
   const { newFriend, newFriendsNumber, markAllAsNotified } = useNewFriend(
-    user.userId
+    personal.userId
   );
 
   //取得交友邀請
@@ -37,7 +37,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     loading,
     newFriendRequestNumber,
     markInvitationsAsRead,
-  } = useFriendRequests(user.userId);
+  } = useFriendRequests(personal.userId);
 
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -45,7 +45,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   // 可以成為好友的用戶資料
   const fetchAllUsers = async () => {
     try {
-      const userData = (await getAllUsers(user.userId)) as User[];
+      const userData = (await getAllUsers(personal.userId)) as User[];
       setAllUsers(userData);
     } catch (error) {
       console.log("取得 可以成為好友的用戶資料  錯誤", error);
@@ -56,7 +56,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const clickAddFriend = async (receiverId: string) => {
     try {
       const result = await sendFriendRequest({
-        senderId: user.userId,
+        senderId: personal.userId,
         receiverId: receiverId,
       });
       if (!result.success) {

@@ -18,9 +18,9 @@ interface FriendInvitationProps {
 
 //交友邀請
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
-  const { friendRequests, loading } = useFriendRequests(user.userId);
+  const { friendRequests, loading } = useFriendRequests(personal.userId);
 
   useEffect(() => {
     navigation.setOptions({

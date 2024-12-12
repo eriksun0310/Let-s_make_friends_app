@@ -22,7 +22,7 @@ interface EditUserInfoProps {
 // 編輯個人資料
 const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   const { mode, defaultValue } = route.params;
 
@@ -39,10 +39,10 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
       Alert.alert("請填寫空白處");
     } else {
       // 更新回redux
-      dispatch(setUser({ ...user, [mode]: value }));
+      dispatch(setUser({ ...personal, [mode]: value }));
       // 更新supabase
       await updateUser({
-        userId: user.userId,
+        userId: personal.userId,
         fieldName: mode,
         fieldValue: value,
       });

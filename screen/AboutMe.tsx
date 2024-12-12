@@ -20,7 +20,7 @@ interface AboutMeProps {
 }
 
 const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
 
@@ -75,16 +75,16 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
   }, [navigation, form]);
 
   useEffect(() => {
-    if (user) {
+    if (personal) {
       setForm((prev) => ({
         ...prev,
-        userId: user.userId,
-        email: user.email,
-        selectedOption: user.selectedOption,
-        headShot: user.headShot,
+        userId: personal.userId,
+        email: personal.email,
+        selectedOption: personal.selectedOption,
+        headShot: personal.headShot,
       }));
     }
-  }, [user]);
+  }, [personal]);
 
   // useEffect(()=>{
   //   const aa = async () => {

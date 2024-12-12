@@ -24,7 +24,7 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
 
   const { screen } = route.params;
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   const [headShot, setHeadShot] = useState<HeadShot>({
     imageUrl: "",
@@ -33,18 +33,18 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
 
   // 預設選中的大頭貼
   useEffect(() => {
-    setHeadShot(user.headShot);
-  }, [user]);
+    setHeadShot(personal.headShot);
+  }, [personal]);
 
   const handleSave = async () => {
     // 更新回redux
-    dispatch(setUser({ ...user, headShot }));
+    dispatch(setUser({ ...personal, headShot }));
 
     // 判斷哪個畫面需要打api
     if (screen === "userInfo") {
       await saveUserHeadShot({
         user: {
-          ...user,
+          ...personal,
           headShot,
         },
       });

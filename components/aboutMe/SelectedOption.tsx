@@ -8,7 +8,7 @@ import { selectUser, useAppSelector } from "../../store";
 
 // 興趣、喜歡的食物、不喜歡的食物
 const SelectedOption = () => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   return (
     <>
@@ -17,7 +17,7 @@ const SelectedOption = () => {
           <MultipleText
             key={key}
             currentTab={key as Tab}
-            dataList={user.selectedOption[key]}
+            dataList={personal.selectedOption[key]}
           />
         );
       })}

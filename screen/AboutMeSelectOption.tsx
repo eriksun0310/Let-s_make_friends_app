@@ -38,7 +38,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   navigation,
   route,
 }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
   const { currentTab, screen } = route.params;
@@ -86,13 +86,13 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
 
   const handleSave = async () => {
     // 更新回redux
-    dispatch(setUser({ ...user, selectedOption }));
+    dispatch(setUser({ ...personal, selectedOption }));
 
     // 判斷哪個畫面需要打api
     if (screen === "userInfo") {
       await saveUserSelectedOption({
         user: {
-          ...user,
+          ...personal,
           selectedOption,
         },
       });
@@ -114,9 +114,9 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   useEffect(() => {
     setSelectedOption((prev) => ({
       ...prev,
-      ...user.selectedOption,
+      ...personal.selectedOption,
     }));
-  }, [user]);
+  }, [personal]);
 
   return (
     <View style={styles.screen}>

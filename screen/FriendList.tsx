@@ -27,7 +27,7 @@ const testFriendList = Array(14).fill({
 
 //好友列表
 const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   const [friendList, setFriendList] = useState([]);
 
@@ -37,7 +37,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   const fetchFriendList = async () => {
     setLoading(true);
     try {
-      const data = await getFriendList(user.userId);
+      const data = await getFriendList(personal.userId);
       setFriendList(data);
     } catch (error) {
       console.log("取得好友列表 錯誤", error);
@@ -63,7 +63,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     });
 
     fetchFriendList();
-  }, [navigation, user]);
+  }, [navigation, personal]);
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
 

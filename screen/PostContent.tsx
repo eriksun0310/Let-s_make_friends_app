@@ -17,7 +17,7 @@ interface PostContentProps {
 }
 //貼文內容
 const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   useEffect(() => {
     navigation.setOptions({
@@ -31,7 +31,7 @@ const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* 貼文內容 */}
-          <Post mode="personal" date="2024/08/02" user={user} />
+          <Post mode="personal" date="2024/08/02" user={personal} />
 
           <View
             style={{

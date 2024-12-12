@@ -43,13 +43,13 @@ interface ChatRoomListProps {
 // 聊天室列表
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
   // const [currentChatRoomId, setCurrentChatRoomId] = useState("");
 
   // 監聽未讀數量的變化
   useUnreadCount({
-    userId: user.userId,
+    userId: personal.userId,
     currentChatRoomId: null,
   });
 
@@ -62,13 +62,13 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchChatData = async () => {
-      const rooms = await getAllChatRooms(user.userId);
+      const rooms = await getAllChatRooms(personal.userId);
       console.log("rooms is chatRoomList", rooms);
       dispatch(setChatRooms(rooms));
     };
 
     fetchChatData();
-  }, [user.userId, dispatch]);
+  }, [personal.userId, dispatch]);
 
   useEffect(() => {
     console.log("chatRoomsData is chatRoomList", chatRoomsData);
@@ -76,7 +76,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     // 判斷是否有未讀訊息
     const hasUnreadMessages = chatRoomsData?.some((room) => {
       const unreadCount =
-        room.userId1 === user.userId
+        room.userId1 === personal.userId
           ? room.unreadCountUser1
           : room.unreadCountUser2;
       return unreadCount > 0;
@@ -86,7 +86,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       // 動態設置底部導航的 tabBarBadge
       tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,
     });
-  }, [navigation, chatRoomsData, user.userId]);
+  }, [navigation, chatRoomsData, personal.userId]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {

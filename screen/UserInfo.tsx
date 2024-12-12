@@ -46,6 +46,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   // 判斷 要取 個人還是好友 資料
   const user = userState === "personal" ? personal : friend;
 
+
+  console.log('user  UserInfo', user);
+
   const handleLogout = () => {
     dispatch(logout()).then(() => {
       navigation.navigate("login");

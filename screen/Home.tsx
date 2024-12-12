@@ -17,7 +17,7 @@ const Home = ({ navigation }) => {
   const onStateChange = ({ open }) => setState({ open });
 
   const { open } = state;
-  const user = useAppSelector(selectUser);
+  const personal = useAppSelector(selectUser);
 
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const Home = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => navigation.navigate("postContent")}
             >
-              <Post mode="personal" date={post.date} user={user} />
+              <Post mode="personal" date={post.date} user={personal} />
             </TouchableOpacity>
           ))}
         </ScrollView>
