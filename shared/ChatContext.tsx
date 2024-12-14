@@ -1,6 +1,5 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { Message } from "./types";
-import { child } from "firebase/database";
 import { useChatListeners } from "../components/hooks/useChatListeners";
 
 // 定義 Context 類型
@@ -11,7 +10,7 @@ interface Value {
 
 // 創建 Context
 const ChatContext = createContext<Value>({
-  newMessage: {} as Message,
+  newMessage: null,
   readMessages: [], // TODO: 不確定 是不是 Message[]
 });
 
@@ -22,14 +21,17 @@ export const ChatContextProvider: React.FC<{
 }> = ({ children }) => {
   const { newMessage, readMessages } = useChatListeners();
 
-  return (
-    <ChatContext.Provider
-      value={{
-        newMessage,
-        readMessages,
-      }}
-    >
-      {children}
-    </ChatContext.Provider>
+  // const value = {
+  //   newMessage: newMessage || null,
+  //   readMessages,
+  // };
+
+  const value = useMemo(
+    () => ({
+      newMessage: newMessage || null, // 確保初始值不為 undefined
+      readMessages: readMessages || [], // 確保初始值不為 undefined
+    }),
+    [newMessage, readMessages]
   );
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };

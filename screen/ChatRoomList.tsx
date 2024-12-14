@@ -15,8 +15,8 @@ import {
   selectCurrentChatRoomId,
 } from "../store";
 import React from "react";
-import { useUnreadCount } from "../components/hooks/useUnreadCount";
-import { ChatContextProvider } from "../shared/ChatContext";
+//import { useUnreadCount } from "../components/hooks/useUnreadCount";
+//import { ChatContextProvider } from "../shared/ChatContext";
 const chatData = [
   // {
   //   birthday: "1998-11-03",
@@ -51,7 +51,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   const chatRoomsData = useAppSelector(selectChatRooms);
 
-  const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
+  //const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
   // 監聽未讀數量的變化
   // useUnreadCount({
@@ -91,7 +91,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   }, [navigation, chatRoomsData, personal.userId]);
 
   return (
-    <ChatContextProvider>
+    // <ChatContextProvider>
       <View style={styles.screen}>
         <FlatList
           data={chatRoomsData}
@@ -99,7 +99,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
           keyExtractor={(item) => item?.id}
         />
       </View>
-    </ChatContextProvider>
+    // </ChatContextProvider>
   );
 };
 const styles = StyleSheet.create({

@@ -24,9 +24,9 @@ import {
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-import { useNewMessages } from "../components/hooks/useNewMessages";
+//import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
-import { useReadMessages } from "../components/hooks/useReadMessages";
+//import { useReadMessages } from "../components/hooks/useReadMessages";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectUser,
@@ -42,6 +42,8 @@ import { useChatContext } from "../shared/ChatContext";
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
+
+  //console.log('進到聊天室')
   const dispatch = useAppDispatch();
   const { chatRoom, messages: preloadedMessages } = route.params;
   const friend = chatRoom?.friend;
@@ -49,13 +51,7 @@ const ChatDetail = ({ route, navigation }) => {
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
-  const {newMessage , readMessages } = useChatContext()
-
-  // 監聽有新訊息的狀態變化
-  // const { newMessage } = useNewMessages({ chatRoomId: currentChatRoomId });
-  // 監聽有 已讀訊息的狀態變化
-  // const { readMessages } = useReadMessages(currentChatRoomId);
-
+  const { newMessage, readMessages } = useChatContext();
   const [messages, setMessages] = useState<MessageType[]>(
     preloadedMessages || []
   );
@@ -139,7 +135,6 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
-  
   const fetchMessagesIfNeeded = async () => {
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
@@ -189,16 +184,7 @@ const ChatDetail = ({ route, navigation }) => {
         return isDuplicate ? prevMessages : [...prevMessages, newMessage];
       });
 
-      // 如果新訊息屬於當前聊天室,清零未讀數量
-      // if (newMessage.chat_room_id === chatRoom.id) {
-      //   dispatch(
-      //     resetUnreadUser({
-      //       chatRoomId: chatRoom.id,
-      //       resetUnreadUser1: chatRoom.userId1 === personal.userId,
-      //       resetUnreadUser2: chatRoom.userId2 === personal.userId,
-      //     })
-      //   );
-      // }
+      
     }
   }, [newMessage, personal.userId]);
 

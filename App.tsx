@@ -37,6 +37,7 @@ import {
   selectIsNewUser,
   AppReduxProvider,
 } from "./store";
+import { ChatContextProvider } from "./shared/ChatContext";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -219,9 +220,13 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      {/* <AuthenticatedStack /> */}
-      {/* <></> */}
-      {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
+      {isAuthenticated ? (
+        <ChatContextProvider>
+          <AuthenticatedStack />
+        </ChatContextProvider>
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 };
@@ -231,7 +236,9 @@ export default function App() {
     <>
       <StatusBar style="dark"></StatusBar>
       <AppReduxProvider store={store}>
+        {/* <ChatContextProvider> */}
         <Navigation />
+        {/* </ChatContextProvider> */}
       </AppReduxProvider>
     </>
   );

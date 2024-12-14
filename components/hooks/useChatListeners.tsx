@@ -16,7 +16,7 @@ export const useChatListeners = () => {
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
   const dispatch = useAppDispatch();
 
-  const [newMessage, setNewMessage] = useState<Message | null>(null);
+  const [newMessage, setNewMessage] = useState<Message>();
   const [readMessages, setReadMessages] = useState<Message[]>([]);
 
   useEffect(() => {
@@ -93,7 +93,15 @@ export const useChatListeners = () => {
           },
           (payload) => {
             console.log("newMsg is useChatListeners", payload.new);
-            setNewMessage(payload.new);
+            const newMessage = payload.new;
+            console.log(
+              "currentChatRoomId is useChatListeners",
+              currentChatRoomId
+            );
+
+            if (newMessage.chat_room_id === currentChatRoomId) {
+              setNewMessage(newMessage);
+            }
           }
         )
         .subscribe();
@@ -112,7 +120,7 @@ export const useChatListeners = () => {
           },
           (payload) => {
             console.log("readMessages is useChatListeners", payload.new);
-            setReadMessages((prev) => [...prev, payload.new]);
+            setReadMessages((prev) => [...prev, payload.new.id]);
           }
         )
         .subscribe();
@@ -127,6 +135,7 @@ export const useChatListeners = () => {
     };
   }, [userId, currentChatRoomId, dispatch]);
 
+  console.log("newMessage state is useChatListeners", newMessage);
   return {
     newMessage,
     readMessages,

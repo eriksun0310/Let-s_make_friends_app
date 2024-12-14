@@ -69,13 +69,13 @@ const chatSlice = createSlice({
 
       // 如果聊天室存在
       if (chatRoom) {
-        console.log("Before update:", { ...chatRoom });
+        //console.log("Before update:", { ...chatRoom });
         // 更新最後訊息和時間
         chatRoom.lastMessage = lastMessage;
         chatRoom.lastTime = formatTimeWithDayjs(lastTime);
         chatRoom.unreadCountUser1 += incrementUser1 || 0;
         chatRoom.unreadCountUser2 += incrementUser2 || 0;
-        console.log("After update:", { ...chatRoom });
+        //console.log("After update:", { ...chatRoom });
       }
     },
 
