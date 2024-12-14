@@ -42,15 +42,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
-
   // 判斷 要取 個人還是好友 資料
   const user = userState === "personal" ? personal : friend;
 
-
-  console.log('user  UserInfo', user);
-
+  //登出
   const handleLogout = () => {
-    dispatch(logout()).then(() => {
+    dispatch(logout(personal.userId)).then(() => {
       navigation.navigate("login");
     });
   };
