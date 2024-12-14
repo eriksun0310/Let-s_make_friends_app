@@ -1,8 +1,13 @@
 import { User } from "../shared/types";
 import { supabase } from "./supabaseClient";
 
-
-// 處理 個人資料 db 操作(users、user_selected_option、user_head_shot)
+/*
+處理 個人資料 db 操作
+users:個人資料
+user_selected_option:興趣選項
+user_head_shot: 大頭貼
+user_online_status: 用戶在線狀態
+*/
 
 // 取得用戶資料
 export const getUserData = async ({
@@ -103,6 +108,10 @@ export const saveAboutMe = async ({ user }: { user: User }) => {
 
     // 儲存自己的選項
     await saveUserSelectedOption({ user });
+
+    // 儲存自己的在線狀態
+    await updateUserOnlineStatus({ userId: user.userId, isOnline: true });
+
   } catch (error) {
     console.error("Error updating saveAboutMe:", error);
   }
@@ -188,23 +197,50 @@ export const saveUserHeadShot = async ({ user }: { user: User }) => {
 // 儲存用戶興趣選項
 export const saveUserSelectedOption = async ({ user }: { user: User }) => {
   try {
-    const { error } = await supabase
-      .from("user_selected_option")
-      .upsert(
-        {
-          user_id: user.userId,
-          interests: user.selectedOption?.interests,
-          favorite_food: user.selectedOption?.favoriteFood,
-          disliked_food: user.selectedOption?.dislikedFood,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" } // 衝突鍵為 user_id
-      );
+    const { error } = await supabase.from("user_selected_option").upsert(
+      {
+        user_id: user.userId,
+        interests: user.selectedOption?.interests,
+        favorite_food: user.selectedOption?.favoriteFood,
+        disliked_food: user.selectedOption?.dislikedFood,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" } // 衝突鍵為 user_id
+    );
 
     if (error) {
       throw new Error(`Error saving user options: ${error.message}`);
     }
   } catch (error) {
     console.error("Error saving user options:", error.message);
+  }
+};
+
+// 更新用戶在線狀態
+export const updateUserOnlineStatus = async ({
+  userId,
+  isOnline,
+}: {
+  userId: string;
+  isOnline: boolean;
+}) => {
+  console.log('updateUserOnlineStatus', userId, isOnline)
+  try {
+    const { error } = await supabase.from("user_online_status").upsert(
+      {
+        user_id: userId,
+        is_online: isOnline,
+        last_seen: new Date().toISOString(),
+      },
+      {
+        onConflict: "user_id",
+      }
+    );
+
+    if (error) {
+      console.error("Error updating user_online_status:", error);
+    }
+  } catch (error) {
+    console.error("Unexpected error updating user online status:", error);
   }
 };

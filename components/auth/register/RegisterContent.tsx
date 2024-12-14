@@ -55,10 +55,7 @@ const RegisterContent: React.FC<RegisterContentProps> = ({ getFormValue }) => {
 
   // 回到登入頁面
   const backToLogin = () => {
-    // authCtx.logout();
-    dispatch(logout()).then(() => {
-      navigation.navigate("login");
-    });
+    navigation.navigate("login");
   };
 
   return (

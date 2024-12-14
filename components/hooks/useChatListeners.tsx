@@ -60,6 +60,7 @@ export const useChatListeners = () => {
             // 判斷是否當前聊天室
             const isInSameChatRoom = currentChatRoomId === newMsg.chat_room_id;
 
+            // 只有在不在同一聊天室時，才更新資料庫的未讀數量
             if (!isInSameChatRoom) {
               const result = await updateUnreadCount({
                 chatRoomId: newMsg.chat_room_id,
@@ -73,6 +74,9 @@ export const useChatListeners = () => {
                 );
               }
             }
+            // 如果訊息是自己發的，更新對方聊天室的未讀數量
+          }else {
+            console.log('newMsg.recipient_id 登出狀態 ', newMsg.recipient_id)
           }
         }
       )

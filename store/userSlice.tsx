@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
-import { getUserData } from "../util/handlePersonEvent";
+import { getUserData, updateUserOnlineStatus } from "../util/handlePersonEvent";
 import { supabase } from "../util/supabaseClient";
 
 interface InitialStateProps {
@@ -91,23 +91,35 @@ const userSlice = createSlice({
 });
 
 // 將 logout 定義為一個 thunk，用來登出用戶(因為非同步操作，所以用 thunk)
-export const logout = (): AppThunk => async (dispatch) => {
-  try {
-    await supabase.auth.signOut();
-    dispatch(userSlice.actions.setUser(initialState.user)); // 清除用戶信息
-    dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置為未認證
+export const logout =
+  (userId: string): AppThunk =>
+  async (dispatch) => {
+    try {
+      // 更新用戶離線狀態
+      if (userId) {
+        await updateUserOnlineStatus({
+          userId: userId,
+          isOnline: false,
+        });
+      }
 
-    return Promise.resolve();
-  } catch (error) {
-    console.log("error", error);
-    return Promise.reject(error);
-  }
-};
+      await supabase.auth.signOut();
+      dispatch(userSlice.actions.setUser(initialState.user)); // 清除用戶信息
+      dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置為未認證
+
+      return Promise.resolve();
+    } catch (error) {
+      console.log("error", error);
+      return Promise.reject(error);
+    }
+  };
 
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Supabase 認證狀態
 export const initializeAuth = (): AppThunk => async (dispatch) => {
   // 使用 onAuthStateChange 來監聽認證狀態變化
   supabase.auth.onAuthStateChange(async (event, session) => {
+    // console.log("session", session);
+    // 不管是註冊還是登入都會有 session
     if (session) {
       const user = session.user;
       const userData = await getUserData({
@@ -121,7 +133,6 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
       } else {
         // 新用戶登入
 
-        // await createNewUser({ userId: user.id, email: user.email });
         dispatch(
           userSlice.actions.setUser({
             userId: user.id,
@@ -144,7 +155,6 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
 export const { setUser, setSelectedOption, setIsAuthenticated } =
   userSlice.actions;
 
-
 export const selectUser = (state: RootState) => state.user.user;
 
 export const selectIsNewUser = (state: RootState) => state.user.isNewUser;
@@ -153,6 +163,5 @@ export const selectIsAuthenticated = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectInitialized = (state: RootState) => state.user.initialized;
-
 
 export default userSlice.reducer;

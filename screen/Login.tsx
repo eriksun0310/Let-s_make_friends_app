@@ -6,7 +6,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 import { setUser } from "../store/userSlice";
-import { getUserData } from "../util/handlePersonEvent";
+import { getUserData, updateUserOnlineStatus } from "../util/handlePersonEvent";
 import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {
@@ -76,9 +76,18 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         userId,
       });
 
+      // 舊用戶
       if (userData) {
+        // 更新用戶在線狀態
+        await updateUserOnlineStatus({
+          userId: userId,
+          isOnline: true,
+        });
+
         dispatch(setUser(userData));
         navigation.navigate("main", { screen: "chatRoomList" }); // 如果用戶資料完整，跳轉聊天頁面
+
+        // 新用戶
       } else {
         navigation.navigate("aboutMe"); // 如果用戶資料不存在，導航到 aboutMe
       }
