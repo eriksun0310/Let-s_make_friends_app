@@ -82,7 +82,8 @@ const ChatDetail = ({ route, navigation }) => {
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    let chatRoomId = currentChatRoomId;
+
+    let chatRoomId = currentChatRoomId; // redux 的
     if (!chatRoomId) {
       const newChatRoom = await createNewChatRoom(
         personal.userId,
@@ -94,6 +95,7 @@ const ChatDetail = ({ route, navigation }) => {
       }
       chatRoomId = newChatRoom.id;
       dispatch(addChatRoom(newChatRoom));
+      dispatch(setCurrentChatRoomId(newChatRoom.id));
     }
 
     const tempId = `temp_${Date.now()}`;

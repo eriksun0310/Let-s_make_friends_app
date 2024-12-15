@@ -1,0 +1,65 @@
+// ChatDetail.tsx 的發送訊息
+
+const handleSend = async () => {
+  if (!inputText.trim()) return;
+
+  console.log("currentChatRoomId chatDetail", currentChatRoomId);
+
+  // 確保聊天室存在
+  let chatRoomId = await ensureChatRoom();
+
+  // 創建臨時訊息
+  const tempMessage = createTempMessage(chatRoomId, inputText);
+  setMessages((prevMessages) => [...prevMessages, tempMessage]);
+  setInputText("");
+
+  // 發送訊息
+  await processMessage(tempMessage, inputText, chatRoomId);
+};
+
+const ensureChatRoom = async () => {
+  if (currentChatRoomId) return currentChatRoomId;
+
+  const newChatRoom = await createNewChatRoom(personal.userId, friend.userId);
+  if (newChatRoom.error) {
+    console.error("Failed to create chat room:", newChatRoom.error);
+    throw new Error("Failed to create chat room");
+  }
+
+  const chatRoomId = newChatRoom.id;
+  dispatch(addChatRoom(newChatRoom));
+  dispatch(setCurrentChatRoomId(chatRoomId));
+  return chatRoomId;
+};
+
+const createTempMessage = (chatRoomId, content) => ({
+  id: `temp_${Date.now()}`,
+  sender_id: personal.userId,
+  recipient_id: friend.userId,
+  content,
+  chatRoomId,
+  created_at: new Date().toISOString(),
+  isTemporary: true,
+});
+
+const processMessage = async (tempMessage, content, chatRoomId) => {
+  const result = await sendMessage({
+    userId: personal.userId,
+    friendId: friend.userId,
+    message: content,
+    chatRoomId,
+  });
+
+  if (result.error) {
+    console.error("Failed to send message:", result.error);
+    updateMessageStatus(tempMessage.id, {
+      isTemporary: false,
+      failed: true,
+    });
+  } else {
+    updateMessageStatus(tempMessage.id, {
+      ...result.data,
+      isTemporary: false,
+    });
+  }
+};

@@ -90,6 +90,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     });
   }, [navigation, chatRoomsData, personal.userId]);
 
+
+
   return (
     // <ChatContextProvider>
       <View style={styles.screen}>

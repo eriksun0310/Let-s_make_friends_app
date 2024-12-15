@@ -9,7 +9,6 @@ import {
 } from "../../store";
 import { supabase } from "../../util/supabaseClient";
 import { updateUnreadCount } from "../../util/handleChatEvent";
-import { isUserOnline } from "../../util/handlePersonEvent";
 
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
@@ -72,27 +71,30 @@ export const useChatListeners = () => {
                 result.error
               );
             }
-            // 如果傳訊息的對方不在線上，更新對方未讀數量
-          } else {
-            // 檢查對方是否在線上
-            const isOnline = await isUserOnline(newMsg.recipient_id);
 
-            if (!isOnline) {
-              const result = await updateUnreadCount({
-                chatRoomId: newMsg.chat_room_id,
-                userId: newMsg.recipient_id,
-              });
+            /*
+            如果訊息是自己發的，更新對方聊天室的未讀數量
+            以後在考慮 是否要先檢查對方是否在線上才去更新資料庫的未讀數量
+            */
+           } 
+          // else {
+          //   console.log("newMsg.recipient_id 登出狀態 ", newMsg.recipient_id);
+          //   const result = await updateUnreadCount({
+          //     chatRoomId: newMsg.chat_room_id,
+          //     userId: newMsg.recipient_id,
+          //   });
 
-              if (!result.success) {
-                console.error(
-                  "Failed to update unread count in DB:",
-                  result.error
-                );
-              }
-            } else {
-              console.log("對方在線上");
-            }
-          }
+          //   if (!result.success) {
+          //     console.error(
+          //       "Failed to update unread count in DB:",
+          //       result.error
+          //     );
+          //   }
+          // }
+
+          // else{
+          //   console.log('無需更新未讀數量')
+          // }
         }
       )
       .subscribe();

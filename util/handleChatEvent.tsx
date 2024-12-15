@@ -103,6 +103,8 @@ export const getLastMessage = async (chatRoomId: string) => {
 
 // 建立新聊天室
 export const createNewChatRoom = async (userId: string, friendId: string) => {
+
+
   const { data: room, error } = await supabase
     .from("chat_rooms")
     .insert({
@@ -213,7 +215,41 @@ export const sendMessage = async ({
   };
 };
 
-// 更新 聊天室 未讀數量 +1
+// origin - 更新 聊天室 未讀數量 +1
+// export const updateUnreadCount = async ({
+//   chatRoomId,
+//   userId,
+// }: {
+//   chatRoomId: string;
+//   userId: string;
+// }) => {
+//   const { data: chatRoom } = await supabase
+//     .from("chat_rooms")
+//     .select("*")
+//     .eq("id", chatRoomId)
+//     .single();
+
+//   const unreadColumn =
+//     chatRoom.user1_id === userId ? "unread_count_user1" : "unread_count_user2";
+
+//   const { error } = await supabase
+//     .from("chat_rooms")
+//     .update({ [unreadColumn]: chatRoom[unreadColumn] + 1 })
+//     .eq("id", chatRoom.id);
+
+//   if (error) {
+//     console.error("Error updating unread count:", error);
+//     return {
+//       success: false,
+//       error: error.message,
+//     };
+//   }
+//   return {
+//     success: true,
+//   };
+// };
+
+//  new - 更新 聊天室 未讀數量 +1 改用 Postgres function
 export const updateUnreadCount = async ({
   chatRoomId,
   userId,
@@ -221,27 +257,20 @@ export const updateUnreadCount = async ({
   chatRoomId: string;
   userId: string;
 }) => {
-  const { data: chatRoom } = await supabase
-    .from("chat_rooms")
-    .select("*")
-    .eq("id", chatRoomId)
-    .single();
-
-  const unreadColumn =
-    chatRoom.user1_id === userId ? "unread_count_user1" : "unread_count_user2";
-
-  const { error } = await supabase
-    .from("chat_rooms")
-    .update({ [unreadColumn]: chatRoom[unreadColumn] + 1 })
-    .eq("id", chatRoom.id);
+  const { error } = await supabase.rpc("increment_unread_count", {
+    chat_room_id: chatRoomId,
+    user_id: userId,
+  });
 
   if (error) {
     console.error("Error updating unread count:", error);
+
     return {
       success: false,
       error: error.message,
     };
   }
+
   return {
     success: true,
   };

@@ -111,7 +111,6 @@ export const saveAboutMe = async ({ user }: { user: User }) => {
 
     // 儲存自己的在線狀態
     await updateUserOnlineStatus({ userId: user.userId, isOnline: true });
-
   } catch (error) {
     console.error("Error updating saveAboutMe:", error);
   }
@@ -216,6 +215,27 @@ export const saveUserSelectedOption = async ({ user }: { user: User }) => {
   }
 };
 
+//檢查用戶是否在線上
+export const isUserOnline = async (userId: string): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from("user_online_status")
+    .select("is_online") // 仅选择所需字段
+    .eq("user_id", userId)
+    .maybeSingle(); // 避免抛出异常
+
+  if (error) {
+    console.error("Error checking user online status:", error);
+    return false; // 默认返回不在线
+  }
+
+  if (!data) {
+    console.warn("No record found for user:", userId);
+    return false; // 无记录则返回不在线
+  }
+
+  return data.is_online; // 返回用户在线状态
+};
+
 // 更新用戶在線狀態
 export const updateUserOnlineStatus = async ({
   userId,
@@ -224,7 +244,7 @@ export const updateUserOnlineStatus = async ({
   userId: string;
   isOnline: boolean;
 }) => {
-  console.log('updateUserOnlineStatus', userId, isOnline)
+  console.log("updateUserOnlineStatus", userId, isOnline);
   try {
     const { error } = await supabase.from("user_online_status").upsert(
       {
