@@ -84,6 +84,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       return unreadCount > 0;
     });
 
+
+    console.log('hasUnreadMessages', hasUnreadMessages)
     navigation.setOptions({
       // 動態設置底部導航的 tabBarBadge
       tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,

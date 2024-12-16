@@ -70,7 +70,6 @@ const MainTabNavigator = () => {
         options={{
           title: "聊天室",
           headerTitleAlign: "center",
-          unmountOnBlur: true,
         }}
         component={ChatRoomList}
       />

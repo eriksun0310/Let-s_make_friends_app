@@ -103,6 +103,7 @@ export const getLastMessage = async (chatRoomId: string) => {
 
 // 建立新聊天室
 export const createNewChatRoom = async (userId: string, friendId: string) => {
+  console.log('createNewChatRoom', userId, friendId);
 
 
   const { data: room, error } = await supabase
