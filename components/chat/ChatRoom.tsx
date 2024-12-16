@@ -39,6 +39,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
     navigation.navigate("chatDetail", {
+      chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
       messages: messages.data, // 預加載的聊天記錄
     });

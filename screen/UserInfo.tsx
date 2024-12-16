@@ -15,8 +15,14 @@ import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
-import { getChatRoom } from "../util/handleChatEvent";
-import { logout, selectUser, useAppDispatch, useAppSelector } from "../store";
+import { getChatRoom, getMessages } from "../util/handleChatEvent";
+import {
+  logout,
+  selectUser,
+  setCurrentChatRoomId,
+  useAppDispatch,
+  useAppSelector,
+} from "../store";
 
 interface UserInfoProps {
   route: {
@@ -52,6 +58,25 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     });
   };
 
+  // 進入1對1聊天室
+  const handleChatRoomPress = async () => {
+    const chatRoom = await getChatRoom({
+      userId: personal.userId,
+      friendId: friend.userId,
+    });
+    // 開始加載聊天紀錄
+    const messages = await getMessages(chatRoom.id);
+    dispatch(setCurrentChatRoomId(chatRoom.id));
+    navigation.navigate("chatDetail", {
+      chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室
+      chatRoom: {
+        id: chatRoom?.id,
+        friend: friend,
+      },
+      messages: messages.data,
+    });
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: userState === "personal" ? "個人資料" : "好友資料",
@@ -64,20 +89,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       headerRight: () => {
         if (isShowMsgIcon) {
           return (
-            <CustomIcon
-              onPress={async () => {
-                const chatRoom = await getChatRoom({
-                  userId: personal.userId,
-                  friendId: friend.userId,
-                });
-                navigation.navigate("chatDetail", {
-                  chatRoom: {
-                    id: chatRoom?.id,
-                    friend: friend,
-                  },
-                });
-              }}
-            >
+            <CustomIcon onPress={handleChatRoomPress}>
               <MessageCircleMore color={Colors.icon} />
             </CustomIcon>
           );

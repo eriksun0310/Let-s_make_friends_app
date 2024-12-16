@@ -140,6 +140,17 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
 
 // 取得聊天室訊息
 export const getMessages = async (chatRoomId: string) => {
+
+
+  if(!chatRoomId){
+    console.log('與該好友尚未傳遞訊息')
+    return{
+      success: false,
+      error: '與該好友尚未傳遞訊息'
+    }
+  }
+
+console.log('getMessages ', chatRoomId)
   const { data, error } = await supabase
     .from("messages")
     .select("*")

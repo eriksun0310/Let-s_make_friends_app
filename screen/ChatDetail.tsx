@@ -40,12 +40,18 @@ import {
 import { useChatListeners } from "../components/hooks/useChatListeners";
 import { useChatContext } from "../shared/ChatContext";
 
+/*
+chatRoomState: 'old' | 'new'
+從好友列表進來 不一定是新舊聊天室
+從聊天列表進來通常會是舊的聊天室
+*/
+
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
-
   //console.log('進到聊天室')
   const dispatch = useAppDispatch();
-  const { chatRoom, messages: preloadedMessages } = route.params;
+  const { chatRoom, messages: preloadedMessages, chatRoomState } = route.params;
+  console.log("chatRoomState ChatDetail", chatRoomState);
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
 
@@ -81,7 +87,6 @@ const ChatDetail = ({ route, navigation }) => {
   // 發送訊息
   const handleSend = async () => {
     if (!inputText.trim()) return;
-
 
     let chatRoomId = currentChatRoomId; // redux 的
     if (!chatRoomId) {
@@ -141,7 +146,7 @@ const ChatDetail = ({ route, navigation }) => {
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
-      setLoading(true);
+       setLoading(true);
       const messageData = await getMessages(currentChatRoomId);
 
       if (messageData.success) {
@@ -152,14 +157,15 @@ const ChatDetail = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error fetching messages:", error);
       setError("發生錯誤，請稍後再試");
-    } finally {
+    }
+     finally {
       setLoading(false);
     }
   };
 
   // 加載聊天記錄(如果聊天室已存在且沒有預加載數據)
   useEffect(() => {
-    if (currentChatRoomId) {
+    if (currentChatRoomId && chatRoomState === "old") {
       fetchMessagesIfNeeded();
     }
   }, [currentChatRoomId, preloadedMessages]);
@@ -185,8 +191,6 @@ const ChatDetail = ({ route, navigation }) => {
         );
         return isDuplicate ? prevMessages : [...prevMessages, newMessage];
       });
-
-      
     }
   }, [newMessage, personal.userId]);
 
