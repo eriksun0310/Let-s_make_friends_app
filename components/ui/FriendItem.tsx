@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { Colors } from "../../constants/style";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { User } from "../../shared/types";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "./AlertDialog";
@@ -49,6 +49,17 @@ const FriendItem: React.FC<FriendItemProps> = ({
       }
     }
   };
+
+  // 好友詳細資料
+  const handleUserInfoFriendPress = () => {
+    navigation.navigate("userInfoFriend", {
+      isShowMsgIcon: true,
+      userState: "friend",
+      friend: friend,
+    });
+  };
+  console.log("FriendItem 111111 ");
+
   return (
     <>
       <AlertDialog
@@ -89,13 +100,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
             buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
           />
         )}
-        onPress={() => {
-          navigation.navigate("userInfoFriend", {
-            isShowMsgIcon: true,
-            userState: "friend",
-            friend: friend,
-          });
-        }}
+        onPress={handleUserInfoFriendPress}
       >
         <View style={styles.AvatarContainer}>
           <Avatar

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import FriendItem from "../components/ui/FriendItem";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -27,7 +27,7 @@ const testFriendList = Array(14).fill({
 
 //好友列表
 const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
-  console.log('好友列表 render');
+  console.log("好友列表 render");
   const personal = useAppSelector(selectUser);
 
   const [friendList, setFriendList] = useState([]);
@@ -56,18 +56,29 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     />
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      console.log("好友列表 useFocusEffect");
+      console.log("好友列表  当前导航堆栈:", navigation.getState());
+      navigation.setOptions({
+        title: "好友列表",
+        headerTitleAlign: "center",
+        headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+      });
+      // 强制触发更新
+      setTimeout(() => {
+        navigation.setOptions({
+          title: "好友列表",
+          headerTitleAlign: "center",
+          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+        });
+      }, 0);
+    }, [navigation])
+  );
+
   useEffect(() => {
-    console.log('好友列表 useEffect');
-    navigation.setOptions({
-      title: "好友列表",
-      headerTitleAlign: "center",
-      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
-    });
-
     fetchFriendList();
-  }, [navigation, personal]);
-
-
+  }, []);
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
 

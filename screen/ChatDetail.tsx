@@ -146,7 +146,7 @@ const ChatDetail = ({ route, navigation }) => {
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
-       setLoading(true);
+      setLoading(true);
       const messageData = await getMessages(currentChatRoomId);
 
       if (messageData.success) {
@@ -157,8 +157,7 @@ const ChatDetail = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error fetching messages:", error);
       setError("發生錯誤，請稍後再試");
-    }
-     finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -229,6 +228,7 @@ const ChatDetail = ({ route, navigation }) => {
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
+    console.log("聊天  当前导航堆栈:", navigation.getState());
     //更新 本地未讀數量歸0
     dispatch(
       resetUnreadUser({

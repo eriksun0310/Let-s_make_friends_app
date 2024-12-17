@@ -183,9 +183,11 @@ const AuthenticatedStack = () => {
       <Stack.Screen
         name="friendList"
         component={FriendList}
-        options={{
-          title: "好友列表",
-        }}
+        // options={{
+        //   title: "好友列表",
+        //   headerTitleAlign: "center",
+        //   headerLeft: () => <BackButton />,
+        // }}
       />
       {/* 交友邀請*/}
       <Stack.Screen name="friendInvitation" component={FriendInvitation} />
