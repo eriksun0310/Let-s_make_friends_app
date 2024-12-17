@@ -38,6 +38,7 @@ import {
   AppReduxProvider,
 } from "./store";
 import { ChatContextProvider } from "./shared/ChatContext";
+import BackButton from "./components/ui/button/BackButton";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -177,8 +178,15 @@ const AuthenticatedStack = () => {
       <Stack.Screen name="editUserInfo" component={EditUserInfo} />
 
       <Stack.Screen name="editHeadShot" component={EditHeadShot} />
+
       {/* 好友列表*/}
-      <Stack.Screen name="FriendList" component={FriendList} />
+      <Stack.Screen
+        name="friendList"
+        component={FriendList}
+        options={{
+          title: "好友列表",
+        }}
+      />
       {/* 交友邀請*/}
       <Stack.Screen name="friendInvitation" component={FriendInvitation} />
       {/* 用戶資訊 */}

@@ -27,6 +27,7 @@ const testFriendList = Array(14).fill({
 
 //好友列表
 const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
+  console.log('好友列表 render');
   const personal = useAppSelector(selectUser);
 
   const [friendList, setFriendList] = useState([]);
@@ -56,6 +57,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    console.log('好友列表 useEffect');
     navigation.setOptions({
       title: "好友列表",
       headerTitleAlign: "center",
@@ -64,6 +66,8 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
     fetchFriendList();
   }, [navigation, personal]);
+
+
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
 

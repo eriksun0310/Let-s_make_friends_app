@@ -79,7 +79,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       headerLeft: () => (
         <CustomIcon
           onPress={async () => {
-            navigation.navigate("FriendList");
+            navigation.navigate("friendList");
             await markAllAsNotified(); // 標記所有新好友為已通知
           }}
         >
