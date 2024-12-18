@@ -78,7 +78,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    console.log("好友資料 当前导航堆栈:", navigation.getState());
+    // console.log("好友資料 当前导航堆栈:", navigation.getState());
     navigation.setOptions({
       title: userState === "personal" ? "個人資料" : "好友資料",
       headerTitleAlign: "center",

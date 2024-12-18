@@ -48,10 +48,8 @@ chatRoomState: 'old' | 'new'
 
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
-  //console.log('進到聊天室')
   const dispatch = useAppDispatch();
   const { chatRoom, messages: preloadedMessages, chatRoomState } = route.params;
-  console.log("chatRoomState ChatDetail", chatRoomState);
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
 
@@ -228,13 +226,13 @@ const ChatDetail = ({ route, navigation }) => {
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
-    console.log("聊天  当前导航堆栈:", navigation.getState());
+    //console.log("聊天  当前导航堆栈:", navigation.getState());
     //更新 本地未讀數量歸0
     dispatch(
       resetUnreadUser({
         chatRoomId: currentChatRoomId,
-        resetUnreadUser1: chatRoom.userId1 === personal.userId,
-        resetUnreadUser2: chatRoom.userId2 === personal.userId,
+        resetUnreadUser1: chatRoom.user1Id === personal.userId,
+        resetUnreadUser2: chatRoom.user2Id === personal.userId,
       })
     );
 

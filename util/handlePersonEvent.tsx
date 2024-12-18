@@ -244,7 +244,7 @@ export const updateUserOnlineStatus = async ({
   userId: string;
   isOnline: boolean;
 }) => {
-  console.log("updateUserOnlineStatus", userId, isOnline);
+  // console.log("updateUserOnlineStatus", userId, isOnline);
   try {
     const { error } = await supabase.from("user_online_status").upsert(
       {

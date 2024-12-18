@@ -27,7 +27,7 @@ const testFriendList = Array(14).fill({
 
 //好友列表
 const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
-  console.log("好友列表 render");
+  // console.log("好友列表 render");
   const personal = useAppSelector(selectUser);
 
   const [friendList, setFriendList] = useState([]);
@@ -58,8 +58,8 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("好友列表 useFocusEffect");
-      console.log("好友列表  当前导航堆栈:", navigation.getState());
+      // console.log("好友列表 useFocusEffect");
+      //console.log("好友列表  当前导航堆栈:", navigation.getState());
       navigation.setOptions({
         title: "好友列表",
         headerTitleAlign: "center",

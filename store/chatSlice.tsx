@@ -38,9 +38,6 @@ const chatSlice = createSlice({
       state.currentChatRoomId = action.payload;
     },
 
-
-    
-
     setChatRooms(state, action) {
       // console.log("setChatRooms 1", action.payload);
       // console.log("setChatRooms 2", state.chatRooms);

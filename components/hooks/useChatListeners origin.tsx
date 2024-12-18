@@ -9,6 +9,13 @@ import {
 } from "../../store";
 import { supabase } from "../../util/supabaseClient";
 import { updateUnreadCount } from "../../util/handleChatEvent";
+import { isUserOnline } from "../../util/handlePersonEvent";
+
+
+
+
+
+
 
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
@@ -40,7 +47,7 @@ export const useChatListeners = () => {
         async (payload) => {
           const newMsg = payload.new;
 
-          console.log("newMsg is useChatListeners", newMsg);
+          // console.log("newMsg is useChatListeners", newMsg);
 
           // 更新本地 chat Redux
           dispatch(
@@ -71,30 +78,27 @@ export const useChatListeners = () => {
                 result.error
               );
             }
+            // 如果傳訊息的對方不在線上，更新對方未讀數量
+          } else {
+            // 檢查對方是否在線上
+            const isOnline = await isUserOnline(newMsg.recipient_id);
 
-            /*
-            如果訊息是自己發的，更新對方聊天室的未讀數量
-            以後在考慮 是否要先檢查對方是否在線上才去更新資料庫的未讀數量
-            */
-           } 
-          // else {
-          //   console.log("newMsg.recipient_id 登出狀態 ", newMsg.recipient_id);
-          //   const result = await updateUnreadCount({
-          //     chatRoomId: newMsg.chat_room_id,
-          //     userId: newMsg.recipient_id,
-          //   });
+            if (!isOnline) {
+              const result = await updateUnreadCount({
+                chatRoomId: newMsg.chat_room_id,
+                userId: newMsg.recipient_id,
+              });
 
-          //   if (!result.success) {
-          //     console.error(
-          //       "Failed to update unread count in DB:",
-          //       result.error
-          //     );
-          //   }
-          // }
-
-          // else{
-          //   console.log('無需更新未讀數量')
-          // }
+              if (!result.success) {
+                console.error(
+                  "Failed to update unread count in DB:",
+                  result.error
+                );
+              }
+            } else {
+              console.log("對方在線上");
+            }
+          }
         }
       )
       .subscribe();
@@ -115,10 +119,10 @@ export const useChatListeners = () => {
           (payload) => {
             console.log("newMsg is useChatListeners", payload.new);
             const newMessage = payload.new;
-            console.log(
-              "currentChatRoomId is useChatListeners",
-              currentChatRoomId
-            );
+            // console.log(
+            //   "currentChatRoomId is useChatListeners",
+            //   currentChatRoomId
+            // );
 
             if (newMessage.chat_room_id === currentChatRoomId) {
               setNewMessage(newMessage);
@@ -140,7 +144,7 @@ export const useChatListeners = () => {
             filter: `chat_room_id=eq.${currentChatRoomId}`,
           },
           (payload) => {
-            console.log("readMessages is useChatListeners", payload.new);
+            // console.log("readMessages is useChatListeners", payload.new);
             setReadMessages((prev) => [...prev, payload.new.id]);
           }
         )
@@ -156,7 +160,7 @@ export const useChatListeners = () => {
     };
   }, [userId, currentChatRoomId, dispatch]);
 
-  console.log("newMessage state is useChatListeners", newMessage);
+  // console.log("newMessage state is useChatListeners", newMessage);
   return {
     newMessage,
     readMessages,

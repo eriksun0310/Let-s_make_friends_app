@@ -58,7 +58,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
       friend: friend,
     });
   };
-  console.log("FriendItem 111111 ");
+  //console.log("FriendItem 111111 ");
 
   return (
     <>

@@ -232,7 +232,7 @@ const Navigation = () => {
       {isAuthenticated ? (
         <ChatContextProvider>
           <AuthenticatedStack />
-        </ChatContextProvider>
+         </ChatContextProvider>
       ) : (
         <AuthStack />
       )}

@@ -31,8 +31,8 @@ export const getAllChatRooms = async (userId: string) => {
         lastMessage: lastMessageData?.content,
         id: room.id,
         created_at: room.created_at,
-        userId1: room.user1_id,
-        userId2: room.user2_id,
+        user1Id: room.user1_id,
+        user2Id: room.user2_id,
         user1Deleted: room.user1_deleted,
         user2Deleted: room.user2_deleted,
         unreadCountUser1: room.unread_count_user1,
@@ -41,7 +41,7 @@ export const getAllChatRooms = async (userId: string) => {
       };
     })
   );
-  console.log("chatRoomsDetails", chatRoomsDetails);
+  // console.log("chatRoomsDetails", chatRoomsDetails);
   return chatRoomsDetails;
 };
 
@@ -103,8 +103,7 @@ export const getLastMessage = async (chatRoomId: string) => {
 
 // 建立新聊天室
 export const createNewChatRoom = async (userId: string, friendId: string) => {
-  console.log('createNewChatRoom', userId, friendId);
-
+  // console.log('createNewChatRoom', userId, friendId);
 
   const { data: room, error } = await supabase
     .from("chat_rooms")
@@ -118,7 +117,7 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
     console.error("Error creating chat room:", error);
     return {};
   }
-  console.log("createNewChatRoom room", room);
+  // console.log("createNewChatRoom room", room);
 
   // const isUser1 = room.user1_id === userId;
   // const friendId = isUser1 ? room.user2_id : room.user1_id;
@@ -127,8 +126,8 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
   return {
     id: room.id,
     created_at: room.created_at,
-    userId1: room.user1_id,
-    userId2: room.user2_id,
+    user1Id: room.user1_id,
+    user2Id: room.user2_id,
     user1Deleted: room.user1_deleted,
     user2Deleted: room.user2_deleted,
     unreadCountUser1: room.unread_count_user1,
@@ -141,17 +140,15 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
 
 // 取得聊天室訊息
 export const getMessages = async (chatRoomId: string) => {
-
-
-  if(!chatRoomId){
-    console.log('與該好友尚未傳遞訊息')
-    return{
+  if (!chatRoomId) {
+    console.log("與該好友尚未傳遞訊息");
+    return {
       success: false,
-      error: '與該好友尚未傳遞訊息'
-    }
+      error: "與該好友尚未傳遞訊息",
+    };
   }
 
-console.log('getMessages ', chatRoomId)
+  // console.log('getMessages ', chatRoomId)
   const { data, error } = await supabase
     .from("messages")
     .select("*")

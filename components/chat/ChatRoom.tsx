@@ -48,15 +48,15 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     dispatch(
       resetUnreadUser({
         chatRoomId: chatRoom.id,
-        resetUnreadUser1: chatRoom.userId1 === personal.userId,
-        resetUnreadUser2: chatRoom.userId2 === personal.userId,
+        resetUnreadUser1: chatRoom.user1Id === personal.userId,
+        resetUnreadUser2: chatRoom.user2Id === personal.userId,
       })
     );
   };
 
   const getUnreadCount = (chatRoom, userId) => {
     if (!chatRoom) return 0;
-    return chatRoom.userId1 === userId
+    return chatRoom.user1Id === userId
       ? chatRoom.unreadCountUser1
       : chatRoom.unreadCountUser2;
   };
