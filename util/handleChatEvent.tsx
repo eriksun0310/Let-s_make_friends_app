@@ -8,7 +8,7 @@ import { formatTimeWithDayjs } from "../shared/funcs";
 
 // 取得所有聊天室
 export const getAllChatRooms = async (userId: string) => {
-  const { data, error } = await supabase
+  const { data: chatRoomsData, error } = await supabase
     .from("chat_rooms")
     .select("*")
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
@@ -18,9 +18,19 @@ export const getAllChatRooms = async (userId: string) => {
     return [];
   }
 
+  //過濾掉 user1_deleted 或 user2_deleted 為 true 的聊天室
+  const filteredRooms = chatRoomsData.filter((room) => {
+    // 如果 a 刪除聊天室，但 b 沒有刪除，則 b 可以看到聊天室
+    if (room.user1_id === userId && room.user1_deleted) return false;
+    if (room.user2_id === userId && room.user2_deleted) return false;
+
+    // 其他情況下顯示聊天室
+    return true;
+  });
+
   // 取得每個聊天室的詳細資訊
   const chatRoomsDetails = await Promise.all(
-    data.map(async (room) => {
+    filteredRooms.map(async (room) => {
       const isUser1 = room.user1_id === userId;
       const friendId = isUser1 ? room.user2_id : room.user1_id;
       const friend = await getFriendDetail(friendId);
@@ -444,7 +454,133 @@ export const markChatRoomMessagesAsRead = async ({
 };
 
 // 刪除聊天室
-export const deleteChatRoom = async (roomId: string) => {};
+export const deleteChatRoomDB = async ({
+  roomId,
+  userId,
+}: {
+  roomId: string;
+  userId: string;
+}) => {
+  try {
+    // 查詢聊天室資料
+    const { data: chatRoom, error: fetchError } = await supabase
+      .from("chat_rooms")
+      .select("*")
+      .eq("id", roomId)
+      .single();
+
+    if (fetchError || !chatRoom) {
+      console.error("Chat room not found or fetch error:", fetchError);
+      return {
+        success: false,
+        error: "Chat room not found",
+      };
+    }
+
+    // 判斷是哪個用戶刪除聊天室
+    let deletedColumn = "";
+    let unreadColumn = "";
+    if (chatRoom.user1_id === userId) {
+      deletedColumn = "user1_deleted";
+      unreadColumn = "unread_count_user1";
+    } else if (chatRoom.user2_id === userId) {
+      deletedColumn = "user2_deleted";
+      unreadColumn = "unread_count_user2";
+    } else {
+      console.error("User ID does not match chat room participants");
+      return {
+        success: false,
+        error: "Unauthorized action",
+      };
+    }
+
+    console.log("deletedColumn", deletedColumn, "unreadColumn", unreadColumn);
+
+    // 更新刪除狀態及未讀數量
+    const { error: updateError } = await supabase
+      .from("chat_rooms")
+      .update({
+        [deletedColumn]: true,
+        [unreadColumn]: 0,
+      })
+      .eq("id", roomId);
+
+    if (updateError) {
+      console.error(
+        "Error update chat room  deletedColumn unreadColumn :",
+        updateError
+      );
+      return {
+        success: false,
+        error: updateError.message,
+      };
+    }
+
+    // 再次查詢已確認刪除條件
+    const { data: updatedChatRoom, error: reFetchError } = await supabase
+      .from("chat_rooms")
+      .select("id, user1_deleted, user2_deleted")
+      .eq("id", roomId)
+      .single();
+
+    if (reFetchError || !updatedChatRoom) {
+      console.error("Failed to re-fetch updated chat room:", reFetchError);
+      return {
+        success: false,
+        error: "Chat room not found",
+      };
+    }
+
+    // 如果 user1_deleted && user2_deleted 都為 true，則刪除 messages 的資料
+    if (chatRoom.user1_deleted && chatRoom.user2_deleted) {
+      const deleteResult = await deleteChatMessage(roomId);
+      if (!deleteResult.success) {
+        console.error("Failed to delete messages:", deleteResult.error);
+        return {
+          success: false,
+          error: deleteResult.error,
+        };
+      }
+    }
+
+    return {
+      success: true,
+      roomId: updatedChatRoom.id,
+    };
+  } catch (error) {
+    console.error("刪除聊天室 error:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
 
 // 刪除聊天紀錄
-export const deleteChatHistory = async (roomId: string) => {};
+export const deleteChatMessage = async (roomId: string) => {
+  try {
+    // 刪除聊天室中的所有訊息
+    const { error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("chat_room_id", roomId);
+
+    if (error) {
+      console.error("Error deleting messages:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("刪除聊天紀錄 error:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};

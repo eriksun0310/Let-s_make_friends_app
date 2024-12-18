@@ -93,16 +93,12 @@ const chatSlice = createSlice({
       }
     },
 
-    // 清空聊天室的未讀訊息數量
-    // clearUnreadCount(state, action) {
-    //   const { chatRoomId } = action.payload;
-    //   // 找出對應的聊天室
-    //   const chatRoom = state.chatRooms.find((room) => room.id === chatRoomId);
-
-    //   if (chatRoom) {
-    //     chatRoom.unreadCount = 0;
-    //   }
-    // },
+    // 刪除單一聊天室
+    deleteChatRoom(state, action) {
+      state.chatRooms = state.chatRooms.filter(
+        (room) => room.id !== action.payload
+      );
+    },
   },
 });
 
@@ -112,6 +108,7 @@ export const {
   updateChatRoom,
   resetUnreadUser,
   setCurrentChatRoomId,
+  deleteChatRoom,
 } = chatSlice.actions;
 
 export const updateOrCreateChatRoom =

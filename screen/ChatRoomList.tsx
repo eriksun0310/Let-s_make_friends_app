@@ -94,6 +94,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
 
 
+  console.log('chatRoomsData', chatRoomsData)
+
   return (
     // <ChatContextProvider>
       <View style={styles.screen}>

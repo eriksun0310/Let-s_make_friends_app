@@ -3,8 +3,12 @@ import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
-import { resetUnreadUser, setCurrentChatRoomId } from "../../store/chatSlice";
-import { getMessages } from "../../util/handleChatEvent";
+import {
+  deleteChatRoom,
+  resetUnreadUser,
+  setCurrentChatRoomId,
+} from "../../store/chatSlice";
+import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
@@ -26,8 +30,30 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       resetRef.current(); // 執行 `reset`
     }
 
+    console.log("mode", mode);
+    console.log("chatRoom.id", chatRoom.id);
+
     if (mode === "delete") {
-      console.log("delete");
+      try {
+        const result = await deleteChatRoomDB({
+          roomId: chatRoom.id,
+          userId: personal.userId,
+        });
+
+        if (result.success && result.roomId) {
+          // 成功資料庫刪除, 更新redux狀態
+          dispatch(deleteChatRoom(result.roomId));
+        } else {
+          console.error(
+            "Failed to delete chat room:",
+            result.error || "Unknown error"
+          );
+          alert("刪除聊天室失敗, 請再試一次");
+        }
+      } catch (error) {
+        console.error("Unexpected error while deleting chat room:", error);
+        alert("刪除聊天室失敗, 請再試一次");
+      }
     }
   };
 
