@@ -64,6 +64,8 @@ export const getAllChatRooms = async (userId: string) => {
     })
   );
 
+  //console.log("chatRoomsDetails", chatRoomsDetails);
+
   // 根據最後一條訊息的時間進行排序,將最新的聊天室排到最上面
   const sortedChatRooms = chatRoomsDetails.sort((a, b) => {
     if (a.lastMessageTime && b.lastMessageTime) {
@@ -71,7 +73,7 @@ export const getAllChatRooms = async (userId: string) => {
     }
     return 0; // 若有空值則保持原順序
   });
-  
+
   return sortedChatRooms;
 };
 
@@ -552,7 +554,7 @@ export const deleteChatRoomDB = async ({
     }
 
     // 如果 user1_deleted && user2_deleted 都為 true，則刪除 messages 的資料
-    if (chatRoom.user1_deleted && chatRoom.user2_deleted) {
+    if (updatedChatRoom.user1_deleted && updatedChatRoom.user2_deleted) {
       const deleteResult = await deleteChatMessage(roomId);
       if (!deleteResult.success) {
         console.error("Failed to delete messages:", deleteResult.error);

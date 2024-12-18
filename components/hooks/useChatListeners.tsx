@@ -39,7 +39,7 @@ export const useChatListeners = () => {
         }
       })
       .on("presence", { event: "sync" }, () => {
-        console.log("presence state updated:", channel.presenceState());
+        //console.log("presence state updated:", channel.presenceState());
       });
 
     setPresenceChannel(channel);
