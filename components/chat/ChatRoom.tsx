@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     paddingHorizontal: 8,
     paddingVertical: 6,
-    borderRadius: "100%",
+    borderRadius: 100,
     // borderWidth: 1,
   },
 });

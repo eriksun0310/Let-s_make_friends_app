@@ -228,6 +228,7 @@ const ChatDetail = ({ route, navigation }) => {
   const handleReturnToChatList = async () => {
     //console.log("聊天  当前导航堆栈:", navigation.getState());
     //更新 本地未讀數量歸0
+
     dispatch(
       resetUnreadUser({
         chatRoomId: currentChatRoomId,
