@@ -20,10 +20,20 @@ export const getAllChatRooms = async (userId: string) => {
 
   //過濾掉 user1_deleted 或 user2_deleted 為 true 的聊天室
   const filteredRooms = chatRoomsData.filter((room) => {
-    // user1_deleted:true && 
+    // user1_deleted:true &&
     // 如果 a 刪除聊天室，但 b 沒有刪除，則 b 可以看到聊天室
-    if (room.user1_id === userId && room.user1_deleted && room.unread_count_user1 === 0) return false;
-    if (room.user2_id === userId && room.user2_deleted && room.unread_count_user2 === 0) return false;
+    if (
+      room.user1_id === userId &&
+      room.user1_deleted &&
+      room.unread_count_user1 === 0
+    )
+      return false;
+    if (
+      room.user2_id === userId &&
+      room.user2_deleted &&
+      room.unread_count_user2 === 0
+    )
+      return false;
 
     // 其他情況下顯示聊天室
     return true;
@@ -48,12 +58,21 @@ export const getAllChatRooms = async (userId: string) => {
         user2Deleted: room.user2_deleted,
         unreadCountUser1: room.unread_count_user1,
         unreadCountUser2: room.unread_count_user2,
+        lastMessageTime: lastMessageData?.created_at, // 添加最新訊息的時間，用於排序
         friend: friend,
       };
     })
   );
-  // console.log("chatRoomsDetails", chatRoomsDetails);
-  return chatRoomsDetails;
+
+  // 根據最後一條訊息的時間進行排序,將最新的聊天室排到最上面
+  const sortedChatRooms = chatRoomsDetails.sort((a, b) => {
+    if (a.lastMessageTime && b.lastMessageTime) {
+      return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
+    }
+    return 0; // 若有空值則保持原順序
+  });
+  
+  return sortedChatRooms;
 };
 
 // 取得與好友的聊天室
