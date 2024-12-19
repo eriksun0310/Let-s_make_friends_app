@@ -65,7 +65,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       friendId: friend.userId,
     });
     // 開始加載聊天紀錄
-    const messages = await getMessages(chatRoom.id);
+    const messages = await getMessages({
+      chatRoomId: chatRoom.id,
+      userId: personal.userId,
+    });
     dispatch(setCurrentChatRoomId(chatRoom.id));
     navigation.navigate("chatDetail", {
       chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室

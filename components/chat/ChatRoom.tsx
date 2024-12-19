@@ -60,7 +60,10 @@ const ChatRoom = ({ chatRoom, navigation }) => {
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
     // 開始加載聊天紀錄
-    const messages = await getMessages(chatRoom.id);
+    const messages = await getMessages({
+      chatRoomId: chatRoom.id,
+      userId: personal.userId,
+    });
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 

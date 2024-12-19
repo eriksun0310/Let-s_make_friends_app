@@ -171,7 +171,13 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
 };
 
 // 取得聊天室訊息
-export const getMessages = async (chatRoomId: string) => {
+export const getMessages = async ({
+  chatRoomId,
+  userId,
+}: {
+  chatRoomId: string;
+  userId: string;
+}) => {
   if (!chatRoomId) {
     console.log("與該好友尚未傳遞訊息");
     return {
@@ -180,11 +186,36 @@ export const getMessages = async (chatRoomId: string) => {
     };
   }
 
-  // console.log('getMessages ', chatRoomId)
+  // 取得聊天室資料
+  const { data: chatRoom, error: chatRoomError } = await supabase
+    .from("chat_rooms")
+    .select("*")
+    .eq("id", chatRoomId)
+    .single();
+
+  if (chatRoomError) {
+    console.error("Error fetching chat room:", chatRoomError);
+    return {
+      success: false,
+      error: chatRoomError.message,
+    };
+  }
+
+  // 確定當前使用者的刪除時間
+  const deletedAt =
+    chatRoom.user1_id === userId
+      ? chatRoom.user1_deleted_at
+      : chatRoom.user2_deleted_at;
+
+  //如果刪除時間為空, 表示使用者未刪除聊天室
+  const filterTime = deletedAt || "1970-01-01T00:00:00Z";
+
+  // 查詢過濾後的訊息
   const { data, error } = await supabase
     .from("messages")
     .select("*")
     .eq("chat_room_id", chatRoomId)
+    .gte("created_at", filterTime) // 過濾刪除時間之前的訊息
     .order("created_at", { ascending: true }); // 根據 created_at 排序，確保先發的訊息在上
 
   if (error) {
@@ -438,6 +469,20 @@ export const markChatRoomMessagesAsRead = async ({
       return false;
     }
 
+    // 確定使用者刪除時間
+    const userDeletedAt =
+      chatRoom.user1_id === userId
+        ? chatRoom.user1_deleted_at
+        : chatRoom.user2_deleted_at;
+
+    // 如果聊天室已刪除且刪除時間不為空，不標記已讀
+    if (userDeletedAt) {
+      console.log(
+        "User has deleted the chat room. Skipping mark as read operation."
+      );
+      return true; // 視為成功，但不標記已讀 (跳過更新未讀數量和訊息的已讀狀態。)
+    }
+
     const unreadColumn =
       chatRoom.user1_id === userId
         ? "unread_count_user1"
@@ -501,12 +546,15 @@ export const deleteChatRoomDB = async ({
 
     // 判斷是哪個用戶刪除聊天室
     let deletedColumn = "";
+    let deletedAtColumn = "";
     let unreadColumn = "";
     if (chatRoom.user1_id === userId) {
       deletedColumn = "user1_deleted";
+      deletedAtColumn = "user1_deleted_at";
       unreadColumn = "unread_count_user1";
     } else if (chatRoom.user2_id === userId) {
       deletedColumn = "user2_deleted";
+      deletedAtColumn = "user2_deleted_at";
       unreadColumn = "unread_count_user2";
     } else {
       console.error("User ID does not match chat room participants");
@@ -523,6 +571,7 @@ export const deleteChatRoomDB = async ({
       .from("chat_rooms")
       .update({
         [deletedColumn]: true,
+        [deletedAtColumn]: new Date().toISOString(),
         [unreadColumn]: 0,
       })
       .eq("id", roomId);

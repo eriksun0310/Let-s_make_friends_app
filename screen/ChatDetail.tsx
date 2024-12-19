@@ -145,7 +145,10 @@ const ChatDetail = ({ route, navigation }) => {
 
     try {
       setLoading(true);
-      const messageData = await getMessages(currentChatRoomId);
+      const messageData = await getMessages({
+        chatRoomId: currentChatRoomId,
+        userId: personal.userId,
+      });
 
       if (messageData.success) {
         setMessages(messageData.data);
