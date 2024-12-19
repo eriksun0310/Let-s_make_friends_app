@@ -10,7 +10,7 @@ import { getFriendList } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { selectUser, useAppSelector } from "../store";
-
+import ostrich from "../assets/animal/ostrich.png";
 interface FriendListProps {
   navigation: NavigationProp<any>;
 }
@@ -21,7 +21,7 @@ const testFriendList = Array(14).fill({
   birthDate: "2000-03-10",
   age: 24,
   headShot: {
-    imageUrl: require("../assets/people/man/man.png"),
+    imageUrl: ostrich,
   },
 });
 

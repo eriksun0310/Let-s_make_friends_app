@@ -9,18 +9,26 @@ import {
 } from "react-native";
 import { Colors } from "../../constants/style";
 import { HeadShot, ImageType } from "../../shared/types";
+import man from "../../assets/people/man/man.png";
+import man1 from "../../assets/people/man/man (1).png";
+import man2 from "../../assets/people/man/man (2).png";
+import woman from "../../assets/people/woman/girl.png";
+import woman1 from "../../assets/people/woman/woman (1).png";
+import woman2 from "../../assets/people/woman/woman (2).png";
+import woman3 from "../../assets/people/woman/woman (3).png";
+import ostrich from "../../assets/animal/ostrich.png";
 
 export const imageUrls = {
   people: [
-    { imageUrl: require("../../assets/people/man/man.png") },
-    { imageUrl: require("../../assets/people/man/man (1).png") },
-    { imageUrl: require("../../assets/people/man/man (2).png") },
-    { imageUrl: require("../../assets/people/woman/girl.png") },
-    { imageUrl: require("../../assets/people/woman/woman (1).png") },
-    { imageUrl: require("../../assets/people/woman/woman (2).png") },
-    { imageUrl: require("../../assets/people/woman/woman (3).png") },
+    { imageUrl: man },
+    { imageUrl: man1 },
+    { imageUrl: man2 },
+    { imageUrl: woman },
+    { imageUrl: woman1 },
+    { imageUrl: woman2 },
+    { imageUrl: woman3 },
   ],
-  animal: [{ imageUrl: require("../../assets/animal/ostrich.png") }],
+  animal: [{ imageUrl: ostrich }],
 };
 
 interface AllHeadShotProps {
@@ -47,7 +55,7 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
               <Text
                 style={{
                   color:
-                    headShot.imageType === key ?  Colors.textBlue : Colors.text,
+                    headShot.imageType === key ? Colors.textBlue : Colors.text,
                 }}
               >
                 {key === "people" ? "人像" : "動物"}

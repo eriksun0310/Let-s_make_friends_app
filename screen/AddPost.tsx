@@ -17,6 +17,7 @@ import SelectedTagText from "../components/ui/SelectedTagText";
 import SegmentedButtons from "../components/ui/button/SegmentedButtons";
 import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import ostrich from "../assets/animal/ostrich.png";
 
 // 新增文章
 const AddPost = ({ navigation }) => {
@@ -92,10 +93,7 @@ const AddPost = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.postContainer}>
             <View style={styles.header}>
-              <Image
-                source={require("../assets/animal/ostrich.png")}
-                style={styles.avatar}
-              />
+              <Image source={ostrich} style={styles.avatar} />
               <Text style={styles.username}>海鷗</Text>
             </View>
             <TextInput

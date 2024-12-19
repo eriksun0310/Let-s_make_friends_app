@@ -6,6 +6,7 @@ import CustomIcon from "../components/ui/button/CustomIcon";
 import { X } from "lucide-react-native";
 import SearchBar from "../components/ui/SearchBar";
 import { NavigationProp } from "@react-navigation/native";
+import ostrich from "../assets/animal/ostrich.png";
 const recentSearches = [
   { id: "1", name: "海鴨" },
   { id: "2", name: "我是海鴨" },
@@ -43,11 +44,7 @@ const Search: React.FC<SearchProps> = ({ navigation }) => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.searchItem}>
-                <Avatar
-                  rounded
-                  source={require("../assets/animal/ostrich.png")}
-                  size="medium"
-                />
+                <Avatar rounded source={ostrich} size="medium" />
                 <Text style={styles.searchText}>{item.name}</Text>
 
                 <CustomIcon onPress={() => console.log("close")}>
