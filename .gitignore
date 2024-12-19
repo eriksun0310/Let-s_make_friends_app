@@ -35,3 +35,7 @@ yarn-error.*
 *.tsbuildinfo
 
 .env
+
+
+google-services.json
+let-s-make-friends-app-firebase-adminsdk-gsoah-b6295ceda8.json

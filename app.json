@@ -12,10 +12,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.erika.lets_make_friends_app"
     },
     "android": {
       "package": "com.erika.lets_make_friends_app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -23,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f0b41d75-3f01-4525-b532-8db79385a1ac"
+      }
+    },
+    "owner": "erikasun"
   }
 }
