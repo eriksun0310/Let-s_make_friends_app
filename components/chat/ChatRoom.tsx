@@ -10,6 +10,7 @@ import {
 } from "../../store/chatSlice";
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
+import { processMessageWithSeparators } from "../../shared/chatFuncs";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
@@ -67,10 +68,13 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
+    // 處理訊息資料，加入分隔符標記
+    const processedData = processMessageWithSeparators(messages.data);
+
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
-      messages: messages.data, // 預加載的聊天記錄
+      messages: processedData, // 預加載的聊天記錄
     });
 
     // 清零未讀訊息

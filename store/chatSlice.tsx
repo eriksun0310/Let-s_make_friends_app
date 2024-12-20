@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../shared/types";
-import { formatTimeWithDayjs } from "../shared/funcs";
+import { formatTimeWithDayjs } from "../shared/personalFuncs";
 import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
 

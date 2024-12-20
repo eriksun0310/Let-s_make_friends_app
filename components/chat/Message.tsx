@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { formatTimeWithDayjs } from "../../shared/funcs";
+import { formatTimeWithDayjs } from "../../shared/personalFuncs";
 import { Colors } from "../../constants/style";
 import { useAppSelector } from "../../store";
 import { selectUser } from "../../store/userSlice";
 
 const Message = ({ item, onView }) => {
   const personal = useAppSelector(selectUser);
-  
+
   useEffect(() => {
     // 當組件掛載且是接收者的訊息時，觸發已讀
     if (item.recipient_id === personal.userId && !item.is_read) {

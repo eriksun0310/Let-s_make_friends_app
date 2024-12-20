@@ -24,9 +24,7 @@ import {
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-//import { useNewMessages } from "../components/hooks/useNewMessages";
 import { Message as MessageType } from "../shared/types";
-//import { useReadMessages } from "../components/hooks/useReadMessages";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectUser,
@@ -37,8 +35,11 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
 } from "../store";
-import { useChatListeners } from "../components/hooks/useChatListeners";
 import { useChatContext } from "../shared/ChatContext";
+import {
+  handleMessageView,
+  processMessageWithSeparators,
+} from "../shared/chatFuncs";
 
 /*
 chatRoomState: 'old' | 'new'
@@ -60,26 +61,33 @@ const ChatDetail = ({ route, navigation }) => {
     preloadedMessages || []
   );
 
-  const [loading, setLoading] = useState(); // 如果有預加載數據，就不需要加載狀態
+  // 分隔符的狀態
+  const [hasViewSeparator, setHasViewSeparator] = useState(false);
+
+  const [loading, setLoading] = useState();
 
   const [error, setError] = useState(null);
 
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
 
-  // 當訊息渲染時自動標記為已讀
-  const handleMessageView = async (messageId) => {
-    if (messageId && messageId !== personal.userId) {
-      await markMessageAsRead(messageId);
-    }
-  };
+  console.log("hasViewSeparator", hasViewSeparator);
 
+  // 渲染訊息
   const renderMessage = ({ item }) => (
-    <Message
-      key={item.id}
-      item={item}
-      onView={(messageId) => handleMessageView(messageId)}
-    />
+    <>
+      <Message
+        key={item.id}
+        item={item}
+        onView={(messageId: string) => handleMessageView(messageId)}
+      />
+
+      {(item.showSeparator && !hasViewSeparator) && (
+        <Text style={styles.separatorText}>
+          ------------ 以下為查看訊息 ------------
+        </Text>
+      )}
+    </>
   );
 
   // 發送訊息
@@ -140,7 +148,32 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
+  // const onViewableItemChanged = ({ viewableItems }) => {
+  //   const separatorIndex = messages.findIndex((msg) => msg.showSeparator);
+  //   const isSeparatorVisible = viewableItems.some(
+  //     (item) => item.index === separatorIndex
+  //   );
+
+  //   if (isSeparatorVisible && !hasViewSeparator) {
+  //     setTimeout(() => {
+  //       setHasViewSeparator(true); // 標記分隔符為已查看
+  //     }, 1000);
+  //   }
+  // };
+
+  // 清除分隔符
+  const clearSeparators = () => {
+    setMessages((prev) =>
+      prev.map((msg) => ({
+        ...msg,
+        showSeparator: false,
+      }))
+    );
+  };
+
+  //  加載訊息
   const fetchMessagesIfNeeded = async () => {
+    console.log("preloadedMessages", preloadedMessages);
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
@@ -151,7 +184,11 @@ const ChatDetail = ({ route, navigation }) => {
       });
 
       if (messageData.success) {
-        setMessages(messageData.data);
+        // 處理訊息資料，加入分隔符標記
+        const processedData = processMessageWithSeparators(messageData.data);
+
+        console.log("processedData", processedData);
+        setMessages(processedData); // 設置處理後的訊息
       } else {
         setError("取得訊息失敗，請稍後再試");
       }
@@ -198,6 +235,10 @@ const ChatDetail = ({ route, navigation }) => {
   useEffect(() => {
     if (flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
+    }
+    if (messages.length > 0) {
+      console.log("messages", messages);
+      //clearSeparators();
     }
   }, [messages]);
 
@@ -249,8 +290,13 @@ const ChatDetail = ({ route, navigation }) => {
       console.error("更新未讀數量失敗", result.error);
     }
 
+    // 標記分隔符已查看
+     setHasViewSeparator(true);
+    clearSeparators();
+
     console.log("返回聊天列表", chatRoom);
     dispatch(setCurrentChatRoomId(null));
+
     navigation.goBack();
   };
 
@@ -294,6 +340,7 @@ const ChatDetail = ({ route, navigation }) => {
               onContentSizeChange={() =>
                 flatListRef.current?.scrollToEnd({ animated: true })
               }
+              // onViewableItemsChanged={onViewableItemChanged}
             />
             <View style={styles.inputContainer}>
               <TouchableOpacity>
@@ -377,6 +424,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     flex: 1,
+  },
+  separatorText: {
+    textAlign: "center",
+    color: "gray",
+    marginVertical: 8,
+    fontStyle: "italic",
   },
 });
 

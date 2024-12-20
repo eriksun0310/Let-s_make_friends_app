@@ -2,7 +2,7 @@ import { supabase } from "./supabaseClient";
 import { addChatRoom } from "../store/chatSlice";
 import { UnknownAction } from "@reduxjs/toolkit";
 import { getFriendDetail } from "./handleFriendsEvent";
-import { formatTimeWithDayjs } from "../shared/funcs";
+import { formatTimeWithDayjs } from "../shared/personalFuncs";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 
@@ -225,6 +225,8 @@ export const getMessages = async ({
       error: error.message,
     };
   }
+
+  console.log("getMessages data", data);
 
   return {
     success: true,

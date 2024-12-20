@@ -77,9 +77,9 @@ export const checkRequired = (user: User) => {
   };
 };
 
-
 // 格式化時間
 export const formatTimeWithDayjs = (isoString) => {
   const formattedTime = dayjs(isoString).format("A hh:mm");
   return formattedTime.replace("AM", "上午").replace("PM", "下午");
 };
+

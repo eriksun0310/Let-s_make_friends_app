@@ -23,6 +23,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
+import { processMessageWithSeparators } from "../shared/chatFuncs";
 
 interface UserInfoProps {
   route: {
@@ -70,13 +71,16 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       userId: personal.userId,
     });
     dispatch(setCurrentChatRoomId(chatRoom.id));
+    // 處理訊息資料，加入分隔符標記
+    const processedData = processMessageWithSeparators(messages.data);
+
     navigation.navigate("chatDetail", {
       chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室
       chatRoom: {
         id: chatRoom?.id,
         friend: friend,
       },
-      messages: messages.data,
+      messages: processedData,
     });
   };
 

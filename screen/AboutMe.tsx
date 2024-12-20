@@ -7,7 +7,7 @@ import { Gender, HeadShot as HeadShotType, User } from "../shared/types";
 import SelectedOption from "../components/aboutMe/SelectedOption";
 import { selectUser, setUser } from "../store/userSlice";
 import { useEffect, useState } from "react";
-import { checkRequired } from "../shared/funcs";
+import { checkRequired } from "../shared/personalFuncs";
 import { NavigationProp } from "@react-navigation/native";
 import GenderButtons from "../components/ui/button/GenderButtons";
 import SaveButton from "../components/ui/button/SaveButton";
