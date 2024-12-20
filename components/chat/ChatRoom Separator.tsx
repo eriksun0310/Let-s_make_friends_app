@@ -8,9 +8,16 @@ import {
   resetUnreadUser,
   setCurrentChatRoomId,
 } from "../../store/chatSlice";
-import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
+import {
+  deleteChatRoomDB,
+  getMessages,
+  resetDeleteChatRoom,
+} from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
-import { resetDeleteChatRoomState } from "../../shared/chatFuncs";
+import {
+  getProcessedChatData,
+  processMessageWithSeparators,
+} from "../../shared/chatFuncs";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
@@ -22,6 +29,9 @@ const ChatRoom = ({ chatRoom, navigation }) => {
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
+  // 是否有未讀分隔符
+  // const [hasUnreadSeparator, setHasUnreadSeparator] = useState(false);
+
   const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
 
   // 刪除聊天室 事件
@@ -31,6 +41,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       resetRef.current(); // 執行 `reset`
     }
 
+    
     if (mode === "delete") {
       try {
         const result = await deleteChatRoomDB({
@@ -65,10 +76,21 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
+    // 處理聊天紀錄是否要填加分隔符
+    // const { hasSeparator, processedChatData } = getProcessedChatData({
+    //   chatRoom,
+    //   userId: personal.userId,
+    //   messagesData: messages.data,
+    // });
+
+    // setHasUnreadSeparator(hasSeparator);
+
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
       messages: messages?.data, // 預加載的聊天記錄
+      // hasUnreadSeparator: hasUnreadSeparator, // 傳遞分隔符狀態
+      // setHasUnreadSeparator: setHasUnreadSeparator,
     });
 
     // 清零未讀訊息
@@ -80,12 +102,16 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       })
     );
 
-    // 重製聊天室狀態
-    resetDeleteChatRoomState({
-      chatRoom: chatRoom,
-      userId: personal.userId,
-    });
-    
+    const isUser1 = chatRoom.user1Id === personal.userId;
+    let deletedColumn = isUser1 ? "user1Deleted" : "user2Deleted";
+
+    // 如果有刪除聊天室的話, 再次點進那個聊天室 要重置聊天室的刪除狀態
+    if (chatRoom[deletedColumn]) {
+      await resetDeleteChatRoom({
+        roomId: chatRoom.id,
+        userId: personal.userId,
+      });
+    }
   };
 
   const getUnreadCount = (chatRoom, userId) => {

@@ -23,7 +23,10 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
-import { resetDeleteChatRoomState } from "../shared/chatFuncs";
+import {
+  getProcessedChatData,
+  processMessageWithSeparators,
+} from "../shared/chatFuncs";
 
 interface UserInfoProps {
   route: {
@@ -46,6 +49,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     friend,
     isShowMsgIcon = false,
   } = route.params || { userState: "personal" };
+
+  // 是否有未讀分隔符
+  // const [hasUnreadSeparator, setHasUnreadSeparator] = useState(false);
 
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
@@ -74,6 +80,18 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     });
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
+    // let processedData = [];
+    // 舊聊天室
+    // if (chatRoom.id) {
+    //   const { processedChatData } = getProcessedChatData({
+    //     chatRoom,
+    //     userId: personal.userId,
+    //     messagesData: messages.data,
+    //   });
+
+    //   processedData = processedChatData;
+    // }
+
     navigation.navigate("chatDetail", {
       chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室
       chatRoom: {
@@ -81,12 +99,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
         friend: friend,
       },
       messages: messages?.data,
-    });
-
-    // 重製聊天室狀態
-    resetDeleteChatRoomState({
-      chatRoom: chatRoom,
-      userId: personal.userId,
+      // hasUnreadSeparator: hasUnreadSeparator, // 傳遞分隔符狀態
+      // setHasUnreadSeparator: setHasUnreadSeparator,
     });
   };
 

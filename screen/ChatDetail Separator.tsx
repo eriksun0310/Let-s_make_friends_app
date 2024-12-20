@@ -56,8 +56,8 @@ const ChatDetail = ({ route, navigation }) => {
     chatRoom,
     messages: preloadedMessages,
     chatRoomState,
-    // hasUnreadSeparator,
-    // setHasUnreadSeparator,
+    hasUnreadSeparator,
+    setHasUnreadSeparator,
   } = route.params;
 
   const friend = chatRoom?.friend;
@@ -70,12 +70,17 @@ const ChatDetail = ({ route, navigation }) => {
     preloadedMessages || []
   );
 
+  // 分隔符的狀態
+  const [hasViewSeparator, setHasViewSeparator] = useState(false);
+
   const [loading, setLoading] = useState();
 
   const [error, setError] = useState(null);
 
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
+
+  // console.log("hasViewSeparator", hasViewSeparator);
 
   // 渲染訊息
   const renderMessage = ({ item }) => (
@@ -86,11 +91,11 @@ const ChatDetail = ({ route, navigation }) => {
         onView={(messageId: string) => handleMessageView(messageId)}
       />
 
-      {/* {item.showSeparator && hasUnreadSeparator && (
+      {item.showSeparator && hasUnreadSeparator && (
         <Text style={styles.separatorText}>
           ------------ 以下為查看訊息 ------------
         </Text>
-      )} */}
+      )}
     </>
   );
 
@@ -152,9 +157,32 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
+  // const onViewableItemChanged = ({ viewableItems }) => {
+  //   const separatorIndex = messages.findIndex((msg) => msg.showSeparator);
+  //   const isSeparatorVisible = viewableItems.some(
+  //     (item) => item.index === separatorIndex
+  //   );
+
+  //   if (isSeparatorVisible && !hasViewSeparator) {
+  //     setTimeout(() => {
+  //       setHasViewSeparator(true); // 標記分隔符為已查看
+  //     }, 1000);
+  //   }
+  // };
+
+  // 清除分隔符
+  const clearSeparators = () => {
+    setMessages((prev) =>
+      prev.map((msg) => ({
+        ...msg,
+        showSeparator: false,
+      }))
+    );
+  };
 
   //  加載訊息
   const fetchMessagesIfNeeded = async () => {
+    // console.log("preloadedMessages", preloadedMessages);
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
@@ -249,6 +277,7 @@ const ChatDetail = ({ route, navigation }) => {
   const handleReturnToChatList = async () => {
     //console.log("聊天  当前导航堆栈:", navigation.getState());
     //更新 本地未讀數量歸0
+
     dispatch(
       resetUnreadUser({
         chatRoomId: currentChatRoomId,
@@ -264,6 +293,16 @@ const ChatDetail = ({ route, navigation }) => {
     });
     if (!result.success) {
       console.error("更新未讀數量失敗", result.error);
+    }
+
+    if (hasUnreadSeparator) {
+      // 更新資料庫的訊息 將所有 未讀 改為 已讀
+      await markChatRoomMessagesAllAsRead({
+        chatRoomId: currentChatRoomId!,
+        userId: personal.userId,
+      });
+      // 返回聊天列表時清除分隔符顯示狀態
+      setHasUnreadSeparator(false);
     }
 
     dispatch(setCurrentChatRoomId(null));

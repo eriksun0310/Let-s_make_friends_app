@@ -3,6 +3,7 @@ import { User } from "../shared/types";
 import { formatTimeWithDayjs } from "../shared/personalFuncs";
 import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
+import { getChatRoomDetail } from "../util/handleChatEvent";
 
 type ChatRoom = {
   id: string;
@@ -13,6 +14,8 @@ type ChatRoom = {
   unreadCountUser2: number;
   user1Deleted: boolean;
   user2Deleted: boolean;
+  user1DeletedAt: Date;
+  user2DeletedAt: Date;
   user1Id: string;
   user2Id: string;
   createdAt: Date;
@@ -58,21 +61,32 @@ const chatSlice = createSlice({
 
     // 更新聊天室(未讀訊息數量、最後一則訊息、最後一則訊息時間)
     updateChatRoom(state, action) {
-      const { id, lastMessage, lastTime, incrementUser1, incrementUser2 } =
-        action.payload;
+      const {
+        id,
+        lastMessage,
+        lastTime,
+        incrementUser1,
+        incrementUser2,
+        user1Deleted,
+        user1DeletedAt,
+        user2Deleted,
+        user2DeletedAt,
+      } = action.payload;
 
       // 找出對應的聊天室
       const chatRoom = state.chatRooms.find((room) => room.id === id);
 
       // 如果聊天室存在
       if (chatRoom) {
-        //console.log("Before update:", { ...chatRoom });
         // 更新最後訊息和時間
         chatRoom.lastMessage = lastMessage;
         chatRoom.lastTime = formatTimeWithDayjs(lastTime);
         chatRoom.unreadCountUser1 += incrementUser1 || 0;
         chatRoom.unreadCountUser2 += incrementUser2 || 0;
-        //console.log("After update:", { ...chatRoom });
+        chatRoom.user1Deleted = user1Deleted;
+        chatRoom.user1DeletedAt = user1DeletedAt;
+        chatRoom.user2Deleted = user2Deleted;
+        chatRoom.user2DeletedAt = user2DeletedAt;
       }
     },
 
@@ -124,6 +138,11 @@ export const updateOrCreateChatRoom =
     } = payload;
     const state = getState();
     const chatRoom = state.chat.chatRooms.find((room) => room.id === id);
+
+    // 取得聊天室詳細資料
+    const chatRoomDetail = await getChatRoomDetail(id);
+
+    console.log("chatRoomDetail 1111111111111", chatRoomDetail);
     // 更新聊天室
     if (chatRoom) {
       dispatch(
@@ -135,6 +154,10 @@ export const updateOrCreateChatRoom =
           lastTime,
           incrementUser1,
           incrementUser2,
+          user1Deleted: chatRoomDetail.user1_deleted,
+          user1DeletedAt: chatRoomDetail.user1_deleted_at,
+          user2Deleted: chatRoomDetail.user2_deleted,
+          user2DeletedAt: chatRoomDetail.user2_deleted_at,
         })
       );
     } else {
@@ -150,6 +173,10 @@ export const updateOrCreateChatRoom =
           unreadCountUser1: incrementUser1 || 0,
           unreadCountUser2: incrementUser2 || 0,
           friend,
+          user1Deleted: chatRoomDetail.user1_deleted,
+          user1DeletedAt: chatRoomDetail.user1_deleted_at,
+          user2Deleted: chatRoomDetail.user2_deleted,
+          user2DeletedAt: chatRoomDetail.user2_deleted_at,
         })
       );
     }
