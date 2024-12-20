@@ -522,6 +522,37 @@ export const markChatRoomMessagesAsRead = async ({
   }
 };
 
+// 標記整個聊天室的消息為已讀(for: 發送訊息的那方, 會先 提醒 --以下為查看訊息-- , 在更新對方的已讀, 主要讓發送者知道 對方有哪一則訊息是沒有讀到的)
+export const markChatRoomMessagesAllAsRead = async ({
+  chatRoomId,
+  userId,
+}: {
+  chatRoomId: string;
+  userId: string;
+}) => {
+  try {
+
+    // 將該聊天室中屬於當前用戶的訊息標記為已讀
+    const { error: updateMessageError } = await supabase
+      .from("messages")
+      .update({
+        is_read: true,
+      })
+      .eq("chat_room_id", chatRoomId)
+      .eq("sender_id", userId); // 僅更新屬於當前用戶的訊息
+
+    if (updateMessageError) {
+      console.error("Error updating messages:", updateMessageError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return false;
+  }
+};
+
 // 刪除聊天室
 export const deleteChatRoomDB = async ({
   roomId,

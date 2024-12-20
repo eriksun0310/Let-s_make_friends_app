@@ -22,6 +22,9 @@ const ChatRoom = ({ chatRoom, navigation }) => {
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
+  // 是否有未讀分隔符
+  const [hasUnreadSeparator, setHasUnreadSeparator] = useState(false);
+
   const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
 
   // 刪除聊天室 事件
@@ -68,6 +71,11 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
+    // 判斷是否需要分隔符
+    const hasSeparator = messages.data.some((message) => !message.is_read);
+
+    setHasUnreadSeparator(hasSeparator);
+
     // 處理訊息資料，加入分隔符標記
     const processedData = processMessageWithSeparators(messages.data);
 
@@ -75,6 +83,8 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
       messages: processedData, // 預加載的聊天記錄
+      hasUnreadSeparator: hasUnreadSeparator, // 傳遞分隔符狀態
+      setHasUnreadSeparator: setHasUnreadSeparator,
     });
 
     // 清零未讀訊息

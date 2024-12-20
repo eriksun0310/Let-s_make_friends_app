@@ -10,6 +10,7 @@ import {
   Text,
   ImageSourcePropType,
   SafeAreaView,
+  StatusBar,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BackButton from "../components/ui/button/BackButton";
@@ -18,6 +19,7 @@ import { Colors } from "../constants/style";
 import {
   createNewChatRoom,
   getMessages,
+  markChatRoomMessagesAllAsRead,
   markChatRoomMessagesAsRead,
   markMessageAsRead,
   resetUnreadCount,
@@ -50,7 +52,14 @@ chatRoomState: 'old' | 'new'
 // 進到聊天室
 const ChatDetail = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
-  const { chatRoom, messages: preloadedMessages, chatRoomState } = route.params;
+  const {
+    chatRoom,
+    messages: preloadedMessages,
+    chatRoomState,
+    hasUnreadSeparator,
+    setHasUnreadSeparator,
+  } = route.params;
+
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
 
@@ -71,7 +80,7 @@ const ChatDetail = ({ route, navigation }) => {
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef(null);
 
-  console.log("hasViewSeparator", hasViewSeparator);
+  // console.log("hasViewSeparator", hasViewSeparator);
 
   // 渲染訊息
   const renderMessage = ({ item }) => (
@@ -82,7 +91,7 @@ const ChatDetail = ({ route, navigation }) => {
         onView={(messageId: string) => handleMessageView(messageId)}
       />
 
-      {(item.showSeparator && !hasViewSeparator) && (
+      {item.showSeparator && hasUnreadSeparator && (
         <Text style={styles.separatorText}>
           ------------ 以下為查看訊息 ------------
         </Text>
@@ -173,7 +182,7 @@ const ChatDetail = ({ route, navigation }) => {
 
   //  加載訊息
   const fetchMessagesIfNeeded = async () => {
-    console.log("preloadedMessages", preloadedMessages);
+    // console.log("preloadedMessages", preloadedMessages);
     if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
     try {
@@ -187,7 +196,7 @@ const ChatDetail = ({ route, navigation }) => {
         // 處理訊息資料，加入分隔符標記
         const processedData = processMessageWithSeparators(messageData.data);
 
-        console.log("processedData", processedData);
+        // console.log("processedData", processedData);
         setMessages(processedData); // 設置處理後的訊息
       } else {
         setError("取得訊息失敗，請稍後再試");
@@ -235,10 +244,6 @@ const ChatDetail = ({ route, navigation }) => {
   useEffect(() => {
     if (flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
-    }
-    if (messages.length > 0) {
-      console.log("messages", messages);
-      //clearSeparators();
     }
   }, [messages]);
 
@@ -290,17 +295,23 @@ const ChatDetail = ({ route, navigation }) => {
       console.error("更新未讀數量失敗", result.error);
     }
 
-    // 標記分隔符已查看
-     setHasViewSeparator(true);
-    clearSeparators();
+    if (hasUnreadSeparator) {
+      // 更新資料庫的訊息 將所有 未讀 改為 已讀
+      await markChatRoomMessagesAllAsRead({
+        chatRoomId: currentChatRoomId!,
+        userId: personal.userId,
+      });
+      // 返回聊天列表時清除分隔符顯示狀態
+      setHasUnreadSeparator(false);
+    }
 
-    console.log("返回聊天列表", chatRoom);
     dispatch(setCurrentChatRoomId(null));
 
     navigation.goBack();
   };
 
   if (loading) return <LoadingOverlay message="loading ..." />;
+
   return (
     <>
       <KeyboardAvoidingView
@@ -412,7 +423,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "white",
-    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
   },
   avatar: {
     width: 40,
