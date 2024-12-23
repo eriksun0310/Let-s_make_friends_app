@@ -17,10 +17,11 @@ import BackButton from "../components/ui/button/BackButton";
 import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
 import {
-  createNewChatRoomAndInsertMessage,
-  getLastMessage,
+  createNewChatRoom,
   getMessages,
+  markChatRoomMessagesAllAsRead,
   markChatRoomMessagesAsRead,
+  markMessageAsRead,
   resetUnreadCount,
   sendMessage,
 } from "../util/handleChatEvent";
@@ -41,6 +42,7 @@ import {
   handleMessageView,
   processMessageWithSeparators,
 } from "../shared/chatFuncs";
+
 /*
 chatRoomState: 'old' | 'new'
 從好友列表進來 不一定是新舊聊天室
@@ -96,6 +98,22 @@ const ChatDetail = ({ route, navigation }) => {
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
+    let chatRoomId = currentChatRoomId; // redux 的
+    if (!chatRoomId) {
+      const newChatRoom = await createNewChatRoom(
+        personal.userId,
+        friend.userId
+      );
+      if (newChatRoom.error) {
+        console.error("Failed to create chat room:", newChatRoom.error);
+        return;
+      }
+      chatRoomId = newChatRoom.id;
+      console.log("newChatRoom handleSend ", newChatRoom);
+      dispatch(addChatRoom(newChatRoom));
+      dispatch(setCurrentChatRoomId(newChatRoom.id));
+    }
+
     const tempId = `temp_${Date.now()}`;
     const tempMessage = {
       id: tempId,
@@ -105,82 +123,34 @@ const ChatDetail = ({ route, navigation }) => {
       created_at: new Date().toISOString(),
       isTemporary: true,
     };
-
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
     setInputText("");
 
-    let chatRoomId = currentChatRoomId; // redux 的
+    const result = await sendMessage({
+      userId: personal.userId,
+      friendId: friend.userId,
+      message: inputText,
+      chatRoomId,
+    });
 
-    // 新聊天室
-    if (!chatRoomId) {
-      const newChatRoom = await createNewChatRoomAndInsertMessage({
-        userId: personal.userId,
-        friendId: friend.userId,
-        message: inputText,
-      });
-
-      if (!newChatRoom) {
-        console.error("Failed to create chat room and insert message");
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === tempMessage.id
-              ? { ...msg, isTemporary: false, failed: true }
-              : msg
-          )
-        );
-      }
-
-      chatRoomId = newChatRoom.id;
-
-      if (newChatRoom) {
-        dispatch(addChatRoom(newChatRoom));
-        dispatch(setCurrentChatRoomId(newChatRoom.id));
-      }
+    if (result.error) {
+      console.error("Failed to send message:", result.error);
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === tempMessage.id
+            ? { ...msg, isTemporary: false, failed: true }
+            : msg
+        )
+      );
     } else {
-      const result = await sendMessage({
-        userId: personal.userId,
-        friendId: friend.userId,
-        message: inputText,
-        chatRoomId,
-      });
-
-      if (result.error) {
-        console.error("Failed to send message:", result.error);
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === tempMessage.id
-              ? { ...msg, isTemporary: false, failed: true }
-              : msg
-          )
-        );
-        return;
-      }
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === tempMessage.id
+            ? { ...result.data, isTemporary: false }
+            : msg
+        )
+      );
     }
-
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === tempMessage.id ? { ...tempMessage, isTemporary: false } : msg
-      )
-    );
-
-    // if (result.error) {
-    //   console.error("Failed to send message:", result.error);
-    //   setMessages((prevMessages) =>
-    //     prevMessages.map((msg) =>
-    //       msg.id === tempMessage.id
-    //         ? { ...msg, isTemporary: false, failed: true }
-    //         : msg
-    //     )
-    //   );
-    // } else {
-    //   setMessages((prevMessages) =>
-    //     prevMessages.map((msg) =>
-    //       msg.id === tempMessage.id
-    //         ? { ...result.data, isTemporary: false }
-    //         : msg
-    //     )
-    //   );
-    // }
   };
 
   //  加載訊息

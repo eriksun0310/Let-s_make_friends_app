@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../shared/types";
-import { formatTimeWithDayjs } from "../shared/personalFuncs";
 import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
@@ -48,15 +47,28 @@ const chatSlice = createSlice({
       state.chatRooms = action.payload;
     },
     addChatRoom(state, action) {
-      const roomExists = state.chatRooms.some(
-        (room) => room.id === action.payload.id
+      const incomingRoom = action.payload;
+      const index = state.chatRooms.findIndex(
+        (room) => room.id === incomingRoom.id
       );
 
-      if (!roomExists) {
-        state.chatRooms.push(action.payload);
+      // 如果聊天室不存在,添加
+      if (index === -1) {
+        state.chatRooms.push(incomingRoom);
+
+        //聊天室已存在,更新數據
       } else {
-        console.log("聊天室已存在");
+        state.chatRooms[index] = {
+          ...state.chatRooms[index],
+          ...incomingRoom,
+        };
       }
+
+      // 排序聊天室, 按照最後一則訊息的時間排序
+      state.chatRooms.sort(
+        (a, b) =>
+          new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime()
+      );
     },
 
     // 更新聊天室(未讀訊息數量、最後一則訊息、最後一則訊息時間)
@@ -80,7 +92,7 @@ const chatSlice = createSlice({
       if (chatRoom) {
         // 更新最後訊息和時間
         chatRoom.lastMessage = lastMessage;
-        chatRoom.lastTime = formatTimeWithDayjs(lastTime);
+        chatRoom.lastTime = lastTime;
         chatRoom.unreadCountUser1 += incrementUser1 || 0;
         chatRoom.unreadCountUser2 += incrementUser2 || 0;
         chatRoom.user1Deleted = user1Deleted;
@@ -169,7 +181,7 @@ export const updateOrCreateChatRoom =
           user1Id,
           user2Id,
           lastMessage,
-          lastTime: formatTimeWithDayjs(lastTime),
+          lastTime: lastTime,
           unreadCountUser1: incrementUser1 || 0,
           unreadCountUser2: incrementUser2 || 0,
           friend,

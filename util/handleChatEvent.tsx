@@ -1,8 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { addChatRoom } from "../store/chatSlice";
-import { UnknownAction } from "@reduxjs/toolkit";
 import { getFriendDetail } from "./handleFriendsEvent";
-import { formatTimeWithDayjs } from "../shared/personalFuncs";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 
@@ -48,7 +45,7 @@ export const getAllChatRooms = async (userId: string) => {
       const lastMessageData = await getLastMessage(room.id);
 
       return {
-        lastTime: formatTimeWithDayjs(lastMessageData?.created_at),
+        lastTime: lastMessageData?.created_at,
         lastMessage: lastMessageData?.content,
         id: room.id,
         created_at: room.created_at,
@@ -60,7 +57,6 @@ export const getAllChatRooms = async (userId: string) => {
         user2_deleted_at: room.user2_deleted_at,
         unreadCountUser1: room.unread_count_user1,
         unreadCountUser2: room.unread_count_user2,
-        lastMessageTime: lastMessageData?.created_at, // 添加最新訊息的時間，用於排序
         friend: friend,
       };
     })
@@ -70,8 +66,8 @@ export const getAllChatRooms = async (userId: string) => {
 
   // 根據最後一條訊息的時間進行排序,將最新的聊天室排到最上面
   const sortedChatRooms = chatRoomsDetails.sort((a, b) => {
-    if (a.lastMessageTime && b.lastMessageTime) {
-      return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
+    if (a.lastTime && b.lastTime) {
+      return new Date(b.lastTime) - new Date(a.lastTime);
     }
     return 0; // 若有空值則保持原順序
   });
@@ -151,10 +147,16 @@ export const getLastMessage = async (chatRoomId: string) => {
   return data[0];
 };
 
-// 建立新聊天室
-export const createNewChatRoom = async (userId: string, friendId: string) => {
-  // console.log('createNewChatRoom', userId, friendId);
-
+// 建立新聊天室&插入訊息
+export const createNewChatRoomAndInsertMessage = async ({
+  userId,
+  friendId,
+  message,
+}: {
+  userId: string;
+  friendId: string;
+  message: string;
+}) => {
   const { data: room, error } = await supabase
     .from("chat_rooms")
     .insert({
@@ -167,12 +169,25 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
     console.error("Error creating chat room:", error);
     return {};
   }
-  // console.log("createNewChatRoom room", room);
 
-  // const isUser1 = room.user1_id === userId;
-  // const friendId = isUser1 ? room.user2_id : room.user1_id;
+  // 發送訊息
+  const result = await sendMessage({
+    userId: userId,
+    friendId: friendId,
+    message: message,
+    chatRoomId: room.id,
+  });
+
+  // 如果發送訊息失敗
+  if (result.error) {
+    console.error("Error sending message:", result.error);
+    throw new Error("Failed to send message");
+  }
+
   const friend = await getFriendDetail(friendId);
   const lastMessageData = await getLastMessage(room.id);
+  console.log(" 建立新聊天室 lastMessageData", lastMessageData);
+
   return {
     id: room.id,
     created_at: room.created_at,
@@ -183,7 +198,7 @@ export const createNewChatRoom = async (userId: string, friendId: string) => {
     unreadCountUser1: room.unread_count_user1,
     unreadCountUser2: room.unread_count_user2,
     friend: friend,
-    lastTime: formatTimeWithDayjs(lastMessageData?.created_at),
+    lastTime: lastMessageData?.created_at,
     lastMessage: lastMessageData?.content,
   };
 };

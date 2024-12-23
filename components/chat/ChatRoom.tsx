@@ -11,6 +11,7 @@ import {
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import { resetDeleteChatRoomState } from "../../shared/chatFuncs";
+import { formatTimeWithDayjs } from "../../shared/personalFuncs";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
@@ -85,7 +86,6 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       chatRoom: chatRoom,
       userId: personal.userId,
     });
-    
   };
 
   const getUnreadCount = (chatRoom, userId) => {
@@ -135,7 +135,9 @@ const ChatRoom = ({ chatRoom, navigation }) => {
           <View style={styles.chatMessageContainer}>
             <Text style={styles.chatName}>{friend?.name}</Text>
             {chatRoom?.lastMessage && (
-              <Text style={styles.chatTime}>{chatRoom?.lastTime}</Text>
+              <Text style={styles.chatTime}>
+                {formatTimeWithDayjs(chatRoom?.lastTime)}
+              </Text>
             )}
           </View>
 
