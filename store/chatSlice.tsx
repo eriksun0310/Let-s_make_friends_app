@@ -100,6 +100,12 @@ const chatSlice = createSlice({
         chatRoom.user2Deleted = user2Deleted;
         chatRoom.user2DeletedAt = user2DeletedAt;
       }
+
+      // 排序聊天室, 按照最後一則訊息的時間排序
+      state.chatRooms.sort(
+        (a, b) =>
+          new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime()
+      );
     },
 
     // 清零自己的未讀數量
