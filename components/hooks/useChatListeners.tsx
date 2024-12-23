@@ -12,15 +12,7 @@ import { updateUnreadCount } from "../../util/handleChatEvent";
 import { isUserOnline } from "../../util/handlePersonEvent";
 import { set } from "firebase/database";
 import { AppState } from "react-native";
-
-// TODO:轉換為前端可用的格式
-const transformMessage = (data) => {
-  return (data || []).map(({
-
-  })=>({
-    // message type
-  }))
-}
+import { transformMessage } from "../../shared/chatFuncs";
 
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
@@ -134,7 +126,11 @@ export const useChatListeners = () => {
           },
           (payload) => {
             // console.log("當前聊天室的新訊息監聽", payload.new);
-            setNewMessage(payload.new);
+
+            const transformedMessage = transformMessage(payload.new);
+
+            console.log('transformedMessage', transformedMessage);
+            setNewMessage(transformedMessage);
           }
         )
         .subscribe();

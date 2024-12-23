@@ -113,6 +113,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       content: inputText,
       createdAt: new Date().toISOString(),
       isTemporary: true,
+      isRead: false,
     };
 
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
@@ -205,10 +206,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
       if (messageData.success) {
         // 處理訊息資料，加入分隔符標記
-        const processedData = processMessageWithSeparators(messageData.data);
+        //const processedData = processMessageWithSeparators(messageData.data);
 
         // console.log("processedData", processedData);
-        setMessages(processedData); // 設置處理後的訊息
+        setMessages(messageData.data as MessageType[]); // 設置處理後的訊息
       } else {
         setError("取得訊息失敗，請稍後再試");
       }

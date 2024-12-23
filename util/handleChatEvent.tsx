@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient";
 import { getFriendDetail } from "./handleFriendsEvent";
 import { ChatRoom, Message } from "../shared/types";
+import { transformMessageArray } from "../shared/chatFuncs";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 
@@ -287,11 +288,9 @@ export const getMessages = async ({
     };
   }
 
-  console.log("getMessages data", data);
-
   return {
     success: true,
-    data: data,
+    data: transformMessageArray(data),
   };
 };
 

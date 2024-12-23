@@ -1,28 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
-
-// 轉換為前端可用的格式
-const transformFriendRequests = (data) => {
-  return (data || []).map(
-    ({
-      id,
-      sender_id,
-      receiver_id,
-      status,
-      created_at,
-      updated_at,
-      is_read,
-    }) => ({
-      id,
-      receiverId: receiver_id,
-      senderId: sender_id,
-      status,
-      createdAt: created_at,
-      updatedAt: updated_at,
-      isRead: is_read,
-    })
-  );
-};
+import { transformFriendRequests } from "../../shared/friendFuncs";
 
 // 取得狀態為 pending 的好友邀請
 export const useFriendRequests = (userId: string) => {

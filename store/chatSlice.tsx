@@ -3,7 +3,6 @@ import { ChatRoom } from "../shared/types";
 import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
-
 interface InitialStateProps {
   chatRooms: ChatRoom[];
   currentChatRoomId?: string | null;
@@ -142,8 +141,6 @@ export const updateOrCreateChatRoom =
 
     // 取得聊天室詳細資料
     const chatRoomDetail = await getChatRoomDetail(id);
-
-    console.log("chatRoomDetail 1111111111111", chatRoomDetail);
     // 更新聊天室
     if (chatRoom) {
       dispatch(
@@ -162,8 +159,10 @@ export const updateOrCreateChatRoom =
         })
       );
     } else {
-      // 新增聊天室
-      const friend = await getFriendDetail(user1Id); // 非同步操作
+      const personal = state.user.user;
+      const friendId = personal.userId === user1Id ? user1Id : user2Id;
+      // 取得聊天室好友資訊
+      const friend = await getFriendDetail(friendId); // 非同步操作
       dispatch(
         addChatRoom({
           id,
