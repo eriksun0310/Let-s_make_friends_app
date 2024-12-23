@@ -155,7 +155,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
 const styles = StyleSheet.create({
   chatItem: {
     backgroundColor: "#fff",
-    marginBottom: 7,
+    // marginBottom: 7,
   },
   chatIcon: {
     width: 50,

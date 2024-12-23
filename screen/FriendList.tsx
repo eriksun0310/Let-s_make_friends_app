@@ -11,6 +11,7 @@ import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { selectUser, useAppSelector } from "../store";
 import ostrich from "../assets/animal/ostrich.png";
+import SearchBar from "../components/ui/SearchBar";
 interface FriendListProps {
   navigation: NavigationProp<any>;
 }
@@ -56,34 +57,41 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     />
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      // console.log("好友列表 useFocusEffect");
-      //console.log("好友列表  当前导航堆栈:", navigation.getState());
-      navigation.setOptions({
-        title: "好友列表",
-        headerTitleAlign: "center",
-        headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
-      });
-      // 强制触发更新
-      setTimeout(() => {
-        navigation.setOptions({
-          title: "好友列表",
-          headerTitleAlign: "center",
-          headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
-        });
-      }, 0);
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // console.log("好友列表 useFocusEffect");
+  //     //console.log("好友列表  当前导航堆栈:", navigation.getState());
+  //     navigation.setOptions({
+  //       title: "好友列表",
+  //       headerTitleAlign: "center",
+  //       headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+  //     });
+  //     // 强制触发更新
+  //     setTimeout(() => {
+  //       navigation.setOptions({
+  //         title: "好友列表",
+  //         headerTitleAlign: "center",
+  //         headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+  //       });
+  //     }, 0);
+  //   }, [navigation])
+  // );
 
   useEffect(() => {
     fetchFriendList();
-  }, []);
+    navigation.setOptions({
+      title: "好友列表",
+      headerTitleAlign: "center",
+      headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
+    });
+  }, [navigation]);
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
 
   return (
     <View style={styles.screen}>
+      {/* 搜尋列 */}
+      {friendList?.length > 0 && <SearchBar />}
       <FlatList
         data={friendList}
         renderItem={renderFriendItem}

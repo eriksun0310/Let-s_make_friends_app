@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    marginBottom: 8,
+    // marginBottom: 8,
     height: 100,
   },
   AvatarContainer: {

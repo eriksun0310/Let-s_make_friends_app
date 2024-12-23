@@ -15,6 +15,7 @@ import {
   selectCurrentChatRoomId,
 } from "../store";
 import React from "react";
+import SearchBar from "../components/ui/SearchBar";
 //import { useUnreadCount } from "../components/hooks/useUnreadCount";
 //import { ChatContextProvider } from "../shared/ChatContext";
 const chatData = [
@@ -84,7 +85,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       return unreadCount > 0;
     });
 
-
     // console.log('hasUnreadMessages', hasUnreadMessages)
     navigation.setOptions({
       // 動態設置底部導航的 tabBarBadge
@@ -92,19 +92,20 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     });
   }, [navigation, chatRoomsData, personal.userId]);
 
-
-
-  console.log('chatRoomsData', chatRoomsData)
+  console.log("chatRoomsData", chatRoomsData);
 
   return (
     // <ChatContextProvider>
-      <View style={styles.screen}>
-        <FlatList
-          data={chatRoomsData}
-          renderItem={renderChatRoom}
-          keyExtractor={(item) => item?.id}
-        />
-      </View>
+    <View style={styles.screen}>
+      {/* 搜尋列 */}
+      {chatRoomsData?.length > 0 && <SearchBar />}
+
+      <FlatList
+        data={chatRoomsData}
+        renderItem={renderChatRoom}
+        keyExtractor={(item) => item?.id}
+      />
+    </View>
     // </ChatContextProvider>
   );
 };

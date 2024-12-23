@@ -5,6 +5,10 @@ import {
   View,
   Text,
   StyleSheet,
+  Platform,
+  StatusBar,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 import CustomIcon from "./button/CustomIcon";
 import { SearchIcon, X } from "lucide-react-native";
@@ -12,20 +16,26 @@ import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 
 interface SearchBarProps {
-  navigation: NavigationProp<any>;
+  style?: StyleProp<TextStyle>;
+  navigation?: NavigationProp<any>;
+  showCancel?: boolean;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ navigation }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  style,
+  navigation,
+  showCancel = false,
+}) => {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <View style={styles.searchBarContainer}>
+    <View style={[styles.searchBarContainer, style]}>
       <View style={styles.searchBar}>
         <CustomIcon
           style={{
             marginHorizontal: 0,
           }}
-          onPress={() => navigation.navigate("search")}
+          onPress={() => navigation?.navigate("search")}
         >
           <SearchIcon color={Colors.icon} size={25} />
         </CustomIcon>
@@ -47,9 +57,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ navigation }) => {
           </CustomIcon>
         )}
       </View>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.rightText}>取消</Text>
-      </TouchableOpacity>
+      {showCancel && (
+        <TouchableOpacity onPress={() => navigation?.goBack()}>
+          <Text style={styles.rightText}>取消</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -62,7 +74,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#fff",
     paddingVertical: 10,
+    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
   },
+
   searchBar: {
     flex: 1,
     flexDirection: "row",
@@ -72,11 +86,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginHorizontal: 10,
+    // width: "100%",
   },
   searchInput: {
     flex: 1,
     marginLeft: 5,
-    height: 35,
+    height: 40,
   },
   rightText: {
     fontSize: 17,

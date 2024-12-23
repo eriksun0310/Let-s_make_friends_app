@@ -1,5 +1,13 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { Avatar } from "@rneui/themed";
 import { Colors } from "../constants/style";
 import CustomIcon from "../components/ui/button/CustomIcon";
@@ -28,7 +36,14 @@ const Search: React.FC<SearchProps> = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* 搜尋列 */}
-        <SearchBar navigation={navigation} />
+        <SearchBar
+          navigation={navigation}
+          showCancel
+          style={{
+            paddingTop:
+              Platform.OS === "android" ? StatusBar.currentHeight : 10,
+          }}
+        />
 
         <View
           style={{
@@ -61,7 +76,7 @@ const Search: React.FC<SearchProps> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    marginTop: 3,
+    // marginTop: 3,
     flex: 1,
     backgroundColor: "white",
   },
