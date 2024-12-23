@@ -1,25 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { User } from "../shared/types";
+import { ChatRoom } from "../shared/types";
 import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
-
-type ChatRoom = {
-  id: string;
-  lastMessage: string;
-  lastTime: string;
-  unreadCount: number;
-  unreadCountUser1: number;
-  unreadCountUser2: number;
-  user1Deleted: boolean;
-  user2Deleted: boolean;
-  user1DeletedAt: Date;
-  user2DeletedAt: Date;
-  user1Id: string;
-  user2Id: string;
-  createdAt: Date;
-  friend: User;
-};
 
 interface InitialStateProps {
   chatRooms: ChatRoom[];

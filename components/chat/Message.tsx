@@ -4,8 +4,14 @@ import { formatTimeWithDayjs } from "../../shared/personalFuncs";
 import { Colors } from "../../constants/style";
 import { useAppSelector } from "../../store";
 import { selectUser } from "../../store/userSlice";
+import { Message as MessageType } from "../../shared/types";
 
-const Message = ({ item, onView }) => {
+interface MessageProps {
+  item: MessageType;
+  onView?: (messageId: string) => void;
+}
+
+const Message: React.FC<MessageProps> = ({ item, onView }) => {
   const personal = useAppSelector(selectUser);
 
   useEffect(() => {

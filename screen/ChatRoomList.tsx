@@ -15,6 +15,7 @@ import {
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
+import { ChatRoom as ChatRoomType } from "../shared/types";
 
 interface ChatRoomListProps {
   navigation: NavigationProp<any>;
@@ -35,13 +36,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     room.friend.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // 監聽未讀數量的變化
-  // useUnreadCount({
-  //   userId: personal.userId,
-  //   currentChatRoomId: currentChatRoomId!,
-  // });
-
-  const renderChatRoom = ({ item }) => (
+  const renderChatRoom = ({ item }: { item: ChatRoomType }) => (
     <ChatRoom chatRoom={item} navigation={navigation} />
   );
 

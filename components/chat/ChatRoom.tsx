@@ -12,8 +12,15 @@ import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import { resetDeleteChatRoomState } from "../../shared/chatFuncs";
 import { formatTimeWithDayjs } from "../../shared/personalFuncs";
+import { ChatRoom as ChatRoomType } from "../../shared/types";
+import { NavigationProp } from "@react-navigation/native";
 
-const ChatRoom = ({ chatRoom, navigation }) => {
+interface ChatRoomProps {
+  chatRoom: ChatRoomType;
+  navigation: NavigationProp<any, any>;
+}
+
+const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
@@ -63,6 +70,8 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       chatRoomId: chatRoom.id,
       userId: personal.userId,
     });
+
+    console.log('messages', messages);
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
@@ -88,7 +97,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     });
   };
 
-  const getUnreadCount = (chatRoom, userId) => {
+  const getUnreadCount = (chatRoom: ChatRoomType, userId: string) => {
     if (!chatRoom) return 0;
     return chatRoom.user1Id === userId
       ? chatRoom.unreadCountUser1

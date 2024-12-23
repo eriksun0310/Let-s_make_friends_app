@@ -88,7 +88,6 @@ export type EditUserFieldName =
 export type Screen = "userInfo" | "aboutMe";
 
 export type Message = {
-  chat_room_id: string;
   content: string;
   created_at: string;
   id: string;
@@ -96,3 +95,22 @@ export type Message = {
   recipient_id: string;
   sender_id: string;
 };
+
+export type ChatRoom = {
+  id: string;
+  lastMessage: string;
+  lastTime: string;
+  unreadCount: number;
+  unreadCountUser1: number;
+  unreadCountUser2: number;
+  user1Deleted: boolean;
+  user2Deleted: boolean;
+  user1DeletedAt: Date;
+  user2DeletedAt: Date;
+  user1Id: string;
+  user2Id: string;
+  createdAt: Date;
+  friend: User;
+};
+
+export type ChatRoomState = "old" | "new";

@@ -18,14 +18,17 @@ import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
 import {
   createNewChatRoomAndInsertMessage,
-  getLastMessage,
   getMessages,
   markChatRoomMessagesAsRead,
   resetUnreadCount,
   sendMessage,
 } from "../util/handleChatEvent";
 import Message from "../components/chat/Message";
-import { Message as MessageType } from "../shared/types";
+import {
+  ChatRoom,
+  ChatRoomState,
+  Message as MessageType,
+} from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectUser,
@@ -41,22 +44,28 @@ import {
   handleMessageView,
   processMessageWithSeparators,
 } from "../shared/chatFuncs";
+import { NavigationProp } from "@react-navigation/native";
 /*
 chatRoomState: 'old' | 'new'
 從好友列表進來 不一定是新舊聊天室
 從聊天列表進來通常會是舊的聊天室
 */
 
+interface ChatDetailProps {
+  route: {
+    params: {
+      chatRoom: ChatRoom;
+      messages: MessageType[];
+      chatRoomState: ChatRoomState;
+    };
+  };
+  navigation: NavigationProp<any, any>;
+}
+
 // 進到聊天室
-const ChatDetail = ({ route, navigation }) => {
+const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
-  const {
-    chatRoom,
-    messages: preloadedMessages,
-    chatRoomState,
-    // hasUnreadSeparator,
-    // setHasUnreadSeparator,
-  } = route.params;
+  const { chatRoom, messages: preloadedMessages, chatRoomState } = route.params;
 
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
@@ -76,7 +85,7 @@ const ChatDetail = ({ route, navigation }) => {
   const flatListRef = useRef(null);
 
   // 渲染訊息
-  const renderMessage = ({ item }) => (
+  const renderMessage = ({ item }: { item: MessageType }) => (
     <>
       <Message
         key={item.id}
