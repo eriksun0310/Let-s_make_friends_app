@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Text } from "react-native";
 import { Colors } from "../constants/style";
 import FriendItem from "../components/ui/FriendItem";
 import { NavigationProp, useFocusEffect } from "@react-navigation/native";
@@ -92,6 +92,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     <View style={styles.screen}>
       {/* 搜尋列 */}
       {friendList?.length > 0 && <SearchBar />}
+      <View style={{ marginBottom: 8 }} />
       <FlatList
         data={friendList}
         renderItem={renderFriendItem}
@@ -104,10 +105,22 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.background,
-    paddingTop: 8,
+    // paddingTop: 8,
   },
   headerIcon: {
     marginHorizontal: 10,
+  },
+  container: {
+    backgroundColor: "#fff",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // padding: 10,
+    height: 200,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

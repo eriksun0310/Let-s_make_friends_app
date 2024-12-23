@@ -99,7 +99,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     <View style={styles.screen}>
       {/* 搜尋列 */}
       {chatRoomsData?.length > 0 && <SearchBar />}
-
+      <View style={{ marginBottom: 8 }} />
       <FlatList
         data={chatRoomsData}
         renderItem={renderChatRoom}
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.background,
-    paddingTop: 8,
+    // paddingTop: 8,
   },
   chatItem: {
     flexDirection: "row",
