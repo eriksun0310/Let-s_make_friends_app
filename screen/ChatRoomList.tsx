@@ -1,7 +1,7 @@
 import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
 
 import { NavigationProp } from "@react-navigation/native";
@@ -12,34 +12,9 @@ import {
   useAppSelector,
   selectChatRooms,
   setChatRooms,
-  selectCurrentChatRoomId,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
-//import { useUnreadCount } from "../components/hooks/useUnreadCount";
-//import { ChatContextProvider } from "../shared/ChatContext";
-const chatData = [
-  // {
-  //   birthday: "1998-11-03",
-  //   createdAt: "2024-11-27T02:47:07.164+00:00",
-  //   email: "444@gmail.com",
-  //   gender: "male",
-  //   headShot: {
-  //     imageType: "animal",
-  //     imageUrl: "11",
-  //   },
-  //   introduce: "Dddd 4444",
-  //   name: "444",
-  //   selectedOption: {
-  //     dislikedFood: ["onion"],
-  //     favoriteFood: ["chocolate"],
-  //     interests: ["reading"],
-  //   },
-  //   updatedAt: "2024-11-27T02:47:07.164+00:00",
-  //   userId: "af4cf8aa-a9a2-4466-9e5f-302d7eb7091c",
-  //   message: "LINE台灣團隊：感謝您的支持！",
-  // },
-];
 
 interface ChatRoomListProps {
   navigation: NavigationProp<any>;
@@ -52,7 +27,13 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   const chatRoomsData = useAppSelector(selectChatRooms);
 
-  //const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
+  // search bar 的輸入文字
+  const [searchText, setSearchText] = useState("");
+
+  // 過濾符合條件的聊天室列表
+  const filteredChatRooms = chatRoomsData.filter((room) =>
+    room.friend.name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   // 監聽未讀數量的變化
   // useUnreadCount({
@@ -60,10 +41,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   //   currentChatRoomId: currentChatRoomId!,
   // });
 
-  const renderChatRoom = ({ item }) => {
-    // console.log("item is chatRoomList", item);
-    return <ChatRoom chatRoom={item} navigation={navigation} />;
-  };
+  const renderChatRoom = ({ item }) => (
+    <ChatRoom chatRoom={item} navigation={navigation} />
+  );
 
   useEffect(() => {
     const fetchChatData = async () => {
@@ -92,16 +72,19 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     });
   }, [navigation, chatRoomsData, personal.userId]);
 
-  console.log("chatRoomsData", chatRoomsData);
-
   return (
     // <ChatContextProvider>
     <View style={styles.screen}>
       {/* 搜尋列 */}
-      {chatRoomsData?.length > 0 && <SearchBar />}
+      {chatRoomsData?.length > 0 && (
+        <SearchBar
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+        />
+      )}
       <View style={{ marginBottom: 8 }} />
       <FlatList
-        data={chatRoomsData}
+        data={filteredChatRooms}
         renderItem={renderChatRoom}
         keyExtractor={(item) => item?.id}
       />

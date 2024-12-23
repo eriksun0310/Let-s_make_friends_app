@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   TextInput,
   TouchableOpacity,
@@ -16,42 +16,36 @@ import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 
 interface SearchBarProps {
+  value: string;
+  onChangeText: (text: string) => void;
   style?: StyleProp<TextStyle>;
   navigation?: NavigationProp<any>;
   showCancel?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
+  value,
+  onChangeText,
   style,
   navigation,
   showCancel = false,
 }) => {
-  const [searchText, setSearchText] = useState("");
-
   return (
     <View style={[styles.searchBarContainer, style]}>
       <View style={styles.searchBar}>
-        <CustomIcon
-          style={{
-            marginHorizontal: 0,
-          }}
-          onPress={() => navigation?.navigate("search")}
-        >
-          <SearchIcon color={Colors.icon} size={25} />
-        </CustomIcon>
+        <SearchIcon color={Colors.icon} size={25} />
         <TextInput
-          value={searchText}
+          value={value}
           placeholder="搜尋"
           style={styles.searchInput}
-          onChangeText={(e) => setSearchText(e)}
+          onChangeText={(e) => onChangeText(e)}
         />
-
-        {searchText && (
+        {value && (
           <CustomIcon
             style={{
               marginHorizontal: 5,
             }}
-            onPress={() => setSearchText("")}
+            onPress={() => onChangeText("")}
           >
             <X color={Colors.icon} size={25} />
           </CustomIcon>

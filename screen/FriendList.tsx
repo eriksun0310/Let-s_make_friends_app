@@ -35,6 +35,9 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // search bar 的輸入文字
+  const [searchText, setSearchText] = useState("");
+
   // 取得好友列表
   const fetchFriendList = async () => {
     setLoading(true);
@@ -77,6 +80,11 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   //   }, [navigation])
   // );
 
+  // 過濾符合條件的好友列表
+  const filteredFriendList = friendList.filter((friend) =>
+    friend.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   useEffect(() => {
     fetchFriendList();
     navigation.setOptions({
@@ -91,10 +99,15 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}
-      {friendList?.length > 0 && <SearchBar />}
+      {friendList?.length > 0 && (
+        <SearchBar
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+        />
+      )}
       <View style={{ marginBottom: 8 }} />
       <FlatList
-        data={friendList}
+        data={filteredFriendList}
         renderItem={renderFriendItem}
         keyExtractor={(item) => item.userId}
       />

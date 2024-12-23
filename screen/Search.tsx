@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -26,6 +26,9 @@ interface SearchProps {
 
 // 搜尋頁面
 const Search: React.FC<SearchProps> = ({ navigation }) => {
+  // search bar 的輸入文字
+  const [searchText, setSearchText] = useState("");
+
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -37,6 +40,8 @@ const Search: React.FC<SearchProps> = ({ navigation }) => {
       <View style={styles.container}>
         {/* 搜尋列 */}
         <SearchBar
+          value={searchText}
+          onChangeText={setSearchText}
           navigation={navigation}
           showCancel
           style={{
