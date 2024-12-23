@@ -12,6 +12,16 @@ import { updateUnreadCount } from "../../util/handleChatEvent";
 import { isUserOnline } from "../../util/handlePersonEvent";
 import { set } from "firebase/database";
 import { AppState } from "react-native";
+
+// TODO:轉換為前端可用的格式
+const transformMessage = (data) => {
+  return (data || []).map(({
+
+  })=>({
+    // message type
+  }))
+}
+
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
   const userId = personal.userId;

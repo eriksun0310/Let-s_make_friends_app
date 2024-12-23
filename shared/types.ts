@@ -73,10 +73,13 @@ export type FriendState = "add" | "accepted";
 export type FriendInvitationStatus = "pending" | "accepted" | "rejected";
 
 export type FriendRequest = {
-  receiver_id: string;
-  sender_id: string;
+  id: string;
+  receiverId: string;
+  senderId: string;
   status: FriendInvitationStatus;
   createdAt: Date;
+  updatedAt: Date;
+  isRead: boolean;
 };
 
 export type EditUserFieldName =
@@ -88,29 +91,29 @@ export type EditUserFieldName =
 export type Screen = "userInfo" | "aboutMe";
 
 export type Message = {
-  content: string;
-  created_at: string;
   id: string;
-  is_read: boolean;
-  recipient_id: string;
-  sender_id: string;
+  chatRoomId: string;
+  content: string;
+  isRead: boolean;
+  recipientId: string;
+  senderId: string;
+  createdAt: string;
 };
 
 export type ChatRoom = {
   id: string;
-  lastMessage: string;
-  lastTime: string;
-  unreadCount: number;
-  unreadCountUser1: number;
-  unreadCountUser2: number;
+  user1Id: string;
+  user2Id: string;
   user1Deleted: boolean;
   user2Deleted: boolean;
   user1DeletedAt: Date;
   user2DeletedAt: Date;
-  user1Id: string;
-  user2Id: string;
-  createdAt: Date;
+  lastTime: string;
+  lastMessage: string;
+  unreadCountUser1: number;
+  unreadCountUser2: number;
   friend: User;
+  createdAt: Date;
 };
 
 export type ChatRoomState = "old" | "new";

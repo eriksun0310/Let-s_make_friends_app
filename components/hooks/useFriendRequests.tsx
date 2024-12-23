@@ -1,6 +1,29 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
 
+// 轉換為前端可用的格式
+const transformFriendRequests = (data) => {
+  return (data || []).map(
+    ({
+      id,
+      sender_id,
+      receiver_id,
+      status,
+      created_at,
+      updated_at,
+      is_read,
+    }) => ({
+      id,
+      receiverId: receiver_id,
+      senderId: sender_id,
+      status,
+      createdAt: created_at,
+      updatedAt: updated_at,
+      isRead: is_read,
+    })
+  );
+};
+
 // 取得狀態為 pending 的好友邀請
 export const useFriendRequests = (userId: string) => {
   const [friendRequests, setFriendRequests] = useState([]);
@@ -22,10 +45,13 @@ export const useFriendRequests = (userId: string) => {
         return;
       }
 
+      // 使用通用转换函数处理数据
+      const transformedData = transformFriendRequests(data);
+
       // 更新本地的好友邀请数据，包括未读和已读的
-      setFriendRequests(data || []);
+      // setFriendRequests(data || []);
       setNewFriendRequestNumber(
-        (data || []).filter((req) => req.is_read === false).length
+        transformedData.filter((req) => req.isRead === false).length
       );
       setLoading(false);
     };
@@ -39,15 +65,18 @@ export const useFriendRequests = (userId: string) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "friend_requests" },
         (payload) => {
-   
-
           if (
             payload.eventType === "INSERT" &&
             payload.new.receiver_id === userId &&
             payload.new.status === "pending"
           ) {
             // 新增好友邀請，且狀態為 pending
-            setFriendRequests((prev) => [...prev, payload.new]);
+            // setFriendRequests((prev) => [...prev, payload.new]);
+
+            setFriendRequests((prev) => {
+              const transformedNew = transformFriendRequests([payload.new]);
+              return [...prev, ...transformedNew];
+            });
             setNewFriendRequestNumber((prev) => prev + 1); // 更新交友邀請數量
           } else if (
             payload.eventType === "DELETE" ||

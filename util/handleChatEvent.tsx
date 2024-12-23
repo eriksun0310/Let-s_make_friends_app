@@ -1,10 +1,11 @@
 import { supabase } from "./supabaseClient";
 import { getFriendDetail } from "./handleFriendsEvent";
+import { ChatRoom, Message } from "../shared/types";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 
 // 取得所有聊天室
-export const getAllChatRooms = async (userId: string) => {
+export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {
   const { data: chatRoomsData, error } = await supabase
     .from("chat_rooms")
     .select("*")
@@ -45,19 +46,19 @@ export const getAllChatRooms = async (userId: string) => {
       const lastMessageData = await getLastMessage(room.id);
 
       return {
-        lastTime: lastMessageData?.created_at,
-        lastMessage: lastMessageData?.content,
         id: room.id,
-        created_at: room.created_at,
+        createdAt: room.created_at,
         user1Id: room.user1_id,
         user2Id: room.user2_id,
         user1Deleted: room.user1_deleted,
         user2Deleted: room.user2_deleted,
-        user1_deleted_at: room.user1_deleted_at,
-        user2_deleted_at: room.user2_deleted_at,
+        user1DeletedAt: room.user1_deleted_at,
+        user2DeletedAt: room.user2_deleted_at,
         unreadCountUser1: room.unread_count_user1,
         unreadCountUser2: room.unread_count_user2,
         friend: friend,
+        lastTime: lastMessageData?.created_at!,
+        lastMessage: lastMessageData?.content!,
       };
     })
   );
@@ -82,7 +83,7 @@ export const getChatRoom = async ({
 }: {
   userId: string;
   friendId: string;
-}) => {
+}): Promise<ChatRoom> => {
   const { data, error } = await supabase
     .from("chat_rooms")
     .select("*")
@@ -93,23 +94,28 @@ export const getChatRoom = async ({
 
   if (error) {
     console.error("Error fetching chat room:", error);
-    return {
-      id: null,
-    };
+    return {} as ChatRoom;
   }
 
   // 如果找不到聊天室
   if (!data || data.length === 0) {
-    return {
-      id: null,
-    };
+    return {} as ChatRoom;
   }
   // 假設只有一個聊天室
   return data[0];
 };
 
-// 取得聊天室詳細資料
-export const getChatRoomDetail = async (chatRoomId: string) => {
+interface ChatRoomDetailProps {
+  user1Deleted: boolean;
+  user2Deleted: boolean;
+  user1DeletedAt: string | null;
+  user2DeletedAt: string | null;
+}
+
+// 取得聊天室詳細資料(現在只有提供 刪除聊天室的資料)
+export const getChatRoomDetail = async (
+  chatRoomId: string
+): Promise<ChatRoomDetailProps> => {
   const { data, error } = await supabase
     .from("chat_rooms")
     .select("*")
@@ -118,14 +124,30 @@ export const getChatRoomDetail = async (chatRoomId: string) => {
 
   if (error) {
     console.error("Error fetching chat room details:", error);
-    return null;
+    return {} as ChatRoomDetailProps;
   }
 
-  return data;
+  return {
+    // id: data.id,
+    // createdAt: data.created_at,
+    // user1Id: data.user1_id,
+    // user2Id: data.user2_id,
+    user1Deleted: data.user1_deleted,
+    user2Deleted: data.user2_deleted,
+    user1DeletedAt: data.user1_deleted_at,
+    user2DeletedAt: data.user2_deleted_at,
+    // unreadCountUser1: data.unread_count_user1,
+    // unreadCountUser2: data.unread_count_user2,
+  };
 };
 
 // 取得最後一則訊息
-export const getLastMessage = async (chatRoomId: string) => {
+export const getLastMessage = async (
+  chatRoomId: string
+): Promise<{
+  content: string;
+  created_at: string;
+} | null> => {
   const { data, error } = await supabase
     .from("messages")
     .select("content, created_at")
@@ -156,7 +178,7 @@ export const createNewChatRoomAndInsertMessage = async ({
   userId: string;
   friendId: string;
   message: string;
-}) => {
+}): Promise<ChatRoom> => {
   const { data: room, error } = await supabase
     .from("chat_rooms")
     .insert({
@@ -167,7 +189,7 @@ export const createNewChatRoomAndInsertMessage = async ({
     .single();
   if (error) {
     console.error("Error creating chat room:", error);
-    return {};
+    return {} as ChatRoom;
   }
 
   // 發送訊息
@@ -190,16 +212,18 @@ export const createNewChatRoomAndInsertMessage = async ({
 
   return {
     id: room.id,
-    created_at: room.created_at,
+    createdAt: room.created_at,
     user1Id: room.user1_id,
     user2Id: room.user2_id,
     user1Deleted: room.user1_deleted,
     user2Deleted: room.user2_deleted,
+    user1DeletedAt: room.user1_deleted_at,
+    user2DeletedAt: room.user2_deleted_at,
     unreadCountUser1: room.unread_count_user1,
     unreadCountUser2: room.unread_count_user2,
     friend: friend,
-    lastTime: lastMessageData?.created_at,
-    lastMessage: lastMessageData?.content,
+    lastTime: lastMessageData?.created_at!,
+    lastMessage: lastMessageData?.content!,
   };
 };
 
@@ -210,7 +234,11 @@ export const getMessages = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<{
+  success: boolean;
+  error?: string;
+  data?: Message[];
+}> => {
   if (!chatRoomId) {
     console.log("與該好友尚未傳遞訊息");
     return {
@@ -278,7 +306,11 @@ export const sendMessage = async ({
   friendId: string;
   message: string;
   chatRoomId: string;
-}) => {
+}): Promise<{
+  success: boolean;
+  error?: string;
+  data?: Message;
+}> => {
   // 發送訊息
   const { data: messageData, error: messageError } = await supabase
     .from("messages")
@@ -298,26 +330,16 @@ export const sendMessage = async ({
       error: messageError.message,
     };
   }
-
-  //TODO:先關 應該用不到  更新 聊天室 未讀數量
-  // const result = await updateUnreadCount({
-  //   chatRoomId: chatRoomId,
-  //   userId: userId,
-  // });
-
-  // if (result.error) {
-  //   console.error("Error updating unread count:", result.error);
-  //   return {
-  //     success: false,
-  //     error: result.error,
-  //   };
-  // }
-
-  // 返回成功訊息與創建的資料，並附帶 tempId 來更新前端
   return {
     success: true,
     data: {
-      ...messageData, // 後端返回的正式訊息資料
+      id: messageData.id,
+      chatRoomId: messageData.chat_room_id,
+      content: messageData.content,
+      isRead: messageData.is_read,
+      recipientId: messageData.recipient_id,
+      senderId: messageData.sender_id,
+      createdAt: messageData.created_at,
     },
   };
 };
@@ -363,7 +385,10 @@ export const updateUnreadCount = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> => {
   const { error } = await supabase.rpc("increment_unread_count", {
     chat_room_id: chatRoomId,
     user_id: userId,
@@ -390,7 +415,10 @@ export const resetUnreadCount = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> => {
   try {
     // 獲取聊天室資料
     const { data: chatRoom, error } = await supabase
@@ -450,7 +478,9 @@ export const resetUnreadCount = async ({
 };
 
 // 單條訊息的更新已讀
-export const markMessageAsRead = async (messageId) => {
+export const markMessageAsRead = async (
+  messageId: string
+): Promise<boolean> => {
   const { error } = await supabase
     .from("messages")
     .update({ is_read: true })
@@ -555,14 +585,14 @@ export const markMessageAsRead = async (messageId) => {
 //     return false;
 //   }
 // };
-
+//將自己相關的未讀訊息標記為已讀
 export const markChatRoomMessagesAsRead = async ({
   chatRoomId,
   userId,
 }: {
   chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<boolean> => {
   try {
     // 確定當前用戶是 user1 或 user2
     const { data: chatRoom, error: roomError } = await supabase
@@ -613,14 +643,14 @@ export const markChatRoomMessagesAsRead = async ({
   }
 };
 
-// 標記整個聊天室的消息為已讀(for: 發送訊息的那方, 會先 提醒 --以下為查看訊息-- , 在更新對方的已讀, 主要讓發送者知道 對方有哪一則訊息是沒有讀到的)
+// 目前還沒用到: 標記整個聊天室的消息為已讀(for: 發送訊息的那方, 會先 提醒 --以下為查看訊息-- , 在更新對方的已讀, 主要讓發送者知道 對方有哪一則訊息是沒有讀到的)
 export const markChatRoomMessagesAllAsRead = async ({
   chatRoomId,
   userId,
 }: {
   chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<boolean> => {
   try {
     // 將該聊天室中屬於當前用戶的訊息標記為已讀
     const { error: updateMessageError } = await supabase
@@ -645,18 +675,18 @@ export const markChatRoomMessagesAllAsRead = async ({
 
 // 刪除聊天室
 export const deleteChatRoomDB = async ({
-  roomId,
+  chatRoomId,
   userId,
 }: {
-  roomId: string;
+  chatRoomId: string;
   userId: string;
-}) => {
+}): Promise<{ success: boolean; error?: string; chatRoomId?: string }> => {
   try {
     // 查詢聊天室資料
     const { data: chatRoom, error: fetchError } = await supabase
       .from("chat_rooms")
       .select("*")
-      .eq("id", roomId)
+      .eq("id", chatRoomId)
       .single();
 
     if (fetchError || !chatRoom) {
@@ -697,7 +727,7 @@ export const deleteChatRoomDB = async ({
         [deletedAtColumn]: new Date().toISOString(),
         [unreadColumn]: 0,
       })
-      .eq("id", roomId);
+      .eq("id", chatRoomId);
 
     if (updateError) {
       console.error(
@@ -714,7 +744,7 @@ export const deleteChatRoomDB = async ({
     const { data: updatedChatRoom, error: reFetchError } = await supabase
       .from("chat_rooms")
       .select("id, user1_deleted, user2_deleted")
-      .eq("id", roomId)
+      .eq("id", chatRoomId)
       .single();
 
     if (reFetchError || !updatedChatRoom) {
@@ -727,7 +757,7 @@ export const deleteChatRoomDB = async ({
 
     // 如果 user1_deleted && user2_deleted 都為 true，則刪除 messages 的資料
     if (updatedChatRoom.user1_deleted && updatedChatRoom.user2_deleted) {
-      const deleteResult = await deleteChatMessage(roomId);
+      const deleteResult = await deleteChatMessage(chatRoomId);
       if (!deleteResult.success) {
         console.error("Failed to delete messages:", deleteResult.error);
         return {
@@ -739,7 +769,7 @@ export const deleteChatRoomDB = async ({
 
     return {
       success: true,
-      roomId: updatedChatRoom.id,
+      chatRoomId: updatedChatRoom.id,
     };
   } catch (error) {
     console.error("刪除聊天室 error:", error);
@@ -751,13 +781,15 @@ export const deleteChatRoomDB = async ({
 };
 
 // 刪除聊天紀錄
-export const deleteChatMessage = async (roomId: string) => {
+export const deleteChatMessage = async (
+  chatRoomId: string
+): Promise<{ success: boolean; error?: string }> => {
   try {
     // 刪除聊天室中的所有訊息
     const { error } = await supabase
       .from("messages")
       .delete()
-      .eq("chat_room_id", roomId);
+      .eq("chat_room_id", chatRoomId);
 
     if (error) {
       console.error("Error deleting messages:", error);
@@ -781,14 +813,14 @@ export const deleteChatMessage = async (roomId: string) => {
 
 // 重置聊天室的刪除狀態
 export const resetDeleteChatRoomDB = async ({
-  roomId,
+  chatRoomId,
   userId,
 }: {
-  roomId: string;
+  chatRoomId: string;
   userId: string;
 }) => {
   try {
-    const isUser1 = roomId === userId;
+    const isUser1 = chatRoomId === userId;
     let deletedColumn = isUser1 ? "user1_deleted" : "user2_deleted";
 
     const { error } = await supabase
@@ -796,7 +828,7 @@ export const resetDeleteChatRoomDB = async ({
       .update({
         [deletedColumn]: false,
       })
-      .eq("id", roomId);
+      .eq("id", chatRoomId);
 
     if (error) {
       console.error("更新重置刪除聊天室 error:", error);

@@ -3,14 +3,15 @@ import {
   markMessageAsRead,
   resetDeleteChatRoomDB,
 } from "../util/handleChatEvent";
+import { ChatRoom } from "./types";
 
 // 處理訊息的分隔符
 export const processMessageWithSeparators = (messages) => {
   return messages.map((msg, index) => {
     // 判斷是否需要渲染分隔符
     if (
-      !msg.is_read &&
-      (index === messages.length - 1 || messages[index + 1]?.is_read)
+      !msg.isRead &&
+      (index === messages.length - 1 || messages[index + 1]?.isRead)
     ) {
       return { ...msg, showSeparator: true };
     }
@@ -42,7 +43,7 @@ export const getProcessedChatData = ({ chatRoom, userId, messagesData }) => {
   if (chatRoom[deletedColumn]) {
     console.log("messagesData 1111", messagesData);
     // 判斷是否需要分隔符
-    const hasSeparator = messagesData.some((message) => !message.is_read);
+    const hasSeparator = messagesData.some((message) => !message.isRead);
     console.log("hasSeparator 2222", hasSeparator);
 
     processedChatData = processMessageWithSeparators(messagesData);
@@ -58,15 +59,22 @@ export const getProcessedChatData = ({ chatRoom, userId, messagesData }) => {
   }
 };
 
+type DeletedColumn = 'user1Deleted' | 'user2Deleted';
 // 重製聊天室
-export const resetDeleteChatRoomState = async ({ chatRoom, userId }) => {
+export const resetDeleteChatRoomState = async ({
+  chatRoom,
+  userId,
+}: {
+  chatRoom: ChatRoom;
+  userId: string;
+}) => {
   const isUser1 = chatRoom.user1Id === userId;
-  let deletedColumn = isUser1 ? "user1Deleted" : "user2Deleted";
+  let deletedColumn = (isUser1 ? "user1Deleted" : "user2Deleted") as DeletedColumn
 
   // 如果有刪除聊天室的話, 再次點進那個聊天室 要重置聊天室的刪除狀態
   if (chatRoom[deletedColumn]) {
     await resetDeleteChatRoomDB({
-      roomId: chatRoom.id,
+      chatRoomId: chatRoom.id,
       userId: userId,
     });
   }

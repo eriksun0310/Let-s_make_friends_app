@@ -121,8 +121,8 @@ const ChatDetail = ({ route, navigation }) => {
     const tempId = `temp_${Date.now()}`;
     const tempMessage = {
       id: tempId,
-      sender_id: personal.userId,
-      recipient_id: friend.userId,
+      senderId: personal.userId,
+      recipientId: friend.userId,
       content: inputText,
       created_at: new Date().toISOString(),
       isTemporary: true,
@@ -221,7 +221,7 @@ const ChatDetail = ({ route, navigation }) => {
     if (readMessages) {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
-          readMessages.includes(msg.id) ? { ...msg, is_read: true } : msg
+          readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg
         )
       );
     }
@@ -229,7 +229,7 @@ const ChatDetail = ({ route, navigation }) => {
 
   // 監聽新訊息
   useEffect(() => {
-    if (newMessage && newMessage.recipient_id === personal.userId) {
+    if (newMessage && newMessage.recipientId === personal.userId) {
       // 更新消息列表，避免重複插入
       setMessages((prevMessages) => {
         const isDuplicate = prevMessages.some(
@@ -262,8 +262,8 @@ const ChatDetail = ({ route, navigation }) => {
           setMessages((prevMessages) =>
             prevMessages.map((msg) => ({
               ...msg,
-              is_read:
-                msg.recipient_id === personal.userId ? true : msg.is_read,
+              isRead:
+                msg.recipientId === personal.userId ? true : msg.isRead,
             }))
           );
         }

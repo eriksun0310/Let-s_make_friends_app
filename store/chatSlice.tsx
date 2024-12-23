@@ -155,10 +155,10 @@ export const updateOrCreateChatRoom =
           lastTime,
           incrementUser1,
           incrementUser2,
-          user1Deleted: chatRoomDetail.user1_deleted,
-          user1DeletedAt: chatRoomDetail.user1_deleted_at,
-          user2Deleted: chatRoomDetail.user2_deleted,
-          user2DeletedAt: chatRoomDetail.user2_deleted_at,
+          user1Deleted: chatRoomDetail.user1Deleted,
+          user1DeletedAt: chatRoomDetail.user1DeletedAt,
+          user2Deleted: chatRoomDetail.user2Deleted,
+          user2DeletedAt: chatRoomDetail.user2DeletedAt,
         })
       );
     } else {
@@ -174,10 +174,10 @@ export const updateOrCreateChatRoom =
           unreadCountUser1: incrementUser1 || 0,
           unreadCountUser2: incrementUser2 || 0,
           friend,
-          user1Deleted: chatRoomDetail.user1_deleted,
-          user1DeletedAt: chatRoomDetail.user1_deleted_at,
-          user2Deleted: chatRoomDetail.user2_deleted,
-          user2DeletedAt: chatRoomDetail.user2_deleted_at,
+          user1Deleted: chatRoomDetail.user1Deleted,
+          user1DeletedAt: chatRoomDetail.user1DeletedAt,
+          user2Deleted: chatRoomDetail.user2Deleted,
+          user2DeletedAt: chatRoomDetail.user2DeletedAt,
         })
       );
     }

@@ -16,7 +16,7 @@ const Message: React.FC<MessageProps> = ({ item, onView }) => {
 
   useEffect(() => {
     // 當組件掛載且是接收者的訊息時，觸發已讀
-    if (item.recipient_id === personal.userId && !item.is_read) {
+    if (item.recipientId === personal.userId && !item.isRead) {
       onView?.(item.id);
     }
   }, []);
@@ -25,16 +25,16 @@ const Message: React.FC<MessageProps> = ({ item, onView }) => {
     <View
       style={[
         styles.messageContainer,
-        item.sender_id === personal.userId
+        item.senderId === personal.userId
           ? styles.messageContainerSender
           : styles.messageContainerRecipient,
       ]}
     >
-      {item.sender_id === personal.userId && (
+      {item.senderId === personal.userId && (
         <View>
-          <Text style={styles.senderIsRead}>{item.is_read && "已讀"}</Text>
+          <Text style={styles.senderIsRead}>{item.isRead && "已讀"}</Text>
           <Text style={styles.senderTime}>
-            {formatTimeWithDayjs(item.created_at)}
+            {formatTimeWithDayjs(item.createdAt)}
           </Text>
         </View>
       )}
@@ -42,17 +42,17 @@ const Message: React.FC<MessageProps> = ({ item, onView }) => {
       <View
         style={[
           styles.messageBubble,
-          item.sender_id === personal.userId
+          item.senderId === personal.userId
             ? styles.senderMessage
             : styles.recipientMessage,
         ]}
       >
         <Text>{item.content}</Text>
       </View>
-      {item.recipient_id === personal.userId && (
+      {item.recipientId === personal.userId && (
         <View>
           <Text style={styles.recipientTime}>
-            {formatTimeWithDayjs(item.created_at)}
+            {formatTimeWithDayjs(item.createdAt)}
           </Text>
         </View>
       )}

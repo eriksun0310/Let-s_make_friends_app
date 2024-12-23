@@ -42,7 +42,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     if (mode === "delete") {
       try {
         const result = await deleteChatRoomDB({
-          roomId: chatRoom.id,
+          chatRoomId: chatRoom.id,
           userId: personal.userId,
         });
 

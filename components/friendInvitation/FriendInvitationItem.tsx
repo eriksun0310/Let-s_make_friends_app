@@ -22,7 +22,7 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
   useEffect(() => {
     const fetchSenderData = async () => {
       try {
-        const data = await getFriendDetail(friendRequest.sender_id);
+        const data = await getFriendDetail(friendRequest.senderId);
 
         setSenderData(data);
       } catch (error) {
@@ -33,14 +33,14 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
     };
 
     fetchSenderData();
-  }, [friendRequest.sender_id]);
+  }, [friendRequest.senderId]);
 
   return (
     Object.keys(senderData || {}).length > 0 && (
       <FriendCard
         friendState="accepted"
-        key={friendRequest.sender_id}
-        index={friendRequest.sender_id}
+        key={friendRequest.senderId}
+        index={friendRequest.senderId}
         friend={senderData}
         navigation={navigation}
       />

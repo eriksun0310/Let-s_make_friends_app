@@ -1,3 +1,4 @@
+import { User } from "../shared/types";
 import { supabase } from "./supabaseClient";
 
 interface FriendProps {
@@ -8,7 +9,7 @@ interface FriendProps {
 // 處理 所有 加好友的 db 操作(friend_requests、friends)
 
 //取得(單一)好友詳細資料
-export const getFriendDetail = async (friendId: string) => {
+export const getFriendDetail = async (friendId: string): Promise<User> => {
   // 查詢 users
   const { data, error } = await supabase
     .from("users")
@@ -31,7 +32,7 @@ export const getFriendDetail = async (friendId: string) => {
 
   if (error) {
     console.error("Error fetching users:", error);
-    return [];
+    return {} as User;
   }
 
   return {
@@ -41,8 +42,8 @@ export const getFriendDetail = async (friendId: string) => {
     introduce: data.introduce,
     birthday: data.birthday,
     email: data.email,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+    // createdAt: data.created_at,
+    // updatedAt: data.updated_at,
     headShot: {
       imageUrl: data.user_head_shot?.image_url || null,
       imageType: data.user_head_shot?.image_type || null,

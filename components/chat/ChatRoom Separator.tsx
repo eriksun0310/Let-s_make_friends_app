@@ -11,7 +11,7 @@ import {
 import {
   deleteChatRoomDB,
   getMessages,
-  resetDeleteChatRoom,
+  resetDeleteChatRoomState,
 } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import {
@@ -45,13 +45,13 @@ const ChatRoom = ({ chatRoom, navigation }) => {
     if (mode === "delete") {
       try {
         const result = await deleteChatRoomDB({
-          roomId: chatRoom.id,
+          chatRoomId: chatRoom.id,
           userId: personal.userId,
         });
 
-        if (result.success && result.roomId) {
+        if (result.success && result.chatRoomId) {
           // 成功資料庫刪除, 更新redux狀態
-          dispatch(deleteChatRoom(result.roomId));
+          dispatch(deleteChatRoom(result.chatRoomId));
         } else {
           console.error(
             "Failed to delete chat room:",
@@ -107,7 +107,7 @@ const ChatRoom = ({ chatRoom, navigation }) => {
 
     // 如果有刪除聊天室的話, 再次點進那個聊天室 要重置聊天室的刪除狀態
     if (chatRoom[deletedColumn]) {
-      await resetDeleteChatRoom({
+      await resetDeleteChatRoomState({
         roomId: chatRoom.id,
         userId: personal.userId,
       });
