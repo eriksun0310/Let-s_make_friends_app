@@ -70,13 +70,13 @@ export type UserState = "personal" | "friend" | "visitor";
 
 export type FriendState = "add" | "accepted";
 
-export type FriendInvitationStatus = "pending" | "accepted" | "rejected";
+export type FriendRequestStatus = "pending" | "accepted" | "rejected";
 
 export type FriendRequest = {
   id: string;
   receiverId: string;
   senderId: string;
-  status: FriendInvitationStatus;
+  status: FriendRequestStatus;
   createdAt: Date;
   updatedAt: Date;
   isRead: boolean;

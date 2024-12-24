@@ -3,6 +3,7 @@ import {
   markMessageAsRead,
   resetDeleteChatRoomDB,
 } from "../util/handleChatEvent";
+import { MessagesDBType } from "./dbType";
 import { ChatRoom, Message } from "./types";
 
 // 處理訊息的分隔符
@@ -82,17 +83,9 @@ export const resetDeleteChatRoomState = async ({
   }
 };
 
-type MessageDBType = {
-  id: string;
-  chat_room_id: string;
-  sender_id: string;
-  recipient_id: string;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-};
 
-export const transformMessage = (data: MessageDBType): Message => {
+
+export const transformMessage = (data: MessagesDBType): Message => {
   const {
     id,
     chat_room_id,
@@ -113,7 +106,7 @@ export const transformMessage = (data: MessageDBType): Message => {
   };
 };
 
-export const transformMessageArray = (data: MessageDBType[]): Message[] => {
+export const transformMessageArray = (data: MessagesDBType[]): Message[] => {
   return (data || []).map(
     ({
       id,

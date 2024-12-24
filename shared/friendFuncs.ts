@@ -1,12 +1,4 @@
-type FriendRequestsDBType = {
-  id: string;
-  sender_id: string;
-  receiver_id: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  is_read: boolean;
-};
+import { FriendRequestsDBType } from "./dbType";
 
 // 轉換為前端可用的格式
 export const transformFriendRequests = (data: FriendRequestsDBType[]) => {
