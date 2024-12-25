@@ -5,12 +5,15 @@
 ➖🧭 邏輯        
 ➖🐛 BUG          
 ➖✅ 已完成  
-➖❌ 未完成   
+➖❌ 未完成
+➖🚀 要先做  
 ➖➖➖➖➖➖➖➖➖
 
 
-[要先測試]
-2024/12/25  目前測到 聊天室已讀不會馬上已讀
+🚀[要先做]
+✅2024/12/25  目前測到 聊天室已讀不會馬上已讀
+1. 補上 handlePersonEvent、handleFriendsEvent 的所有type 以及return type
+2. 要為前端寫個轉換的 ex:transformUser、transformFriend
 
 
 
