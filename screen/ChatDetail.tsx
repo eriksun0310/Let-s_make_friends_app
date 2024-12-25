@@ -40,11 +40,8 @@ import {
   setCurrentChatRoomId,
 } from "../store";
 import { useChatContext } from "../shared/ChatContext";
-import {
-  handleMessageView,
-  processMessageWithSeparators,
-} from "../shared/chatFuncs";
 import { NavigationProp } from "@react-navigation/native";
+// import { handleMessageView } from "../shared/chatFuncs";
 /*
 chatRoomState: 'old' | 'new'
 從好友列表進來 不一定是新舊聊天室
@@ -90,7 +87,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       <Message
         key={item.id}
         item={item}
-        onView={(messageId: string) => handleMessageView(messageId)}
+        // onView={(messageId: string) => handleMessageView(messageId)}
       />
 
       {/* {item.showSeparator && hasUnreadSeparator && (
@@ -120,16 +117,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     setInputText("");
 
     let chatRoomId = currentChatRoomId; // redux 的
+    let messageResult;  // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
 
     // 新聊天室
     if (!chatRoomId) {
-      const newChatRoom = await createNewChatRoomAndInsertMessage({
+      const newChatRoomData = await createNewChatRoomAndInsertMessage({
         userId: personal.userId,
         friendId: friend.userId,
         message: inputText,
       });
 
-      if (!newChatRoom) {
+      // 如果沒有新的聊天室資料,則代表發送訊息失敗
+      if (!newChatRoomData) {
         console.error("Failed to create chat room and insert message");
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -140,11 +139,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         );
       }
 
-      chatRoomId = newChatRoom.id;
+      chatRoomId = newChatRoomData.chatRoom.id;
+      messageResult = newChatRoomData.messageResult!;
 
-      if (newChatRoom) {
-        dispatch(addChatRoom(newChatRoom));
-        dispatch(setCurrentChatRoomId(newChatRoom.id));
+      if (newChatRoomData.chatRoom) {
+        dispatch(addChatRoom(newChatRoomData.chatRoom));
+        dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
       }
     } else {
       const result = await sendMessage({
@@ -154,6 +154,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         chatRoomId,
       });
 
+      // 如果發送訊息失敗
       if (result.error) {
         console.error("Failed to send message:", result.error);
         setMessages((prevMessages) =>
@@ -165,11 +166,15 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         );
         return;
       }
+
+      messageResult = result.data!;
     }
 
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
-        msg.id === tempMessage.id ? { ...tempMessage, isTemporary: false } : msg
+        msg.id === tempMessage.id
+          ? { ...messageResult, isTemporary: false }
+          : msg
       )
     );
 
@@ -230,12 +235,15 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   // 標記單條訊息已讀
   useEffect(() => {
+    console.log("readMessages 1111111", readMessages);
     if (readMessages) {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg
-        )
-      );
+      setMessages((prevMessages) => {
+        console.log("prevMessages", prevMessages);
+        return prevMessages.map((msg) => {
+          console.log("msg", msg);
+          return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
+        });
+      });
     }
   }, [readMessages]);
 
@@ -271,13 +279,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
         if (success) {
           // 本地更新訊息列表：只標記屬於自己的訊息為已讀
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => ({
+          setMessages((prevMessages) => {
+            console.log("prevMessages", prevMessages);
+            return prevMessages.map((msg) => ({
               ...msg,
-              isRead:
-                msg.recipientId === personal.userId ? true : msg.isRead,
-            }))
-          );
+              isRead: msg.recipientId === personal.userId ? true : msg.isRead,
+            }));
+          });
         }
       }
     };

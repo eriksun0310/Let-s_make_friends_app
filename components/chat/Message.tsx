@@ -8,18 +8,18 @@ import { Message as MessageType } from "../../shared/types";
 
 interface MessageProps {
   item: MessageType;
-  onView?: (messageId: string) => void;
+  // onView?: (messageId: string) => void;
 }
 
-const Message: React.FC<MessageProps> = ({ item, onView }) => {
+const Message: React.FC<MessageProps> = ({ item }) => {
   const personal = useAppSelector(selectUser);
 
-  useEffect(() => {
-    // 當組件掛載且是接收者的訊息時，觸發已讀
-    if (item.recipientId === personal.userId && !item.isRead) {
-      onView?.(item.id);
-    }
-  }, []);
+  // useEffect(() => {
+  //   // 當組件掛載且是接收者的訊息時，觸發已讀
+  //   if (item.recipientId === personal.userId && !item.isRead) {
+  //     onView?.(item.id);
+  //   }
+  // }, []);
 
   return (
     <View

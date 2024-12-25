@@ -8,11 +8,15 @@ import {
   useAppSelector,
 } from "../../store";
 import { supabase } from "../../util/supabaseClient";
-import { updateUnreadCount } from "../../util/handleChatEvent";
+import {
+  markMessageAsRead,
+  updateUnreadCount,
+} from "../../util/handleChatEvent";
 import { isUserOnline } from "../../util/handlePersonEvent";
 import { set } from "firebase/database";
 import { AppState } from "react-native";
 import { transformMessage } from "../../shared/chatFuncs";
+import { MessagesDBType } from "../../shared/dbType";
 
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
@@ -41,7 +45,7 @@ export const useChatListeners = () => {
         }
       })
       .on("presence", { event: "sync" }, () => {
-        //console.log("presence state updated:", channel.presenceState());
+        // console.log("presence state updated:", channel.presenceState());
       });
 
     setPresenceChannel(channel);
@@ -124,12 +128,15 @@ export const useChatListeners = () => {
             table: "messages",
             filter: `chat_room_id=eq.${currentChatRoomId}`,
           },
-          (payload) => {
-            // console.log("當前聊天室的新訊息監聽", payload.new);
+          async (payload) => {
+            const insertNewMessage = payload.new as MessagesDBType;
+            const transformedMessage = transformMessage(insertNewMessage);
+            // 如果是對方的訊息, 標記為已讀
+            if (insertNewMessage?.recipient_id === userId) {
+              await markMessageAsRead(insertNewMessage.id);
+            }
 
-            const transformedMessage = transformMessage(payload.new);
-
-            console.log('transformedMessage', transformedMessage);
+            // 更新本地狀態
             setNewMessage(transformedMessage);
           }
         )
@@ -149,7 +156,8 @@ export const useChatListeners = () => {
             filter: `chat_room_id=eq.${currentChatRoomId}`,
           },
           (payload) => {
-            setReadMessages((prev) => [...prev, payload.new.id]);
+            const readMessage = payload.new;
+            setReadMessages((prev) => [...prev, readMessage.id]);
           }
         )
         .subscribe();

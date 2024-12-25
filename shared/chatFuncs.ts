@@ -20,6 +20,7 @@ export const processMessageWithSeparators = (messages) => {
   });
 };
 
+// 目前用不到
 //   當訊息渲染時自動標記為已讀
 export const handleMessageView = async (messageId: string) => {
   const personal = useAppSelector(selectUser);

@@ -245,7 +245,10 @@ export const createNewChatRoomAndInsertMessage = async ({
   userId: string;
   friendId: string;
   message: string;
-}): Promise<ChatRoom> => {
+}): Promise<{
+  chatRoom: ChatRoom;
+  messageResult: Message;
+}> => {
   const { data: room, error } = await supabase
     .from("chat_rooms")
     .insert({
@@ -256,11 +259,14 @@ export const createNewChatRoomAndInsertMessage = async ({
     .single();
   if (error) {
     console.error("Error creating chat room:", error);
-    return {} as ChatRoom;
+    return {} as {
+      chatRoom: ChatRoom;
+      messageResult: Message;
+    };
   }
 
   // 發送訊息
-  const result = await sendMessage({
+  const messageResult = await sendMessage({
     userId: userId,
     friendId: friendId,
     message: message,
@@ -268,8 +274,8 @@ export const createNewChatRoomAndInsertMessage = async ({
   });
 
   // 如果發送訊息失敗
-  if (result.error) {
-    console.error("Error sending message:", result.error);
+  if (messageResult.error) {
+    console.error("Error sending message:", messageResult.error);
     throw new Error("Failed to send message");
   }
 
@@ -285,7 +291,8 @@ export const createNewChatRoomAndInsertMessage = async ({
     },
   });
   return {
-    ...transformedChatRoom,
+    chatRoom: transformedChatRoom,
+    messageResult: messageResult.data!,
   };
 };
 
@@ -534,6 +541,7 @@ export const resetUnreadCount = async ({
 export const markMessageAsRead = async (
   messageId: string
 ): Promise<boolean> => {
+  console.log(" markMessageAsRead messageId", messageId);
   const { error } = await supabase
     .from("messages")
     .update({ is_read: true })
