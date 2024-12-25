@@ -15,7 +15,7 @@ import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
-import { getChatRoom, getMessages } from "../util/handleChatEvent";
+import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
   logout,
   selectUser,
@@ -62,7 +62,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   // 進入1對1聊天室
   const handleChatRoomPress = async () => {
-    const chatRoom = await getChatRoom({
+    const chatRoom = await getChatRoomDetail({
       userId: personal.userId,
       friendId: friend.userId,
     });

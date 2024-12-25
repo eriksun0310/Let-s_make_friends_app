@@ -139,8 +139,13 @@ export const updateOrCreateChatRoom =
     const state = getState();
     const chatRoom = state.chat.chatRooms.find((room) => room.id === id);
 
-    // 取得聊天室詳細資料
-    const chatRoomDetail = await getChatRoomDetail(id);
+    // 取得聊天室好友資訊
+
+    // 取得刪除聊天室資料
+    const chatRoomDetail = await getChatRoomDetail({
+      chatRoomId: id,
+    });
+
     // 更新聊天室
     if (chatRoom) {
       dispatch(
@@ -160,9 +165,14 @@ export const updateOrCreateChatRoom =
       );
     } else {
       const personal = state.user.user;
-      const friendId = personal.userId === user1Id ? user1Id : user2Id;
-      // 取得聊天室好友資訊
+
+      const friendId =
+        personal.userId === chatRoomDetail.user1Id
+          ? chatRoomDetail.user2Id
+          : chatRoomDetail.user1Id;
+
       const friend = await getFriendDetail(friendId); // 非同步操作
+
       dispatch(
         addChatRoom({
           id,

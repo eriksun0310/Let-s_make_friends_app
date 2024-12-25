@@ -108,7 +108,7 @@ export type ChatRoom = {
   user2Deleted: boolean;
   user1DeletedAt: Date;
   user2DeletedAt: Date;
-  lastTime: string;
+  lastTime: Date;
   lastMessage: string;
   unreadCountUser1: number;
   unreadCountUser2: number;

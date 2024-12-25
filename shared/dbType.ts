@@ -64,9 +64,9 @@ export type ChatRoomsDBType = {
   user2_deleted: boolean;
   unread_count_user1: number;
   unread_count_user2: number;
-  created_at: string;
-  user1_deleted_at: string;
-  user2_deleted_at: string;
+  created_at: Date;
+  user1_deleted_at: Date;
+  user2_deleted_at: Date;
 };
 
 // 訊息

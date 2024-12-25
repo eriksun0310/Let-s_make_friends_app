@@ -1,7 +1,11 @@
 import { supabase } from "./supabaseClient";
 import { getFriendDetail } from "./handleFriendsEvent";
 import { ChatRoom, Message } from "../shared/types";
-import { transformMessageArray } from "../shared/chatFuncs";
+import {
+  transformChatRoom,
+  transformMessage,
+  transformMessageArray,
+} from "../shared/chatFuncs";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 
@@ -43,7 +47,9 @@ export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {
     filteredRooms.map(async (room) => {
       const isUser1 = room.user1_id === userId;
       const friendId = isUser1 ? room.user2_id : room.user1_id;
+
       const friend = await getFriendDetail(friendId);
+
       const lastMessageData = await getLastMessage(room.id);
 
       return {
@@ -78,33 +84,35 @@ export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {
 };
 
 // 取得與好友的聊天室
-export const getChatRoom = async ({
-  userId,
-  friendId,
-}: {
-  userId: string;
-  friendId: string;
-}): Promise<ChatRoom> => {
-  const { data, error } = await supabase
-    .from("chat_rooms")
-    .select("*")
-    .or(
-      `and(user1_id.eq.${userId},user2_id.eq.${friendId}),` +
-        `and(user1_id.eq.${friendId},user2_id.eq.${userId})`
-    );
+// export const getChatRoom = async ({
+//   userId,
+//   friendId,
+// }: {
+//   userId: string;
+//   friendId: string;
+// }): Promise<ChatRoom> => {
+//   const { data, error } = await supabase
+//     .from("chat_rooms")
+//     .select("*")
+//     .or(
+//       `and(user1_id.eq.${userId},user2_id.eq.${friendId}),` +
+//         `and(user1_id.eq.${friendId},user2_id.eq.${userId})`
+//     );
 
-  if (error) {
-    console.error("Error fetching chat room:", error);
-    return {} as ChatRoom;
-  }
+//   if (error) {
+//     console.error("Error fetching chat room:", error);
+//     return {} as ChatRoom;
+//   }
 
-  // 如果找不到聊天室
-  if (!data || data.length === 0) {
-    return {} as ChatRoom;
-  }
-  // 假設只有一個聊天室
-  return data[0];
-};
+//   // 如果找不到聊天室
+//   if (!data || data.length === 0) {
+//     return {} as ChatRoom;
+//   }
+//   // 假設只有一個聊天室
+//   return transformChatRoom({
+//     data: data[0],
+//   });
+// };
 
 interface ChatRoomDetailProps {
   user1Deleted: boolean;
@@ -113,33 +121,91 @@ interface ChatRoomDetailProps {
   user2DeletedAt: string | null;
 }
 
-// 取得聊天室詳細資料(現在只有提供 刪除聊天室的資料)
-export const getChatRoomDetail = async (
-  chatRoomId: string
-): Promise<ChatRoomDetailProps> => {
-  const { data, error } = await supabase
-    .from("chat_rooms")
-    .select("*")
-    .eq("id", chatRoomId)
-    .single();
+// 取得刪除聊天室資料
+// export const getDeleteChatRoomData = async (
+//   chatRoomId: string
+// ): Promise<ChatRoom> => {
+//   console.log("chatRoomId", chatRoomId);
 
-  if (error) {
-    console.error("Error fetching chat room details:", error);
-    return {} as ChatRoomDetailProps;
+//   const { data, error } = await supabase
+//     .from("chat_rooms")
+//     .select("*")
+//     .eq("id", chatRoomId)
+//     .single();
+
+//   console.log("data", data);
+
+//   if (error) {
+//     console.error("Error fetching chat room details:", error);
+//     return {} as ChatRoom;
+//   }
+//   console.log("1111aaaa");
+
+//   const aaa = transformChatRoom({
+//     data: data,
+//   });
+//   console.log("1111bbbbbb");
+//   console.log("aaa", aaa);
+
+//   return transformChatRoom({
+//     data: data,
+//   });
+// };
+
+// 取得聊天室的詳細資訊(根據 chatRoomId、 userId+ friendId 查詢)
+export const getChatRoomDetail = async ({
+  chatRoomId,
+  userId,
+  friendId,
+}: {
+  chatRoomId?: string;
+  userId?: string;
+  friendId?: string;
+}) => {
+  try {
+    let data: any = null; // 用於儲存查詢結果
+
+    if (chatRoomId) {
+      const result = await supabase
+        .from("chat_rooms")
+        .select("*")
+        .eq("id", chatRoomId)
+        .single();
+
+      if (result.error) {
+        console.error("Error fetching chat room details:", result.error);
+        return {} as ChatRoom;
+      }
+
+      data = result.data;
+    } else {
+      const result = await supabase
+        .from("chat_rooms")
+        .select("*")
+        .or(
+          `and(user1_id.eq.${userId},user2_id.eq.${friendId}),` +
+            `and(user1_id.eq.${friendId},user2_id.eq.${userId})`
+        );
+
+      if (result.error) {
+        console.error("Error fetching chat room details:", result.error);
+      }
+      if (!result.data || result.data.length === 0) {
+        // 找不到聊天室時回傳空物件
+        return {} as ChatRoom;
+      }
+
+      data = result.data[0];
+    }
+
+    return transformChatRoom({
+      data: data,
+    });
+  } catch (error) {
+    console.log("Error fetching chat room details:", error);
+
+    return {} as ChatRoom;
   }
-
-  return {
-    // id: data.id,
-    // createdAt: data.created_at,
-    // user1Id: data.user1_id,
-    // user2Id: data.user2_id,
-    user1Deleted: data.user1_deleted,
-    user2Deleted: data.user2_deleted,
-    user1DeletedAt: data.user1_deleted_at,
-    user2DeletedAt: data.user2_deleted_at,
-    // unreadCountUser1: data.unread_count_user1,
-    // unreadCountUser2: data.unread_count_user2,
-  };
 };
 
 // 取得最後一則訊息
@@ -147,7 +213,7 @@ export const getLastMessage = async (
   chatRoomId: string
 ): Promise<{
   content: string;
-  created_at: string;
+  created_at: Date;
 } | null> => {
   const { data, error } = await supabase
     .from("messages")
@@ -211,20 +277,15 @@ export const createNewChatRoomAndInsertMessage = async ({
   const lastMessageData = await getLastMessage(room.id);
   console.log(" 建立新聊天室 lastMessageData", lastMessageData);
 
+  const transformedChatRoom = transformChatRoom({
+    data: room,
+    options: {
+      friend: friend,
+      lastMessageData: lastMessageData as { created_at: Date; content: string },
+    },
+  });
   return {
-    id: room.id,
-    createdAt: room.created_at,
-    user1Id: room.user1_id,
-    user2Id: room.user2_id,
-    user1Deleted: room.user1_deleted,
-    user2Deleted: room.user2_deleted,
-    user1DeletedAt: room.user1_deleted_at,
-    user2DeletedAt: room.user2_deleted_at,
-    unreadCountUser1: room.unread_count_user1,
-    unreadCountUser2: room.unread_count_user2,
-    friend: friend,
-    lastTime: lastMessageData?.created_at!,
-    lastMessage: lastMessageData?.content!,
+    ...transformedChatRoom,
   };
 };
 
@@ -329,17 +390,10 @@ export const sendMessage = async ({
       error: messageError.message,
     };
   }
+
   return {
     success: true,
-    data: {
-      id: messageData.id,
-      chatRoomId: messageData.chat_room_id,
-      content: messageData.content,
-      isRead: messageData.is_read,
-      recipientId: messageData.recipient_id,
-      senderId: messageData.sender_id,
-      createdAt: messageData.created_at,
-    },
+    data: transformMessage(messageData),
   };
 };
 
