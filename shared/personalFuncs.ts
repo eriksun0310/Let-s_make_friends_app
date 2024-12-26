@@ -1,5 +1,10 @@
 import dayjs from "dayjs";
 import { User } from "./types";
+import {
+  UserHeadShotDBType,
+  UsersDBType,
+  UserSelectedOptionDBType,
+} from "./dbType";
 // 計算年齡的函數
 export const calculateAge = (date: Date | string) => {
   const today = new Date();
@@ -78,8 +83,39 @@ export const checkRequired = (user: User) => {
 };
 
 // 格式化時間
-export const formatTimeWithDayjs = (isoString) => {
+export const formatTimeWithDayjs = (isoString: Date) => {
   const formattedTime = dayjs(isoString).format("A hh:mm");
   return formattedTime.replace("AM", "上午").replace("PM", "下午");
 };
 
+export const transformUser = ({
+  users,
+  userHeadShot,
+  userSelectedOption,
+}: {
+  users: UsersDBType;
+  userHeadShot: UserHeadShotDBType;
+  userSelectedOption: UserSelectedOptionDBType;
+}): User => {
+  const {
+    id,
+    name,
+    gender,
+    introduce,
+    birthday,
+    email,
+    created_at,
+    updated_at,
+  } = users;
+
+  return {
+    userId: id,
+    name,
+    gender,
+    introduce,
+    birthday,
+    email,
+    createdAt: created_at,
+    updatedAt: updated_at,
+  };
+};

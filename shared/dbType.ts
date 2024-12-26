@@ -1,4 +1,4 @@
-import { FriendRequestStatus } from "./types";
+import { FriendRequestStatus, Gender } from "./types";
 
 // 對應 supabase 的資料型態
 
@@ -6,12 +6,12 @@ import { FriendRequestStatus } from "./types";
 export type UsersDBType = {
   id: string;
   name: string;
-  gender: string;
+  gender: Gender;
   introduce: string;
   birthday: string;
   email: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 };
 
 // 大頭貼

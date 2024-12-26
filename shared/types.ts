@@ -53,17 +53,23 @@ export type Users = {
   introduce: string;
   birthday: string;
   email: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type User = {
   userId: string;
   name: string;
   gender: Gender;
+  introduce: string;
   birthday: string;
   email: string;
-  introduce: string;
+  createdAt: Date;
+  updatedAt: Date;
+
   headShot: HeadShot;
   selectedOption: SelectedOption;
+  
 };
 
 export type UserState = "personal" | "friend" | "visitor";
