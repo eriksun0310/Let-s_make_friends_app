@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { selectUser, setUser } from "../store/userSlice";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
-import { updateUser } from "../util/handlePersonEvent";
+import { updateUser } from "../util/handleUserEvent";
 import { updateUserTitle } from "../shared/static";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 

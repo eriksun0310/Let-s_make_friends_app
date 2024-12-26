@@ -4,7 +4,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { gender, optionList, tabs } from "../../shared/static";
 import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
-import { calculateAge, getZodiacSign } from "../../shared/personalFuncs";
+import { calculateAge, getZodiacSign } from "../../shared/userFuncs";
 import { Snackbar } from "react-native-paper";
 import { User, UserState } from "../../shared/types";
 

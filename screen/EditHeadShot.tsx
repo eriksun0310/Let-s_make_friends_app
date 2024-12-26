@@ -7,7 +7,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
-import { saveUserHeadShot } from "../util/handlePersonEvent";
+import { saveUserHeadShot } from "../util/handleUserEvent";
 import { Screen } from "../shared/types";
 import { selectUser, setUser, useAppDispatch, useAppSelector } from "../store";
 

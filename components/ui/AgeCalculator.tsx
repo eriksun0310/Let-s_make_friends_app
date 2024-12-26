@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Colors } from "../../constants/style";
 import Input from "./Input";
-import { calculateAge } from "../../shared/personalFuncs";
+import { calculateAge } from "../../shared/userFuncs";
 import CustomDateTimePicker from "./DateTimePicker";
 
 interface AgeCalculatorValue {

@@ -10,7 +10,7 @@ import { RouteProp } from "@react-navigation/native";
 import { selectUser, setUser } from "../store/userSlice";
 import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
-import { saveUserSelectedOption } from "../util/handlePersonEvent";
+import { saveUserSelectedOption } from "../util/handleUserEvent";
 import { tabs } from "../shared/static";
 import { Screen } from "../shared/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";

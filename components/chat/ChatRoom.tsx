@@ -11,7 +11,7 @@ import {
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import { resetDeleteChatRoomState } from "../../shared/chatFuncs";
-import { formatTimeWithDayjs } from "../../shared/personalFuncs";
+import { formatTimeWithDayjs } from "../../shared/userFuncs";
 import { ChatRoom as ChatRoomType } from "../../shared/types";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -71,7 +71,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
       userId: personal.userId,
     });
 
-    console.log('messages', messages);
+    console.log("messages", messages);
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 

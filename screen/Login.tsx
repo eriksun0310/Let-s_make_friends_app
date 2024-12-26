@@ -6,7 +6,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 import { setUser } from "../store/userSlice";
-import { getUserData, updateUserOnlineStatus } from "../util/handlePersonEvent";
+import { getUserData, updateUserOnlineStatus } from "../util/handleUserEvent";
 import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {

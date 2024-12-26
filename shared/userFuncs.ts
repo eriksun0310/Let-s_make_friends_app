@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { User } from "./types";
+import { ImageType, User } from "./types";
 import {
   UserHeadShotDBType,
   UsersDBType,
@@ -108,6 +108,28 @@ export const transformUser = ({
     updated_at,
   } = users;
 
+  const headShot = userHeadShot
+    ? {
+        imageUrl: userHeadShot.image_url,
+        imageType: userHeadShot.image_type,
+      }
+    : {
+        imageUrl: "",
+        imageType: "people" as ImageType,
+      };
+
+  const selectedOption = userSelectedOption
+    ? {
+        interests: userSelectedOption.interests || [],
+        favoriteFood: userSelectedOption.favorite_food || [],
+        dislikedFood: userSelectedOption.disliked_food || [],
+      }
+    : {
+        interests: [],
+        favoriteFood: [],
+        dislikedFood: [],
+      };
+
   return {
     userId: id,
     name,
@@ -117,5 +139,7 @@ export const transformUser = ({
     email,
     createdAt: created_at,
     updatedAt: updated_at,
+    headShot,
+    selectedOption,
   };
 };

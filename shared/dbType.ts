@@ -1,4 +1,4 @@
-import { FriendRequestStatus, Gender } from "./types";
+import { FriendRequestStatus, Gender, ImageType } from "./types";
 
 // 對應 supabase 的資料型態
 
@@ -19,7 +19,7 @@ export type UserHeadShotDBType = {
   id: string;
   user_id: string;
   image_url: string;
-  image_type: string;
+  image_type: ImageType;
   created_at: string;
   updated_at: string;
 };

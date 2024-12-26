@@ -9,13 +9,7 @@ import {
 } from "../../store";
 import { supabase } from "../../util/supabaseClient";
 import { updateUnreadCount } from "../../util/handleChatEvent";
-import { isUserOnline } from "../../util/handlePersonEvent";
-
-
-
-
-
-
+import { isUserOnline } from "../../util/handleUserEvent";
 
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);

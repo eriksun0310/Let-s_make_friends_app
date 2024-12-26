@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
-import { getUserData, updateUserOnlineStatus } from "../util/handlePersonEvent";
+import { getUserData, updateUserOnlineStatus } from "../util/handleUserEvent";
 import { supabase } from "../util/supabaseClient";
 
 interface InitialStateProps {

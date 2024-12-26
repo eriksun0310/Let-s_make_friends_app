@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { formatTimeWithDayjs } from "../../shared/personalFuncs";
+import { formatTimeWithDayjs } from "../../shared/userFuncs";
 import { Colors } from "../../constants/style";
 import { useAppSelector } from "../../store";
 import { selectUser } from "../../store/userSlice";

@@ -12,7 +12,7 @@ import {
   markMessageAsRead,
   updateUnreadCount,
 } from "../../util/handleChatEvent";
-import { isUserOnline } from "../../util/handlePersonEvent";
+import { isUserOnline } from "../../util/handleUserEvent";
 import { set } from "firebase/database";
 import { AppState } from "react-native";
 import { transformMessage } from "../../shared/chatFuncs";

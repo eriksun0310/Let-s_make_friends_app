@@ -1,3 +1,4 @@
+import { transformUser } from "../shared/userFuncs";
 import { User } from "../shared/types";
 import { supabase } from "./supabaseClient";
 
@@ -8,6 +9,100 @@ user_selected_option:興趣選項
 user_head_shot: 大頭貼
 user_online_status: 用戶在線狀態
 */
+
+// export const getUserData = async ({
+//   userId,
+// }: {
+//   userId: string;
+// }): Promise<User | null> => {
+//   // 查詢主資料表 users
+//   const {
+//     data: userData,
+//     error: userError,
+//     count: userCount,
+//   } = await supabase
+//     .from("users")
+//     .select("*", {
+//       count: "exact",
+//     })
+//     .eq("id", userId); // 篩選條件：id 等於 userId
+
+//   if (userError) {
+//     console.error("Error fetching user data:", userError);
+//     return null;
+//   }
+
+//   // 新用戶
+//   if (userCount === 0) {
+//     //console.log("新用戶");
+//     return null;
+//   }
+
+//   // 初始化返回資料
+//   let responseData: User = {
+//     userId: userData[0].id,
+//     name: userData[0].name,
+//     gender: userData[0].gender,
+//     introduce: userData[0].introduce,
+//     birthday: userData[0].birthday,
+//     email: userData[0].email,
+//     headShot: {
+//       imageType: "people",
+//       imageUrl: "",
+//     },
+//     selectedOption: {
+//       interests: [],
+//       favoriteFood: [],
+//       dislikedFood: [],
+//     },
+//   };
+
+//   // 查詢 user_selected_option
+//   const { data: selectedData, error: selectedError } = await supabase
+//     .from("user_selected_option")
+//     .select("*", { count: "exact" })
+//     .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+//   if (selectedError) {
+//     console.error("Error fetching selected data:", selectedError);
+//   } else if (selectedData.length > 0) {
+//     responseData = {
+//       ...responseData,
+//       selectedOption: {
+//         interests: selectedData[0].interests,
+//         favoriteFood: selectedData[0].favorite_food,
+//         dislikedFood: selectedData[0].disliked_food,
+//       },
+//     };
+//   }
+
+//   // 查詢 user_head_shot
+//   const { data: headShotData, error: headShotError } = await supabase
+//     .from("user_head_shot")
+//     .select("*", { count: "exact" })
+//     .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+//   if (headShotError) {
+//     console.error("Error fetching headShot data:", headShotError);
+//   } else if (headShotData.length > 0) {
+//     responseData = {
+//       ...responseData,
+//       headShot: {
+//         imageUrl: headShotData[0].image_url,
+//         imageType: headShotData[0].image_type,
+//       },
+//     };
+//   }
+
+//   const transformedUser = transformUser({
+//     users: userData[0]!,
+//     userHeadShot: headShotData[0]!,
+//     userSelectedOption: selectedData[0]!,
+//   });
+
+//   // 返回整合的資料
+//   return transformedUser;
+// };
 
 // 取得用戶資料
 export const getUserData = async ({
@@ -22,7 +117,7 @@ export const getUserData = async ({
     count: userCount,
   } = await supabase
     .from("users")
-    .select("id, name, gender, introduce, birthday, email", {
+    .select("*", {
       count: "exact",
     })
     .eq("id", userId); // 篩選條件：id 等於 userId
@@ -33,68 +128,37 @@ export const getUserData = async ({
   }
 
   // 新用戶
-  if (userCount === 0) {
-    //console.log("新用戶");
-    return null;
+  if (userCount === 0 || !userData || userData.length === 0) {
+    return null; // 新用戶或無效的 userId
   }
-
-  // 初始化返回資料
-  let responseData: User = {
-    userId: userData[0].id,
-    name: userData[0].name,
-    gender: userData[0].gender,
-    introduce: userData[0].introduce,
-    birthday: userData[0].birthday,
-    email: userData[0].email,
-    headShot: {
-      imageType: "people",
-      imageUrl: "",
-    },
-    selectedOption: {
-      interests: [],
-      favoriteFood: [],
-      dislikedFood: [],
-    },
-  };
 
   // 查詢 user_selected_option
   const { data: selectedData, error: selectedError } = await supabase
     .from("user_selected_option")
-    .select("interests, favorite_food, disliked_food", { count: "exact" })
+    .select("*", { count: "exact" })
     .eq("user_id", userId); // 篩選條件：id 等於 userId
 
   if (selectedError) {
     console.error("Error fetching selected data:", selectedError);
-  } else if (selectedData.length > 0) {
-    responseData = {
-      ...responseData,
-      selectedOption: {
-        interests: selectedData[0].interests,
-        favoriteFood: selectedData[0].favorite_food,
-        dislikedFood: selectedData[0].disliked_food,
-      },
-    };
   }
 
   // 查詢 user_head_shot
   const { data: headShotData, error: headShotError } = await supabase
     .from("user_head_shot")
-    .select("image_url, image_type", { count: "exact" })
+    .select("*")
     .eq("user_id", userId); // 篩選條件：id 等於 userId
 
   if (headShotError) {
     console.error("Error fetching headShot data:", headShotError);
-  } else if (headShotData.length > 0) {
-    responseData = {
-      ...responseData,
-      headShot: {
-        imageUrl: headShotData[0].image_url,
-        imageType: headShotData[0].image_type,
-      },
-    };
   }
-  // 返回整合的資料
-  return responseData;
+
+  const transformedUser = transformUser({
+    users: userData[0]!,
+    userHeadShot: headShotData[0]! || null,
+    userSelectedOption: selectedData[0]! || null,
+  });
+
+  return transformedUser;
 };
 
 // 點擊 關於我的儲存

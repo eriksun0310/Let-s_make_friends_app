@@ -8,7 +8,7 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { Colors } from "../../constants/style";
-import { calculateAge, getZodiacSign } from "../../shared/personalFuncs";
+import { calculateAge, getZodiacSign } from "../../shared/userFuncs";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendState, User } from "../../shared/types";
 import CustomIcon from "./button/CustomIcon";
