@@ -17,7 +17,7 @@ import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import {
   getProcessedChatData,
   processMessageWithSeparators,
-} from "../../shared/chatFuncs";
+} from "../../shared/chat/chatFuncs";
 
 const ChatRoom = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
@@ -41,7 +41,6 @@ const ChatRoom = ({ chatRoom, navigation }) => {
       resetRef.current(); // 執行 `reset`
     }
 
-    
     if (mode === "delete") {
       try {
         const result = await deleteChatRoomDB({

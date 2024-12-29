@@ -26,7 +26,7 @@ import {
 import {
   getProcessedChatData,
   processMessageWithSeparators,
-} from "../shared/chatFuncs";
+} from "../shared/chat/chatFuncs";
 
 interface UserInfoProps {
   route: {

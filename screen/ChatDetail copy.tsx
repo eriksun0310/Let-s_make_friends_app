@@ -36,11 +36,12 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
 } from "../store";
-import { useChatContext } from "../shared/ChatContext";
+
 import {
   //handleMessageView,
   processMessageWithSeparators,
-} from "../shared/chatFuncs";
+} from "../shared/chat/chatFuncs";
+import { useChatContext } from "../shared/chat/ChatContext";
 
 /*
 chatRoomState: 'old' | 'new'
@@ -233,8 +234,7 @@ const ChatDetail = ({ route, navigation }) => {
           setMessages((prevMessages) =>
             prevMessages.map((msg) => ({
               ...msg,
-              isRead:
-                msg.recipientId === personal.userId ? true : msg.isRead,
+              isRead: msg.recipientId === personal.userId ? true : msg.isRead,
             }))
           );
         }

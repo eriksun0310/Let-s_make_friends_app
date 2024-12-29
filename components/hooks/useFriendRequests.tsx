@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
-import { transformFriendRequests } from "../../shared/friendFuncs";
+import { transformFriendRequests } from "../../shared/friend/friendUtils";
 
 // 取得狀態為 pending 的好友邀請
 export const useFriendRequests = (userId: string) => {

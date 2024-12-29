@@ -1,4 +1,4 @@
-import { transformUser } from "../shared/userFuncs";
+import { transformUser } from "../shared/user/userUtils";
 import { User } from "../shared/types";
 import { supabase } from "./supabaseClient";
 
@@ -70,7 +70,7 @@ export const getUserData = async ({
 };
 
 // 點擊 關於我的儲存
-export const saveAboutMe = async ({ user }: { user: User }):Promise<void> => {
+export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
   try {
     // 儲存自己的基本資料
     await saveUser({ user });
@@ -97,7 +97,7 @@ export const updateUser = async ({
   userId: string;
   fieldName: "name" | "introduce";
   fieldValue: any;
-}):Promise<void> => {
+}): Promise<void> => {
   try {
     // 驗證 fieldName 是否為允許的欄位
     if (!["name", "introduce"].includes(fieldName)) {
@@ -121,7 +121,7 @@ export const updateUser = async ({
 };
 
 // 儲存自己的基本資料(for aboutMe 的儲存)
-export const saveUser = async ({ user }: { user: User }):Promise<void> => {
+export const saveUser = async ({ user }: { user: User }): Promise<void> => {
   try {
     const { error } = await supabase.from("users").upsert(
       {
@@ -146,7 +146,11 @@ export const saveUser = async ({ user }: { user: User }):Promise<void> => {
 };
 
 // 儲存自己的大頭貼
-export const saveUserHeadShot = async ({ user }: { user: User }):Promise<void> => {
+export const saveUserHeadShot = async ({
+  user,
+}: {
+  user: User;
+}): Promise<void> => {
   try {
     const { error } = await supabase.from("user_head_shot").upsert(
       {
@@ -167,7 +171,11 @@ export const saveUserHeadShot = async ({ user }: { user: User }):Promise<void> =
 };
 
 // 儲存用戶興趣選項
-export const saveUserSelectedOption = async ({ user }: { user: User }):Promise<void> => {
+export const saveUserSelectedOption = async ({
+  user,
+}: {
+  user: User;
+}): Promise<void> => {
   try {
     const { error } = await supabase.from("user_selected_option").upsert(
       {
@@ -216,7 +224,7 @@ export const updateUserOnlineStatus = async ({
 }: {
   userId: string;
   isOnline: boolean;
-}):Promise<void> => {
+}): Promise<void> => {
   try {
     const { error } = await supabase.from("user_online_status").upsert(
       {

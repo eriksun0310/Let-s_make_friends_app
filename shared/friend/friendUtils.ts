@@ -1,4 +1,4 @@
-import { FriendRequestsDBType } from "./dbType";
+import { FriendRequestsDBType } from "../dbType";
 
 // 轉換為前端可用的格式
 export const transformFriendRequests = (data: FriendRequestsDBType[]) => {

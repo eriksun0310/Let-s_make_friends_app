@@ -1,5 +1,5 @@
-import { ChatRoomsDBType, MessagesDBType } from "./dbType";
-import { ChatRoom, Message, User } from "./types";
+import { ChatRoomsDBType, MessagesDBType } from "../dbType";
+import { ChatRoom, Message, User } from "../types";
 
 /* chatUtils.ts 專注於工具函數 */
 

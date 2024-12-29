@@ -39,8 +39,9 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
 } from "../store";
-import { useChatContext } from "../shared/ChatContext";
+
 import { NavigationProp } from "@react-navigation/native";
+import { useChatContext } from "../shared/chat/ChatContext";
 // import { handleMessageView } from "../shared/chatFuncs";
 /*
 chatRoomState: 'old' | 'new'

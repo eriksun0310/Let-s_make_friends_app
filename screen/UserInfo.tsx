@@ -23,7 +23,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
-import { resetDeleteChatRoomState } from "../shared/chatFuncs";
+import { resetDeleteChatRoomState } from "../shared/chat/chatFuncs";
 
 interface UserInfoProps {
   route: {

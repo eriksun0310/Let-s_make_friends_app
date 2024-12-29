@@ -1,6 +1,8 @@
 import { createContext, useContext, useMemo } from "react";
-import { Message } from "./types";
-import { useChatListeners } from "../components/hooks/useChatListeners";
+
+import { useChatListeners } from "../../components/hooks/useChatListeners";
+import { Message } from "../types";
+
 
 // 定義 Context 類型
 interface Value {

@@ -37,8 +37,9 @@ import {
   selectIsNewUser,
   AppReduxProvider,
 } from "./store";
-import { ChatContextProvider } from "./shared/ChatContext";
+
 import BackButton from "./components/ui/button/BackButton";
+import { ChatContextProvider } from "./shared/chat/ChatContext";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();

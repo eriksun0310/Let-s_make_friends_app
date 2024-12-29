@@ -10,8 +10,8 @@ import {
 } from "../../store/chatSlice";
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
-import { resetDeleteChatRoomState } from "../../shared/chatFuncs";
-import { formatTimeWithDayjs } from "../../shared/userFuncs";
+import { resetDeleteChatRoomState } from "../../shared/chat/chatFuncs";
+import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import { ChatRoom as ChatRoomType } from "../../shared/types";
 import { NavigationProp } from "@react-navigation/native";
 

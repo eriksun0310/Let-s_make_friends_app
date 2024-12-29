@@ -1,5 +1,5 @@
-import { resetDeleteChatRoomDB } from "../util/handleChatEvent";
-import { ChatRoom } from "./types";
+import { resetDeleteChatRoomDB } from "../../util/handleChatEvent";
+import { ChatRoom } from "../types";
 
 /* chatFuncs.ts 專注於業務邏輯*/
 

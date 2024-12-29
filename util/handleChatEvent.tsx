@@ -5,7 +5,7 @@ import {
   transformChatRoom,
   transformMessage,
   transformMessageArray,
-} from "../shared/chatUtils";
+} from "../shared/chat/chatUtils";
 
 // 處理 聊天室 db 操作(chat_rooms、messages)
 

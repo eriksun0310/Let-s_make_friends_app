@@ -13,7 +13,7 @@ import {
   updateUnreadCount,
 } from "../../util/handleChatEvent";
 import { AppState } from "react-native";
-import { transformMessage } from "../../shared/chatFuncs";
+import { transformMessage } from "../../shared/chat/chatFuncs";
 import { MessagesDBType } from "../../shared/dbType";
 
 export const useChatListeners = () => {
