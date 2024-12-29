@@ -38,7 +38,7 @@ import {
 } from "../store";
 import { useChatContext } from "../shared/ChatContext";
 import {
-  handleMessageView,
+  //handleMessageView,
   processMessageWithSeparators,
 } from "../shared/chatFuncs";
 
@@ -82,7 +82,7 @@ const ChatDetail = ({ route, navigation }) => {
       <Message
         key={item.id}
         item={item}
-        onView={(messageId: string) => handleMessageView(messageId)}
+        //onView={(messageId: string) => handleMessageView(messageId)}
       />
 
       {/* {item.showSeparator && hasUnreadSeparator && (

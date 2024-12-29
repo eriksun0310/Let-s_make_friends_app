@@ -64,8 +64,8 @@ export type User = {
   introduce: string;
   birthday: string;
   email: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   headShot: HeadShot;
   selectedOption: SelectedOption;

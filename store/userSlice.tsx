@@ -116,41 +116,45 @@ export const logout =
 
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Supabase 認證狀態
 export const initializeAuth = (): AppThunk => async (dispatch) => {
-  // 使用 onAuthStateChange 來監聽認證狀態變化
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    // console.log("session", session);
-    // 不管是註冊還是登入都會有 session
-    if (session) {
-      const user = session.user;
-      const userData = await getUserData({
-        userId: user.id,
-      }); // 取得用戶資料
+  try {
+    // 使用 onAuthStateChange 來監聽認證狀態變化
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      // console.log("session", session);
+      // 不管是註冊還是登入都會有 session
+      if (session) {
+        const user = session.user;
+        const userData = await getUserData({
+          userId: user.id,
+        }); // 取得用戶資料
 
-      // 舊用戶登入
-      if (userData) {
-        dispatch(userSlice.actions.setUser(userData));
-        dispatch(userSlice.actions.setIsNewUser(false));
+        // 舊用戶登入
+        if (userData) {
+          dispatch(userSlice.actions.setUser(userData));
+          dispatch(userSlice.actions.setIsNewUser(false));
+        } else {
+          // 新用戶登入
+
+          dispatch(
+            userSlice.actions.setUser({
+              userId: user.id,
+              email: user.email,
+            })
+          );
+          dispatch(userSlice.actions.setIsNewUser(true));
+        }
+
+        dispatch(userSlice.actions.setIsAuthenticated(true)); // 設置用戶為已認證
       } else {
-        // 新用戶登入
-
-        dispatch(
-          userSlice.actions.setUser({
-            userId: user.id,
-            email: user.email,
-          })
-        );
-        dispatch(userSlice.actions.setIsNewUser(true));
+        // 用戶未登入
+        dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置用戶為未認證
       }
 
-      dispatch(userSlice.actions.setIsAuthenticated(true)); // 設置用戶為已認證
-    } else {
-      // 用戶未登入
-      dispatch(userSlice.actions.setIsAuthenticated(false)); // 設置用戶為未認證
-    }
-
-    // 初始化完成
-    dispatch(userSlice.actions.setInitialized(true));
-  });
+      // 初始化完成
+      dispatch(userSlice.actions.setInitialized(true));
+    });
+  } catch (err) {
+    console.log("initializeAuth error", err);
+  }
 };
 export const { setUser, setSelectedOption, setIsAuthenticated } =
   userSlice.actions;
