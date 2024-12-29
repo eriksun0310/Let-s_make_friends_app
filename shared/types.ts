@@ -69,7 +69,6 @@ export type User = {
 
   headShot: HeadShot;
   selectedOption: SelectedOption;
-  
 };
 
 export type UserState = "personal" | "friend" | "visitor";
@@ -123,3 +122,8 @@ export type ChatRoom = {
 };
 
 export type ChatRoomState = "old" | "new";
+
+export type Result = {
+  success: boolean;
+  errorMessage?: string;
+};

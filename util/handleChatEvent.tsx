@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { getFriendDetail } from "./handleFriendsEvent";
-import { ChatRoom, Message } from "../shared/types";
+import { ChatRoom, Message, Result } from "../shared/types";
 import {
   transformChatRoom,
   transformMessage,
@@ -92,7 +92,7 @@ export const getChatRoomDetail = async ({
   chatRoomId?: string;
   userId?: string;
   friendId?: string;
-}) => {
+}): Promise<ChatRoom> => {
   try {
     let data: any = null; // 用於儲存查詢結果
 
@@ -236,14 +236,14 @@ export const getMessages = async ({
   userId: string;
 }): Promise<{
   success: boolean;
-  error?: string;
+  errorMessage?: string;
   data?: Message[];
 }> => {
   if (!chatRoomId) {
     console.log("與該好友尚未傳遞訊息");
     return {
       success: false,
-      error: "與該好友尚未傳遞訊息",
+      errorMessage: "與該好友尚未傳遞訊息",
     };
   }
 
@@ -258,7 +258,7 @@ export const getMessages = async ({
     console.error("Error fetching chat room:", chatRoomError);
     return {
       success: false,
-      error: chatRoomError.message,
+      errorMessage: chatRoomError.message,
     };
   }
 
@@ -283,7 +283,7 @@ export const getMessages = async ({
     console.error("Error fetching messages:", error);
     return {
       success: false,
-      error: error.message,
+      errorMessage: error.message,
     };
   }
 
@@ -306,11 +306,11 @@ export const sendMessage = async ({
   chatRoomId: string;
 }): Promise<{
   success: boolean;
-  error?: string;
+  errorMessage?: string;
   data?: Message;
 }> => {
   // 發送訊息
-  const { data: messageData, error: messageError } = await supabase
+  const { data: messageData, error } = await supabase
     .from("messages")
     .insert({
       chat_room_id: chatRoomId,
@@ -321,11 +321,11 @@ export const sendMessage = async ({
     .select("*") // 插入後直接返回該條訊息
     .single(); // 確保只返回單條訊息
 
-  if (messageError) {
-    console.error("Error sending message:", messageError);
+  if (error) {
+    console.error("Error sending message:", error);
     return {
       success: false,
-      error: messageError.message,
+      errorMessage: error.message,
     };
   }
 
@@ -342,10 +342,7 @@ export const updateUnreadCount = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}): Promise<{
-  success: boolean;
-  error?: string;
-}> => {
+}): Promise<Result> => {
   const { error } = await supabase.rpc("increment_unread_count", {
     chat_room_id: chatRoomId,
     user_id: userId,
@@ -356,7 +353,7 @@ export const updateUnreadCount = async ({
 
     return {
       success: false,
-      error: error.message,
+      errorMessage: error.message,
     };
   }
 
@@ -372,10 +369,7 @@ export const resetUnreadCount = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}): Promise<{
-  success: boolean;
-  error?: string;
-}> => {
+}): Promise<Result> => {
   try {
     // 獲取聊天室資料
     const { data: chatRoom, error } = await supabase
@@ -388,7 +382,7 @@ export const resetUnreadCount = async ({
       console.error("Error fetching chat room:", error);
       return {
         success: false,
-        error: error.message,
+        errorMessage: error.message,
       };
     }
 
@@ -411,7 +405,7 @@ export const resetUnreadCount = async ({
         console.error("Error resetting unread count:", updateError);
         return {
           success: false,
-          error: updateError.message,
+          errorMessage: updateError.message,
         };
       }
 
@@ -422,14 +416,14 @@ export const resetUnreadCount = async ({
       console.error("Error resetting unread count: No matching user found");
       return {
         success: false,
-        error: "No matching user found",
+        errorMessage: "No matching user found",
       };
     }
   } catch (error) {
     console.error("Error resetting unread count:", error);
     return {
       success: false,
-      error: error.message,
+      errorMessage: (error as Error).message,
     };
   }
 };
@@ -547,7 +541,11 @@ export const deleteChatRoomDB = async ({
 }: {
   chatRoomId: string;
   userId: string;
-}): Promise<{ success: boolean; error?: string; chatRoomId?: string }> => {
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  chatRoomId?: string;
+}> => {
   try {
     // 查詢聊天室資料
     const { data: chatRoom, error: fetchError } = await supabase
@@ -560,7 +558,7 @@ export const deleteChatRoomDB = async ({
       console.error("Chat room not found or fetch error:", fetchError);
       return {
         success: false,
-        error: "Chat room not found",
+        errorMessage: "Chat room not found",
       };
     }
 
@@ -580,7 +578,7 @@ export const deleteChatRoomDB = async ({
       console.error("User ID does not match chat room participants");
       return {
         success: false,
-        error: "Unauthorized action",
+        errorMessage: "Unauthorized action",
       };
     }
 
@@ -603,7 +601,7 @@ export const deleteChatRoomDB = async ({
       );
       return {
         success: false,
-        error: updateError.message,
+        errorMessage: updateError.message,
       };
     }
 
@@ -618,7 +616,7 @@ export const deleteChatRoomDB = async ({
       console.error("Failed to re-fetch updated chat room:", reFetchError);
       return {
         success: false,
-        error: "Chat room not found",
+        errorMessage: "Chat room not found",
       };
     }
 
@@ -629,7 +627,7 @@ export const deleteChatRoomDB = async ({
         console.error("Failed to delete messages:", deleteResult.error);
         return {
           success: false,
-          error: deleteResult.error,
+          errorMessage: deleteResult.error,
         };
       }
     }
@@ -642,7 +640,7 @@ export const deleteChatRoomDB = async ({
     console.error("刪除聊天室 error:", error);
     return {
       success: false,
-      error: error.message,
+      errorMessage: (error as Error).message,
     };
   }
 };
@@ -650,7 +648,7 @@ export const deleteChatRoomDB = async ({
 // 刪除聊天紀錄
 export const deleteChatMessage = async (
   chatRoomId: string
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<Result> => {
   try {
     // 刪除聊天室中的所有訊息
     const { error } = await supabase
@@ -662,7 +660,7 @@ export const deleteChatMessage = async (
       console.error("Error deleting messages:", error);
       return {
         success: false,
-        error: error.message,
+        errorMessage: error.message,
       };
     }
 
@@ -673,7 +671,7 @@ export const deleteChatMessage = async (
     console.error("刪除聊天紀錄 error:", error);
     return {
       success: false,
-      error: error.message,
+      errorMessage: (error as Error).message,
     };
   }
 };

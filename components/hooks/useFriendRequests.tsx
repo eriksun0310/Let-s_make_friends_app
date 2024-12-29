@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
 import { transformFriendRequests } from "../../shared/friend/friendUtils";
+import { FriendRequest } from "../../shared/types";
+import { FriendRequestsDBType } from "../../shared/dbType";
 
 // 取得狀態為 pending 的好友邀請
 export const useFriendRequests = (userId: string) => {
-  const [friendRequests, setFriendRequests] = useState([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFriendRequestNumber, setNewFriendRequestNumber] = useState(0); // 新好友数量
 
@@ -24,10 +26,10 @@ export const useFriendRequests = (userId: string) => {
       }
 
       // 使用通用转换函数处理数据
-      const transformedData = transformFriendRequests(data);
+      const transformedData = transformFriendRequests(data) || [];
 
       // 更新本地的好友邀请数据，包括未读和已读的
-      // setFriendRequests(data || []);
+      setFriendRequests(transformedData);
       setNewFriendRequestNumber(
         transformedData.filter((req) => req.isRead === false).length
       );
@@ -51,8 +53,12 @@ export const useFriendRequests = (userId: string) => {
             // 新增好友邀請，且狀態為 pending
             // setFriendRequests((prev) => [...prev, payload.new]);
 
+            const newFriendRequest = payload.new as FriendRequestsDBType;
+
             setFriendRequests((prev) => {
-              const transformedNew = transformFriendRequests([payload.new]);
+              const transformedNew = transformFriendRequests([
+                newFriendRequest,
+              ]);
               return [...prev, ...transformedNew];
             });
             setNewFriendRequestNumber((prev) => prev + 1); // 更新交友邀請數量
@@ -88,6 +94,8 @@ export const useFriendRequests = (userId: string) => {
       setNewFriendRequestNumber(0);
     }
   };
+
+  console.log("friendRequests", friendRequests);
 
   return {
     friendRequests,

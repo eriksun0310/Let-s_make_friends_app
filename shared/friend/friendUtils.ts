@@ -1,7 +1,10 @@
 import { FriendRequestsDBType } from "../dbType";
+import { FriendRequest } from "../types";
 
 // 轉換為前端可用的格式
-export const transformFriendRequests = (data: FriendRequestsDBType[]) => {
+export const transformFriendRequests = (
+  data: FriendRequestsDBType[]
+): FriendRequest[] => {
   return (data || []).map(
     ({
       id,

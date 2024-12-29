@@ -41,7 +41,7 @@ export const getUserData = async ({
   // 查詢 user_selected_option
   const { data: selectedData, error: selectedError } = await supabase
     .from("user_selected_option")
-    .select("*", { count: "exact" })
+    .select("interests, favorite_food, disliked_food", { count: "exact" })
     .eq("user_id", userId); // 篩選條件：id 等於 userId
 
   if (selectedError) {
@@ -52,7 +52,7 @@ export const getUserData = async ({
   // 查詢 user_head_shot
   const { data: headShotData, error: headShotError } = await supabase
     .from("user_head_shot")
-    .select("*")
+    .select("image_url, image_type", { count: "exact" })
     .eq("user_id", userId); // 篩選條件：id 等於 userId
 
   if (headShotError) {

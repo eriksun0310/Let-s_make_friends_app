@@ -16,23 +16,15 @@ export type UsersDBType = {
 
 // 大頭貼
 export type UserHeadShotDBType = {
-  id: string;
-  user_id: string;
   image_url: string;
   image_type: ImageType;
-  created_at: string;
-  updated_at: string;
 };
 
 // 興趣選項
 export type UserSelectedOptionDBType = {
-  id: string;
-  user_id: string;
   interests: string[];
   favorite_food: string[];
   disliked_food: string[];
-  created_at: string;
-  updated_at: string;
 };
 
 // 好友
@@ -50,8 +42,8 @@ export type FriendRequestsDBType = {
   sender_id: string;
   receiver_id: string;
   status: FriendRequestStatus;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
   is_read: boolean;
 };
 
