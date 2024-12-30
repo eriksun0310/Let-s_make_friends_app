@@ -94,7 +94,63 @@ user1_id:A 、user2_id:B
 
 ✏️[首頁]
 
+
+✏️[大致操作資料的流程]
+1. handlePostEvent: 
+    [post_tags]:
+        1. getTags: 取得 所有的tag  (資料表:post_tags)
+        2. addTag:  取得 新增tag  (資料表:post_tags)
+    [posts]:
+        1. getPosts: 取得所有好友(公開、好友)的文章、 不是好友(公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
+        2. addPost: 新增文章, (資料表: posts、post_tags)
+        3. editPost: 編輯文章
+        4. deletePost: 刪除文章
+    [post_comments]:
+        1. getPostComments: 取得文章留言
+        2. addPostComment: 新增文章留言
+        3. editPostComment: 編輯文章留言
+        4. deletePostComment: 刪除文章留言
+    [post_likes]:
+        1. getPostLikes: 取得文章按讚數
+        2. updatePostLikes: 更新文章按讚數 (按讚、收回)
+
+
+2.  寫 [Policies]
+    [post_tags]:
+        1.select
+        2.insert
+    [posts]:
+        1.select
+        2.insert
+        3.delete
+        4.update
+
+    [post_comments]:
+        1.select
+        2.insert
+        3.delete
+        4.update
+
+    [post_likes]:
+        1.select
+        2.insert: 按讚
+        3.delete: 收回讚
+
+
+
 ✏️[新增貼文]
+1. 換成自己的頭貼、名字
+2. tag 取的資料是從   redux 來render
+3. 新增 postSlice redux:
+    1. getTags: 
+    2. addTag: 取得 新增tag
+    3. addPost:
+
+4. 資料庫串接
+    getTags()、addTag()、addPost()、
+
+
+
 
 ✏️[編輯貼文]
 
