@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Colors } from "../../../constants/style";
+import { SegmentedButtons as SegmentedButtonsType } from "../../../shared/types";
 
-
-interface ButtonConfig {
-  value: string;
-  label: string;
-}
 interface SegmentedButtonProps {
-  buttons: ButtonConfig[];
+  buttons: SegmentedButtonsType[];
   onValueChange: (value: string) => void;
   initialValue?: string;
 }

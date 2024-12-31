@@ -18,17 +18,42 @@ import SegmentedButtons from "../components/ui/button/SegmentedButtons";
 import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import ostrich from "../assets/animal/ostrich.png";
+import { NavigationProp } from "@react-navigation/native";
+import { addPost, selectUser, useAppDispatch, useAppSelector } from "../store";
+import { addPostDB } from "../util/handlePostEvent";
+import { NewPost, PostVisibility } from "../shared/types";
+import { set } from "firebase/database";
 
+interface AddPostProps {
+  navigation: NavigationProp<any>;
+}
 // 新增文章
-const AddPost = ({ navigation }) => {
-  const modalizeRef = useRef(null);
+const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
+  const dispatch = useAppDispatch();
+  const personal = useAppSelector(selectUser);
+  const modalizeRef = useRef<{
+    open: () => void;
+    close: () => void;
+  }>(null);
 
-  const [permissions, setPermissions] = useState("all");
+  // 文章內容
+  const [postContent, setPostContent] = useState("");
+
+  // 文章權限
+  const [visibility, setVisibility] = useState("public");
 
   // 顯示在文章上的tag
   const [postTags, setPostTags] = useState<string[]>([]);
+
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+
+  const newPostRef = useRef<NewPost>({
+    userId: personal.userId,
+    content: postContent,
+    visibility: visibility as PostVisibility,
+    tags: postTags,
+  });
 
   // 關閉 新增文章 page
   const handleClosePost = () => {
@@ -56,6 +81,22 @@ const AddPost = ({ navigation }) => {
     setPostTags(postTags.filter((i) => i !== item));
   };
 
+  // 按下發布文章
+  const handleAddPost = async () => {
+    console.log("finalPost 111111", newPostRef.current);
+    const result = await addPostDB({
+      newPost: newPostRef.current,
+    });
+
+    // 發佈文章成功
+    if (result.success) {
+      dispatch(addPost(result.resultPost));
+
+      // 關閉 新增文章 page
+      navigation.goBack();
+    }
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: "新增文章",
@@ -70,12 +111,26 @@ const AddPost = ({ navigation }) => {
         </CustomIcon>
       ),
       headerRight: () => (
-        <TouchableOpacity style={{ marginHorizontal: 15 }}>
+        <TouchableOpacity
+          style={{ marginHorizontal: 15 }}
+          onPress={() => handleAddPost()}
+        >
           <Text style={{ color: Colors.textBlue }}>發布</Text>
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
+
+  useEffect(() => {
+    newPostRef.current = {
+      userId: personal.userId,
+      content: postContent,
+      visibility: visibility as PostVisibility,
+      tags: postTags,
+    };
+  }, [postTags, postContent, visibility, personal.userId]);
+
+  console.log("postContent", postContent);
 
   return (
     <>
@@ -93,14 +148,18 @@ const AddPost = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.postContainer}>
             <View style={styles.header}>
-              <Image source={ostrich} style={styles.avatar} />
-              <Text style={styles.username}>海鷗</Text>
+              <Image
+                source={personal.headShot.imageUrl}
+                style={styles.avatar}
+              />
+              <Text style={styles.username}>{personal.name}</Text>
             </View>
             <TextInput
               style={styles.input}
               placeholder="在想什麼...."
               placeholderTextColor="#999"
               multiline
+              onChangeText={setPostContent}
             />
 
             {/* 文章標籤 */}
@@ -132,9 +191,9 @@ const AddPost = ({ navigation }) => {
               </View>
 
               <SegmentedButtons
-                buttons={segmentedButtons}
-                onValueChange={setPermissions}
-                initialValue={permissions}
+                buttons={segmentedButtons("addPost")}
+                onValueChange={setVisibility}
+                initialValue={visibility}
               />
             </View>
           </View>

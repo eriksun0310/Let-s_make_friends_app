@@ -1,39 +1,53 @@
 import React from "react";
 import { View, StyleSheet, Text, ImageSourcePropType } from "react-native";
-import { User, UserState } from "../../shared/types";
+import {
+  PostDetail,
+  Post as PostType,
+  User,
+  UserState,
+} from "../../shared/types";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 
 interface PostProps {
   userState: UserState;
-  date: string;
-  user: User;
+  postDetail: PostDetail;
 }
 export const tagList = Array(5).fill({
   text: "大家好",
 });
 
-const Post: React.FC<PostProps> = ({ userState, user, date }) => {
+const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
+  const { post, user, tags, postLikes, postComments } = postDetail;
+  console.log("post", post);
+  console.log("tags", tags);
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
-        <Avatar rounded source={user.headShot?.imageUrl as ImageSourcePropType} size="medium" />
+        <Avatar
+          rounded
+          source={user.headShot?.imageUrl as ImageSourcePropType}
+          size="medium"
+        />
         <View style={styles.headerText}>
           <Text style={styles.username}>{user.name}</Text>
-          <Text style={styles.timestamp}>{date}</Text>
+          <Text style={styles.timestamp}>
+            {formatTimeWithDayjs(post?.createdAt)}
+          </Text>
         </View>
         {userState === "personal" && <CustomMenu />}
       </View>
 
-      <Text style={styles.content}>這是我的第一篇文章</Text>
+      <Text style={styles.content}>{post?.content}</Text>
 
       {userState !== "visitor" && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
             <Icon name="heart" type="material-community" color="#ff6666" />
-            <Text style={styles.iconText}>2</Text>
+            <Text style={styles.iconText}>{postLikes.length}</Text>
           </View>
           <View style={styles.iconContainer}>
             <Icon
@@ -41,7 +55,7 @@ const Post: React.FC<PostProps> = ({ userState, user, date }) => {
               type="material-community"
               color={Colors.iconBlue}
             />
-            <Text style={styles.iconText}>2</Text>
+            <Text style={styles.iconText}>{postComments.length}</Text>
           </View>
         </View>
       )}
@@ -53,9 +67,9 @@ const Post: React.FC<PostProps> = ({ userState, user, date }) => {
           size={24}
           color={Colors.tag}
         />
-        {tagList.map((item) => (
+        {tags.map((tag) => (
           <View style={styles.tag}>
-            <Text style={styles.tagText}>{item.text}</Text>
+            <Text style={styles.tagText}>{tag}</Text>
           </View>
         ))}
       </View>

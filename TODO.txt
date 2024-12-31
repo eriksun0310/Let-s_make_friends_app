@@ -8,6 +8,7 @@
 ➖❌ 未完成
 ➖🚀 要先做  
 ➖⌛ 之後做
+➖⛔ 待測試
 ➖➖➖➖➖➖➖➖➖
 
 
@@ -100,13 +101,13 @@ user1_id:A 、user2_id:B
 ✏️[發文 大致操作資料的流程]
 1. handlePostEvent: 
     [post_tags]:
-        1. getTags: 取得 所有的tag  (資料表:post_tags)
-        2. addTag:  取得 新增tag  (資料表:post_tags)
+        ⛔1. getTags: 取得 所有的tag  (資料表:post_tags)
+        ✅2. addTag:  取得 新增tag  (資料表:post_tags)
     [posts]:
-        1. getAllPosts: 取得所有文章(好友 + 自己 + 非好友但設為公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
+        ⛔1. getAllPosts: 取得所有文章(好友 + 自己 + 非好友但設為公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
         2. getPostDetail: 取得文章詳細資訊
         3. getUserPosts: 取得使用者的文章(個人資訊、好友資訊用的)
-        2. addPost: 新增文章, (資料表: posts、post_tags)
+        ✅2. addPost: 新增文章, (資料表: posts、post_tags)
         3. editPost: 編輯文章
         4. deletePost: 刪除文章
     [post_comments]:
@@ -120,12 +121,12 @@ user1_id:A 、user2_id:B
 
 
 2.  寫 [Policies]
-    [post_tags]:
-        1.select
-        2.insert
+    ✅[post_tags]:
+        ⛔1.select
+        ✅2.insert
     [posts]:
-        1.select
-        2.insert
+        ✅1.select
+        ✅2.insert
         3.delete
         4.update
 

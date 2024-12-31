@@ -7,9 +7,13 @@ post_likes: 文章按讚
 */
 
 import { PostTagsDBType } from "../shared/dbType";
-import { transformPost } from "../shared/post/postUtils";
-import { NewPost, PostCombine, PostDetail, Result } from "../shared/types";
-import { getFriendDetail, getFriendList } from "./handleFriendsEvent";
+import { transformPost, transformPostDetail } from "../shared/post/postUtils";
+import { NewPost, PostDetail, Result, User } from "../shared/types";
+import {
+  getFriendDetail,
+  getFriendDetails,
+  getFriendList,
+} from "./handleFriendsEvent";
 import { supabase } from "./supabaseClient";
 
 // 取得 所有的tag
@@ -35,27 +39,35 @@ export const addPostTag = async ({
   errorMessage?: string;
   resultTags?: string[];
 }> => {
-  const tagsData = tags.map((tag) => ({
-    tag,
-    post_id: postId,
-  }));
+  try {
+    const tagsData = tags.map((tag) => ({
+      tag,
+      post_id: postId,
+    }));
 
-  //   批量插入
-  const { data, error } = await supabase
-    .from("post_tags")
-    .insert(tagsData)
-    .select("tag");
-  if (error) {
+    //   批量插入
+    const { data, error } = await supabase
+      .from("post_tags")
+      .insert(tagsData)
+      .select("tag");
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      resultTags: data.map((item) => item.tag), // 確保只回傳 tag 值
+    };
+  } catch (error) {
+    console.log("新增標籤失敗", error);
     return {
       success: false,
-      errorMessage: error.message,
+      errorMessage: (error as Error).message,
     };
   }
-
-  return {
-    success: true,
-    resultTags: data.map((item) => item.tag), // 確保只回傳 tag 值
-  };
 };
 
 // 取得所有文章(好友 + 自己+ 非好友但設為公開)的文章
@@ -66,7 +78,7 @@ export const getAllPosts = async ({
   userId,
 }: {
   userId: string;
-}): Promise<PostCombine[]> => {
+}): Promise<PostDetail[]> => {
   // 取得好友資訊
   const friendList = await getFriendList(userId);
 
@@ -75,7 +87,86 @@ export const getAllPosts = async ({
 
   // 查詢所有文章
   const { data: postsData, error: postsError } = await supabase
-  .from("posts");
+    .from("posts")
+    .select("*")
+    .or(
+      `user_id.eq.${userId},user_id.in.(${friendIds.join(
+        ","
+      )}),visibility.eq.public`
+    )
+    .order("created_at", { ascending: false }); // 按創建時間排序;
+
+  if (postsError) {
+    console.log("查詢所有文章 錯誤", postsError);
+    return [];
+  }
+
+  // 提取文章id
+  const postIds = postsData.map((post) => post.id);
+
+  // 提取發文者id
+  const userIds = postsData.map((post) => post.user_id);
+
+  // 批量查詢發文者資訊
+  const users = await getFriendDetails(userIds);
+
+  // 查詢文章標籤
+  const { data: tagsData, error: tagsError } = await supabase
+    .from("post_tags")
+    .select("*")
+    .in("post_id", postIds); // 篩選相關文章的標籤
+
+  if (tagsError) {
+    console.log("查詢文章標籤 錯誤", tagsError);
+    return [];
+  }
+
+  // 查詢文章按讚
+  const { data: likesData, error: likesError } = await supabase
+    .from("post_likes")
+    .select("*")
+    .in("post_id", postIds); // 篩選相關文章的按讚數
+
+  if (likesError) {
+    console.log("查詢文章按讚 錯誤", likesError);
+    return [];
+  }
+
+  // 查詢文章留言
+  const { data: commentsData, error: commentsError } = await supabase
+    .from("post_comments")
+    .select("*")
+    .in("post_id", postIds); // 篩選相關文章的留言
+
+  if (commentsError) {
+    console.log("查詢文章留言 錯誤", commentsError);
+    return [];
+  }
+
+  const postDetails = postsData.map((post) => {
+    // 找到對應的發文者資訊
+    const user = users.find((user) => user.userId === post.user_id);
+
+    // 過濾對應的標籤、按讚數和留言
+    const tags = tagsData.filter((tag) => tag.post_id === post.id);
+    const likes = likesData.filter((like) => like.post_id === post.id);
+    const comments = commentsData.filter(
+      (comment) => comment.post_id === post.id
+    );
+
+    // 轉換文章詳情
+    const transformedPostDetail = transformPostDetail({
+      posts: post,
+      user: user || ({} as User),
+      tags,
+      postLikes: likes,
+      postComments: comments,
+    });
+
+    return transformedPostDetail;
+  });
+
+  return postDetails;
 };
 
 // 文章的詳細資訊
@@ -95,19 +186,17 @@ export const getPostDetail = async (postId: string): Promise<PostDetail> => {};
 
 // 取得使用者的文章(for :個人資訊、好友資訊用的)
 // TODO: 到時候可能要識別出是好友還是訪客，好友可以看到所有文章，訪客只能看到公開的文章
-export const getUserPosts = async (
-  userId: string
-): Promise<PostCombine[]> => {};
+export const getUserPosts = async (userId: string): Promise<PostDetail[]> => {};
 
 // 新增文章
-export const addPost = async ({
+export const addPostDB = async ({
   newPost,
 }: {
   newPost: NewPost;
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  resultPost?: PostCombine;
+  resultPost?: PostDetail;
 }> => {
   try {
     // 新增文章並取得插入的文章 ID
@@ -117,7 +206,6 @@ export const addPost = async ({
         user_id: newPost.userId,
         content: newPost.content,
         visibility: newPost.visibility,
-        created_at: new Date().toISOString(),
       })
       .select("*") //只回傳新文章的id
       .single(); // 確保只返回單條文章
@@ -138,32 +226,32 @@ export const addPost = async ({
     });
 
     if (!tagsResult.success) {
+      console.log("新增標籤 失敗", tagsResult.errorMessage);
       return {
         success: false,
         errorMessage: tagsResult.errorMessage,
       };
     }
+    // 發文者的基本資訊
+    const user = await getFriendDetail(postData.user_id);
 
     // 轉換文章的資料格式
     const transformedPost = transformPost({
       posts: postData,
     });
 
-    // 發文者的基本資訊
-    const user = await getFriendDetail(postData.user_id);
-
     return {
       success: true,
       resultPost: {
         post: transformedPost,
-        user: user,
+        user: user || ({} as User),
         tags: tagsResult.resultTags || [], // 如果標籤新增失敗，返回空陣列
         postLikes: [], // 新文章沒有按讚
         postComments: [], // 新文章沒有留言
       },
     };
   } catch (error) {
-    console.error("Error adding post:", error);
+    console.log("Error adding post:", error);
     return {
       success: false,
       errorMessage: (error as Error).message,

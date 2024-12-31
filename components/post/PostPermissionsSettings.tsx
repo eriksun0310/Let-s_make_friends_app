@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import SegmentedButtons from "../ui/button/SegmentedButtons";
-import { segmentedButtons } from "../../shared/static";
+import {  segmentedButtons } from "../../shared/static";
 import { Colors } from "../../constants/style";
 
 // 貼文權限設定
@@ -14,7 +14,7 @@ const PostPermissionsSettings = () => {
       </View>
       <View>
         <SegmentedButtons
-          buttons={segmentedButtons}
+          buttons={segmentedButtons("personal")}
           onValueChange={setPermissions}
           initialValue={permissions}
         />

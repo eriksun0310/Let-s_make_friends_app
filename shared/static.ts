@@ -1,4 +1,5 @@
-import { OptionList, Tabs, User } from "./types";
+import { ButtonConfig } from "../components/ui/button/SegmentedButtons";
+import { OptionList, SegmentedButtons, Tabs, User } from "./types";
 
 export const tabs: Tabs = {
   interests: "興趣",
@@ -26,20 +27,23 @@ export const gender = {
   male: "男",
 };
 
-export const segmentedButtons = [
-  {
-    value: "all",
-    label: "全部",
-  },
-  {
-    value: "public",
-    label: "公開",
-  },
-  {
-    value: "friends",
-    label: "朋友",
-  },
-];
+export const segmentedButtons = (
+  mode: "personal" | "addPost"
+): SegmentedButtons[] =>
+  [
+    mode === "personal" && {
+      value: "all",
+      label: "全部",
+    },
+    {
+      value: "public",
+      label: "公開",
+    },
+    {
+      value: "friends",
+      label: "朋友",
+    },
+  ].filter(Boolean) as SegmentedButtons[];
 
 export const userInit: User = {
   userId: "",

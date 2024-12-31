@@ -102,7 +102,7 @@ export type Message = {
   isRead: boolean;
   recipientId: string;
   senderId: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export type ChatRoom = {
@@ -171,15 +171,6 @@ TODO:
 4. 按讚數:post_likes
 5. 文章內容:posts
 */
-export type PostCombine = {
-  post: Post;
-  user: User;
-  tags: string[];
-  postLikes: PostLikes[];
-  postComments: PostComments[];
-};
-
-// 文章詳細資訊
 
 /*
 TODO:
@@ -190,7 +181,15 @@ TODO:
 5. 留言內容: post_comments
 6. 是否有tag: post_tags
 */
-export type PostDetail = {};
+export type PostDetail = {
+  post: Post;
+  user: User;
+  tags: string[];
+  postLikes: PostLikes[];
+  postComments: PostComments[];
+};
+
+// 文章詳細資訊
 
 export type NewPost = {
   userId: string;
@@ -198,3 +197,8 @@ export type NewPost = {
   visibility: PostVisibility;
   tags: string[];
 };
+
+export interface SegmentedButtons {
+  value: string;
+  label: string;
+}

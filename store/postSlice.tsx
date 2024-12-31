@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { PostTags, Post, PostComments, PostLikes } from "../shared/types";
+import { PostTags, Post, PostComments, PostLikes, PostDetail } from "../shared/types";
 
 interface InitialStateProps {
   tags: PostTags[];
-  posts: Post[];
+  posts: PostDetail[];
   postComments: PostComments[];
   postLikes: PostLikes[];
 }
