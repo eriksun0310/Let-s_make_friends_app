@@ -8,7 +8,12 @@ interface FriendProps {
   receiverId: string;
 }
 
-// 處理 所有 加好友的 db 操作(friend_requests、friends)
+
+/*
+處理 加好友的 db 操作
+friend_requests: 好友邀請
+friends: 好友列表
+*/
 
 //取得(單一)好友詳細資料
 export const getFriendDetail = async (friendId: string): Promise<User> => {

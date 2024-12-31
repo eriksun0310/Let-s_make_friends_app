@@ -7,7 +7,11 @@ import {
   transformMessageArray,
 } from "../shared/chat/chatUtils";
 
-// 處理 聊天室 db 操作(chat_rooms、messages)
+/*
+處理 聊天室 db 操作
+chat_rooms: 聊天室
+messages: 聊天室中的訊息
+*/
 
 // 取得所有聊天室
 export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {

@@ -5,3 +5,4 @@ export type { RootState } from "./store";
 
 export * from "./userSlice";
 export * from "./chatSlice";
+export * from "./postSlice";

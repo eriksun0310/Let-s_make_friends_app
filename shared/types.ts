@@ -127,3 +127,74 @@ export type Result = {
   success: boolean;
   errorMessage?: string;
 };
+
+// 文章權限
+export type PostVisibility = "public" | "friends";
+
+export type PostTags = {
+  id: string;
+  postId: string;
+  tag: string;
+};
+
+export type Post = {
+  id: string;
+  userId: string;
+  content: string;
+  visibility: PostVisibility;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PostComments = {
+  id: string;
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PostLikes = {
+  id: string;
+  postId: string;
+  userId: string;
+  createdAt: Date;
+};
+
+/*
+
+TODO:
+1. 發文者的資訊:users
+2. 標籤:post_tags
+3. 留言數:post_comments
+4. 按讚數:post_likes
+5. 文章內容:posts
+*/
+export type PostCombine = {
+  post: Post;
+  user: User;
+  tags: string[];
+  postLikes: PostLikes[];
+  postComments: PostComments[];
+};
+
+// 文章詳細資訊
+
+/*
+TODO:
+1. 發文者資料: users
+2. 留言者資料: users
+3. 按讚者資料: post_likes + users 
+4. 發文內容: posts
+5. 留言內容: post_comments
+6. 是否有tag: post_tags
+*/
+export type PostDetail = {};
+
+export type NewPost = {
+  userId: string;
+  content: string;
+  visibility: PostVisibility;
+  tags: string[];
+};

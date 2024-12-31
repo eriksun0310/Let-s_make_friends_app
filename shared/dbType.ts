@@ -1,4 +1,9 @@
-import { FriendRequestStatus, Gender, ImageType } from "./types";
+import {
+  FriendRequestStatus,
+  Gender,
+  ImageType,
+  PostVisibility,
+} from "./types";
 
 // 對應 supabase 的資料型態
 
@@ -69,5 +74,40 @@ export type MessagesDBType = {
   recipient_id: string;
   content: string;
   is_read: boolean;
-  created_at: string;
+  created_at: Date;
+};
+
+// tags
+export type PostTagsDBType = {
+  id: string;
+  post_id: string;
+  tag: string;
+};
+
+// 文章
+export type PostsDBType = {
+  id: string;
+  user_id: string;
+  content: string;
+  visibility: PostVisibility;
+  created_at: Date;
+  updated_at: Date;
+};
+
+// 文章留言
+export type PostCommentsDBType = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: Date;
+  updated_at: Date;
+};
+
+// 文章按讚數
+export type PostLikesDBType = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  created_at: Date;
 };
