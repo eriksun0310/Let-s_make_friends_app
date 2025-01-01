@@ -15,6 +15,7 @@ import {
 } from "../store";
 import { getAllPosts } from "../util/handlePostEvent";
 import { NavigationProp } from "@react-navigation/native";
+import { usePostListeners } from "../components/hooks/usePostListeners";
 
 // export const postList = Array(14).fill({
 //   date: "2024/08/02",
@@ -25,13 +26,11 @@ interface HomePostProps {
 }
 const Home: React.FC<HomePostProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
-  const [state, setState] = useState({ open: false });
 
-  const onStateChange = ({ open }) => setState({ open });
+  usePostListeners()
 
   const postData = useAppSelector(selectPosts);
 
-  const { open } = state;
   const personal = useAppSelector(selectUser);
 
   useEffect(() => {
@@ -49,7 +48,6 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
       const allPosts = await getAllPosts({
         userId: personal.userId,
       });
-      // console.log("postData", allPosts);
 
       dispatch(setPosts(allPosts));
     };

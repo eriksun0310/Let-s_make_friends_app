@@ -90,8 +90,8 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
 
     // 發佈文章成功
     if (result.success) {
-      console.log("result.resultPost 發布文章", result.resultPost);
-      dispatch(addPost(result.resultPost));
+      console.log("result.resultPost 發布文章", result.data);
+      dispatch(addPost(result.data));
 
       // 關閉 新增文章 page
       navigation.goBack();

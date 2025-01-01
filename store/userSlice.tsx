@@ -3,12 +3,14 @@ import { AppThunk, RootState } from "./store";
 import { User } from "../shared/types";
 import { getUserData, updateUserOnlineStatus } from "../util/handleUserEvent";
 import { supabase } from "../util/supabaseClient";
+import AddFriend from "../screen/AddFriend";
 
 interface InitialStateProps {
   user: User;
   isAuthenticated: boolean; // 是否已經登入
   initialized: boolean; // 應用程序這個初始化步驟已完成
   isNewUser: boolean; // 是否是新用戶
+  friendList: User[]; // 好友列表
 }
 
 const initialState: InitialStateProps = {
@@ -32,6 +34,7 @@ const initialState: InitialStateProps = {
   isAuthenticated: false, // 是否已經登入
   initialized: false, // 應用程序這個初始化步驟已完成,
   isNewUser: false,
+  friendList: [],
 };
 
 // slice 定義
@@ -87,6 +90,16 @@ const userSlice = createSlice({
     setIsNewUser(state, action) {
       state.isNewUser = action.payload;
     },
+
+    setFriendList(state, action) {
+      state.friendList = action.payload;
+    },
+    //
+    // addFriend(state, action) {
+    //   state.friendList.push(action.payload);
+
+    //   //  好友列表排序(新好友在上面)
+    // },
   },
 });
 
@@ -156,7 +169,7 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
     console.log("initializeAuth error", err);
   }
 };
-export const { setUser, setSelectedOption, setIsAuthenticated } =
+export const { setUser, setSelectedOption, setIsAuthenticated, setFriendList } =
   userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
@@ -167,5 +180,7 @@ export const selectIsAuthenticated = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectInitialized = (state: RootState) => state.user.initialized;
+
+export const selectFriendList = (state: RootState) => state.user.friendList;
 
 export default userSlice.reducer;

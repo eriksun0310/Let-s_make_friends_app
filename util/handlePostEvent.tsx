@@ -6,13 +6,23 @@ post_comments: 文章留言
 post_likes: 文章按讚
 */
 
-import { PostTagsDBType } from "../shared/dbType";
+import { PostsDBType, PostTagsDBType } from "../shared/dbType";
 import {
   transformPost,
+  transformPostComments,
   transformPostDetail,
+  transformPostLikes,
   transformPostTags,
 } from "../shared/post/postUtils";
-import { NewPost, PostDetail, PostTags, Result, User } from "../shared/types";
+import {
+  NewPost,
+  PostComments,
+  PostDetail,
+  PostLikes,
+  PostTags,
+  Result,
+  User,
+} from "../shared/types";
 import {
   getFriendDetail,
   getFriendDetails,
@@ -20,7 +30,7 @@ import {
 } from "./handleFriendsEvent";
 import { supabase } from "./supabaseClient";
 
-// 取得 所有的tag
+// 取得 所有的tag(for: 新增文章用的)
 export const getPostTags = async (): Promise<PostTagsDBType[]> => {
   const { data, error } = await supabase.from("post_tags").select("*");
 
@@ -41,7 +51,7 @@ export const addPostTag = async ({
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  resultTags?: PostTags[];
+  data: PostTags[];
 }> => {
   try {
     const tagsData = tags.map((tag) => ({
@@ -58,6 +68,7 @@ export const addPostTag = async ({
       return {
         success: false,
         errorMessage: error.message,
+        data: [],
       };
     }
 
@@ -67,13 +78,56 @@ export const addPostTag = async ({
 
     return {
       success: true,
-      resultTags: transformedPostTags, // 確保只回傳 tag 值
+      data: transformedPostTags,
     };
   } catch (error) {
     console.log("新增標籤失敗", error);
     return {
       success: false,
       errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
+};
+
+//取得文章內的tag
+export const getPostTagsByPostId = async ({
+  postIds,
+}: {
+  postIds: string[];
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: PostTags[];
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from("post_tags")
+      .select("*")
+      .in("post_id", postIds);
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: (error as Error).message,
+        data: [],
+      };
+    }
+
+    const transformedPostTags = transformPostTags({
+      postTags: data,
+    });
+
+    return {
+      success: true,
+      data: transformedPostTags,
+    };
+  } catch (error) {
+    console.log("取得文章標籤失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
     };
   }
 };
@@ -117,58 +171,38 @@ export const getAllPosts = async ({
   // 批量查詢發文者資訊
   const users = await getFriendDetails(userIds);
 
-  // 查詢文章標籤
-  const { data: tagsData, error: tagsError } = await supabase
-    .from("post_tags")
-    .select("*")
-    .in("post_id", postIds); // 篩選相關文章的標籤
-
-  if (tagsError) {
-    console.log("查詢文章標籤 錯誤", tagsError);
-    return [];
-  }
+  // 取得文章標籤
+  const tagsData = (await getPostTagsByPostId({ postIds })).data;
 
   // 查詢文章按讚
-  const { data: likesData, error: likesError } = await supabase
-    .from("post_likes")
-    .select("*")
-    .in("post_id", postIds); // 篩選相關文章的按讚數
-
-  if (likesError) {
-    console.log("查詢文章按讚 錯誤", likesError);
-    return [];
-  }
+  const likesData = (await getPostLikesByPostId({ postIds })).data;
 
   // 查詢文章留言
-  const { data: commentsData, error: commentsError } = await supabase
-    .from("post_comments")
-    .select("*")
-    .in("post_id", postIds); // 篩選相關文章的留言
-
-  if (commentsError) {
-    console.log("查詢文章留言 錯誤", commentsError);
-    return [];
-  }
+  const commentsData = (await getPostCommentsByPostId({ postIds })).data;
 
   const postDetails = postsData.map((post) => {
     // 找到對應的發文者資訊
     const user = users.find((user) => user.userId === post.user_id);
 
     // 過濾對應的標籤、按讚數和留言
-    const tags = tagsData.filter((tag) => tag.post_id === post.id);
-    const likes = likesData.filter((like) => like.post_id === post.id);
+    const tags = tagsData.filter((tag) => tag.postId === post.id);
+    const likes = likesData.filter((like) => like.postId === post.id);
     const comments = commentsData.filter(
-      (comment) => comment.post_id === post.id
+      (comment) => comment.postId === post.id
     );
 
-    // 轉換文章詳情
-    const transformedPostDetail = transformPostDetail({
+    const transformedPost = transformPost({
       posts: post,
+    });
+
+    // 轉換文章詳情
+    const transformedPostDetail = {
+      post: transformedPost,
       user: user || ({} as User),
       tags,
       postLikes: likes,
       postComments: comments,
-    });
+    };
 
     return transformedPostDetail;
   });
@@ -189,11 +223,37 @@ export const getAllPosts = async ({
 6. 是否有tag: post_tags
 */
 
-export const getPostDetail = async (postId: string): Promise<PostDetail> => {};
+export const getPostDetail = async ({
+  post,
+}: {
+  post: PostsDBType;
+}): Promise<PostDetail> => {
+  // 轉換文章的資料格式
+  const transformedPost = transformPost({
+    posts: post,
+  });
 
-// 取得使用者的文章(for :個人資訊、好友資訊用的)
-// TODO: 到時候可能要識別出是好友還是訪客，好友可以看到所有文章，訪客只能看到公開的文章
-export const getUserPosts = async (userId: string): Promise<PostDetail[]> => {};
+  // 取得發文者資訊
+  const user = (await getFriendDetail(post.user_id)) || ({} as User);
+
+  // 取得文章標籤
+  const tagsData = (await getPostTagsByPostId({ postIds: [post.id] })).data;
+
+  // 查詢文章按讚
+  const likesData = (await getPostLikesByPostId({ postIds: [post.id] })).data;
+
+  // 查詢文章留言
+  const commentsData = (await getPostCommentsByPostId({ postIds: [post.id] }))
+    .data;
+
+  return {
+    user: user,
+    post: transformedPost,
+    tags: tagsData,
+    postLikes: likesData,
+    postComments: commentsData,
+  };
+};
 
 // 新增文章
 export const addPostDB = async ({
@@ -203,7 +263,7 @@ export const addPostDB = async ({
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  resultPost?: PostDetail;
+  data: PostDetail | null;
 }> => {
   try {
     // 新增文章並取得插入的文章 ID
@@ -222,23 +282,19 @@ export const addPostDB = async ({
       return {
         success: false,
         errorMessage: postError.message,
+        data: null,
       };
     }
 
     const postId = postData?.id; // 取得新增文章的 id
     // 新增標籤
-    const tagsResult = await addPostTag({
-      tags: newPost.tags,
-      postId: postId,
-    });
+    const tags = (
+      await addPostTag({
+        tags: newPost.tags,
+        postId: postId,
+      })
+    ).data;
 
-    if (!tagsResult.success) {
-      console.log("新增標籤 失敗", tagsResult.errorMessage);
-      return {
-        success: false,
-        errorMessage: tagsResult.errorMessage,
-      };
-    }
     // 發文者的基本資訊
     const user = await getFriendDetail(postData.user_id);
 
@@ -249,10 +305,10 @@ export const addPostDB = async ({
 
     return {
       success: true,
-      resultPost: {
+      data: {
         post: transformedPost,
         user: user || ({} as User),
-        tags: tagsResult.resultTags || [], // 如果標籤新增失敗，返回空陣列
+        tags: tags || [], // 如果標籤新增失敗，返回空陣列
         postLikes: [], // 新文章沒有按讚
         postComments: [], // 新文章沒有留言
       },
@@ -262,6 +318,92 @@ export const addPostDB = async ({
     return {
       success: false,
       errorMessage: (error as Error).message,
+      data: null,
+    };
+  }
+};
+
+// 取得所有文章的按讚
+export const getPostLikesByPostId = async ({
+  postIds,
+}: {
+  postIds: string[];
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: PostLikes[];
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from("post_likes")
+      .select("*")
+      .in("post_id", postIds); // 篩選相關文章的按讚數
+
+    if (error) {
+      console.log("取得文章按讚失敗", error);
+      return {
+        success: false,
+        errorMessage: (error as Error).message,
+        data: [],
+      };
+    }
+    const transformedPostLikes = transformPostLikes({
+      postLikes: data,
+    });
+
+    return {
+      success: true,
+      data: transformedPostLikes,
+    };
+  } catch (error) {
+    console.log("取得文章按讚失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
+};
+
+// 取得文章的留言
+export const getPostCommentsByPostId = async ({
+  postIds,
+}: {
+  postIds: string[];
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: PostComments[];
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from("post_comments")
+      .select("*")
+      .in("post_id", postIds); // 篩選相關文章的按讚數
+
+    if (error) {
+      console.log("取得文章留言失敗", error);
+      return {
+        success: false,
+        errorMessage: (error as Error).message,
+        data: [],
+      };
+    }
+
+    const transformedPostComments = transformPostComments({
+      postComments: data,
+    });
+
+    return {
+      success: true,
+      data: transformedPostComments,
+    };
+  } catch (error) {
+    console.log("取得文章留言失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
     };
   }
 };

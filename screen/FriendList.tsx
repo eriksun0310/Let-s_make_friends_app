@@ -9,7 +9,13 @@ import { RootState } from "../store/store";
 import { getFriendList } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { selectUser, useAppSelector } from "../store";
+import {
+  selectFriendList,
+  selectUser,
+  setFriendList,
+  useAppDispatch,
+  useAppSelector,
+} from "../store";
 import ostrich from "../assets/animal/ostrich.png";
 import SearchBar from "../components/ui/SearchBar";
 interface FriendListProps {
@@ -31,7 +37,11 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   // console.log("好友列表 render");
   const personal = useAppSelector(selectUser);
 
-  const [friendList, setFriendList] = useState([]);
+  const dispatch = useAppDispatch();
+
+  const friendList = useAppSelector(selectFriendList);
+
+  //const [friendList, setFriendList] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +53,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
     setLoading(true);
     try {
       const data = await getFriendList(personal.userId);
-      setFriendList(data);
+      dispatch(setFriendList(data));
     } catch (error) {
       console.log("取得好友列表 錯誤", error);
     } finally {
@@ -95,6 +105,7 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   }, [navigation]);
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
+
 
   return (
     <View style={styles.screen}>
