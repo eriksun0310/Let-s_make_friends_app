@@ -13,6 +13,7 @@ import {
   User,
 } from "../types";
 
+// 文章
 export const transformPost = ({ posts }: { posts: PostsDBType }): Post => {
   const { id, user_id, content, visibility, created_at, updated_at } = posts;
 
@@ -24,6 +25,19 @@ export const transformPost = ({ posts }: { posts: PostsDBType }): Post => {
     createdAt: created_at,
     updatedAt: updated_at,
   };
+};
+
+// 文章標籤
+export const transformPostTags = ({
+  postTags,
+}: {
+  postTags: PostTagsDBType[];
+}) => {
+  return (postTags || []).map((tag) => ({
+    id: tag.id,
+    postId: tag.post_id,
+    tag: tag.tag,
+  }));
 };
 
 // 文章留言
@@ -75,8 +89,14 @@ export const transformPostDetail = ({
     posts,
   });
 
+
+  console.log('tags', tags)
   // 文章標籤
-  const transformedTags = tags.map((tag) => tag.tag);
+  const transformedTags = transformPostTags({
+    postTags: tags,
+  });
+
+  console.log('transformedTags', transformedTags)
 
   //文章留言
   const transformedPostComments = transformPostComments({

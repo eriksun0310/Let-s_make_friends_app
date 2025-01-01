@@ -18,6 +18,7 @@ import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
   logout,
+  selectPosts,
   selectUser,
   setCurrentChatRoomId,
   useAppDispatch,
@@ -49,6 +50,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
+  const postData = useAppSelector(selectPosts);
 
   // 判斷 要取 個人還是好友 資料
   const user = userState === "personal" ? personal : friend;
@@ -89,6 +91,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       userId: personal.userId,
     });
   };
+
+  // 檢查文章是否為自己發的
+  const hasMyPost = postData?.some((post) => post.user.userId === user.userId);
+
 
   useEffect(() => {
     // console.log("好友資料 当前导航堆栈:", navigation.getState());
@@ -135,17 +141,28 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             }}
           />
 
-          {userState === "personal" && <PostPermissionsSettings />}
+          {hasMyPost && userState === "personal" && <PostPermissionsSettings />}
 
           <View style={{ marginTop: 10 }} />
 
-          {postList?.map((post) => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("postContent")}
-            >
-              <Post userState="personal" date={post.date} user={user} />
-            </TouchableOpacity>
-          ))}
+          {postData?.map((post) => {
+            if (post.user.userId === user.userId) {
+              return (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("postDetail", {
+                      postDetail: post,
+                    })
+                  }
+                >
+                  <Post
+                    userState="personal" // 這個到時候 要看說是訪客還是朋友
+                    postDetail={post}
+                  />
+                </TouchableOpacity>
+              );
+            }
+          })}
 
           {userState === "personal" && (
             <View style={styles.formContainer}>

@@ -130,7 +130,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
     };
   }, [postTags, postContent, visibility, personal.userId]);
 
-  console.log("postContent", postContent);
+  //console.log("postContent", postContent);
 
   return (
     <>

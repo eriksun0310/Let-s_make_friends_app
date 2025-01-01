@@ -103,7 +103,6 @@ export const getAllPosts = async ({
 
   // 提取文章id
   const postIds = postsData.map((post) => post.id);
-
   // 提取發文者id
   const userIds = postsData.map((post) => post.user_id);
 
@@ -153,6 +152,7 @@ export const getAllPosts = async ({
     const comments = commentsData.filter(
       (comment) => comment.post_id === post.id
     );
+
 
     // 轉換文章詳情
     const transformedPostDetail = transformPostDetail({

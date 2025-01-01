@@ -58,13 +58,19 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
   }, [personal.userId]);
 
   console.log("postData redux", postData);
+
   return (
     <PaperProvider>
       <View style={styles.screen}>
         <ScrollView>
           {postData?.map((post) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("postContent")}
+              key={post.post.id}
+              onPress={() =>
+                navigation.navigate("postDetail", {
+                  postDetail: post,
+                })
+              }
             >
               <Post
                 userState={

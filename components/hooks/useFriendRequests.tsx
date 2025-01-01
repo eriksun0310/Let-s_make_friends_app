@@ -95,8 +95,6 @@ export const useFriendRequests = (userId: string) => {
     }
   };
 
-  console.log("friendRequests", friendRequests);
-
   return {
     friendRequests,
     loading,

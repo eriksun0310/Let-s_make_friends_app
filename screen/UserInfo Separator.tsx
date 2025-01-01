@@ -155,7 +155,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
           {postList?.map((post) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("postContent")}
+              onPress={() => navigation.navigate("postDetail")}
             >
               <Post userState="personal" date={post.date} user={user} />
             </TouchableOpacity>

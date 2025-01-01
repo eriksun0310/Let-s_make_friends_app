@@ -24,7 +24,7 @@ import AddFriend from "./screen/AddFriend";
 import FriendList from "./screen/FriendList";
 import FriendInvitation from "./screen/FriendInvitation";
 import UserInfo from "./screen/UserInfo";
-import PostContent from "./screen/PostContent";
+import PostDetail from "./screen/PostDetail";
 import Search from "./screen/Search";
 import AddPost from "./screen/AddPost";
 import "react-native-gesture-handler";
@@ -202,8 +202,8 @@ const AuthenticatedStack = () => {
         component={UserInfo}
       />
 
-      {/* 貼文內容*/}
-      <Stack.Screen name="postContent" component={PostContent} />
+      {/* 文章詳細內容*/}
+      <Stack.Screen name="postDetail" component={PostDetail} />
 
       {/* 搜尋頁面 */}
       <Stack.Screen name="search" component={Search} />
@@ -233,7 +233,7 @@ const Navigation = () => {
       {isAuthenticated ? (
         <ChatContextProvider>
           <AuthenticatedStack />
-         </ChatContextProvider>
+        </ChatContextProvider>
       ) : (
         <AuthStack />
       )}

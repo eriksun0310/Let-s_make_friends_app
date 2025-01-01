@@ -11,6 +11,7 @@ import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
+import PostTags from "./PostTags";
 
 interface PostProps {
   userState: UserState;
@@ -22,8 +23,7 @@ export const tagList = Array(5).fill({
 
 const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
   const { post, user, tags, postLikes, postComments } = postDetail;
-  console.log("post", post);
-  console.log("tags", tags);
+
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
@@ -59,20 +59,8 @@ const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
           </View>
         </View>
       )}
-
-      <View style={styles.tagContainer}>
-        <AntDesign
-          name="tag"
-          style={{ marginRight: 5 }}
-          size={24}
-          color={Colors.tag}
-        />
-        {tags.map((tag) => (
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
-      </View>
+      {/* 文章標籤 */}
+      {tags.length > 0 && <PostTags tags={tags} />}
     </Card>
   );
 };
@@ -119,25 +107,6 @@ const styles = StyleSheet.create({
   iconText: {
     marginLeft: 5,
     fontSize: 14,
-  },
-  tagContainer: {
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-
-  tag: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 16,
-    padding: 5,
-    marginRight: 8,
-    marginTop: 15,
-  },
-  tagText: {
-    color: "#666",
   },
 });
 

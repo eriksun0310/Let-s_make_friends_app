@@ -11,12 +11,20 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import BackButton from "../components/ui/button/BackButton";
 import { selectUser, useAppSelector } from "../store";
+import { PostDetail as PostDetailType } from "../shared/types";
 
-interface PostContentProps {
+interface PostDetailProps {
+  route: {
+    params: {
+      postDetail: PostDetailType;
+    };
+  };
   navigation: NavigationProp<any>;
 }
 //貼文內容
-const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
+const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
+  const { postDetail } = route.params;
+
   const personal = useAppSelector(selectUser);
 
   useEffect(() => {
@@ -26,12 +34,19 @@ const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
       headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
   }, [navigation]);
+
+  console.log("postDetail", postDetail);
   return (
     <PaperProvider>
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* 貼文內容 */}
-          <Post mode="personal" date="2024/08/02" user={personal} />
+          <Post
+            userState={
+              postDetail.user.userId === personal.userId ? "personal" : "friend"
+            } // 這個到時候 要看說是訪客還是朋友
+            postDetail={postDetail}
+          />
 
           <View
             style={{
@@ -39,8 +54,9 @@ const PostContent: React.FC<PostContentProps> = ({ navigation }) => {
             }}
           />
           {/* 留言 */}
-          <Comments />
-          <Comments />
+          {postDetail.postComments.map((comment) => {
+            return <Comments />;
+          })}
         </ScrollView>
 
         {/* 輸入留言 */}
@@ -63,4 +79,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostContent;
+export default PostDetail;
