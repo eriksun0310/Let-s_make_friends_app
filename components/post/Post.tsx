@@ -1,5 +1,11 @@
-import React from "react";
-import { View, StyleSheet, Text, ImageSourcePropType } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ImageSourcePropType,
+  TouchableOpacity,
+} from "react-native";
 import {
   PostDetail,
   Post as PostType,
@@ -9,20 +15,28 @@ import {
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
-import AntDesign from "@expo/vector-icons/AntDesign";
+
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import PostTags from "./PostTags";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;
+  showTags?: boolean;
 }
 export const tagList = Array(5).fill({
   text: "大家好",
 });
 
-const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
+const Post: React.FC<PostProps> = ({
+  userState,
+  postDetail,
+  showTags = false,
+}) => {
   const { post, user, tags, postLikes, postComments } = postDetail;
+
+  const [like, setLike] = useState(false);
 
   return (
     <Card containerStyle={styles.cardContainer}>
@@ -43,10 +57,22 @@ const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
 
       <Text style={styles.content}>{post?.content}</Text>
 
+      {/* 文章標籤 */}
+      {tags.length > 0 && showTags && <PostTags tags={tags} />}
+
       {userState !== "visitor" && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
-            <Icon name="heart" type="material-community" color="#ff6666" />
+            {like ? (
+              <TouchableOpacity onPress={() => setLike(false)}>
+                <AntDesign name="heart" size={24} color="#ff6666" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => setLike(true)}>
+                <AntDesign name="hearto" size={24} color={Colors.icon} />
+              </TouchableOpacity>
+            )}
+
             <Text style={styles.iconText}>{postLikes.length}</Text>
           </View>
           <View style={styles.iconContainer}>
@@ -59,8 +85,6 @@ const Post: React.FC<PostProps> = ({ userState, postDetail }) => {
           </View>
         </View>
       )}
-      {/* 文章標籤 */}
-      {tags.length > 0 && <PostTags tags={tags} />}
     </Card>
   );
 };
@@ -96,8 +120,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   footer: {
+    marginTop: 15,
     flexDirection: "row",
     justifyContent: "flex-start",
+    //borderWidth: 1,
+    borderTopColor: "#e0e0e0",
   },
   iconContainer: {
     flexDirection: "row",
@@ -107,6 +134,7 @@ const styles = StyleSheet.create({
   iconText: {
     marginLeft: 5,
     fontSize: 14,
+    color: Colors.icon,
   },
 });
 

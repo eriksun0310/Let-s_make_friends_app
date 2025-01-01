@@ -46,6 +46,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
               postDetail.user.userId === personal.userId ? "personal" : "friend"
             } // 這個到時候 要看說是訪客還是朋友
             postDetail={postDetail}
+            showTags={true}
           />
 
           <View
