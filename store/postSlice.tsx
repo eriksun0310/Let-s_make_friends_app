@@ -1,6 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { PostTags, Post, PostComments, PostLikes, PostDetail } from "../shared/types";
+import {
+  PostTags,
+  Post,
+  PostComments,
+  PostLikes,
+  PostDetail,
+} from "../shared/types";
 
 interface InitialStateProps {
   tags: PostTags[];
@@ -34,6 +40,12 @@ const postSlice = createSlice({
 
     addPost(state, action) {
       state.posts.push(action.payload);
+      // 排序 貼文
+      state.posts.sort(
+        (a, b) =>
+          new Date(b.post.createdAt).getTime() -
+          new Date(a.post.createdAt).getTime()
+      );
     },
 
     updatePost(state, action) {},

@@ -9,7 +9,7 @@ import {
   PostComments,
   PostDetail,
   PostLikes,
-  Posts,
+  PostTags,
   User,
 } from "../types";
 
@@ -32,7 +32,7 @@ export const transformPostTags = ({
   postTags,
 }: {
   postTags: PostTagsDBType[];
-}) => {
+}): PostTags[] => {
   return (postTags || []).map((tag) => ({
     id: tag.id,
     postId: tag.post_id,
@@ -89,14 +89,10 @@ export const transformPostDetail = ({
     posts,
   });
 
-
-  console.log('tags', tags)
   // 文章標籤
   const transformedTags = transformPostTags({
     postTags: tags,
   });
-
-  console.log('transformedTags', transformedTags)
 
   //文章留言
   const transformedPostComments = transformPostComments({

@@ -7,8 +7,12 @@ post_likes: 文章按讚
 */
 
 import { PostTagsDBType } from "../shared/dbType";
-import { transformPost, transformPostDetail } from "../shared/post/postUtils";
-import { NewPost, PostDetail, Result, User } from "../shared/types";
+import {
+  transformPost,
+  transformPostDetail,
+  transformPostTags,
+} from "../shared/post/postUtils";
+import { NewPost, PostDetail, PostTags, Result, User } from "../shared/types";
 import {
   getFriendDetail,
   getFriendDetails,
@@ -37,7 +41,7 @@ export const addPostTag = async ({
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  resultTags?: string[];
+  resultTags?: PostTags[];
 }> => {
   try {
     const tagsData = tags.map((tag) => ({
@@ -49,7 +53,7 @@ export const addPostTag = async ({
     const { data, error } = await supabase
       .from("post_tags")
       .insert(tagsData)
-      .select("tag");
+      .select("*");
     if (error) {
       return {
         success: false,
@@ -57,9 +61,13 @@ export const addPostTag = async ({
       };
     }
 
+    const transformedPostTags = transformPostTags({
+      postTags: data,
+    });
+
     return {
       success: true,
-      resultTags: data.map((item) => item.tag), // 確保只回傳 tag 值
+      resultTags: transformedPostTags, // 確保只回傳 tag 值
     };
   } catch (error) {
     console.log("新增標籤失敗", error);
@@ -152,7 +160,6 @@ export const getAllPosts = async ({
     const comments = commentsData.filter(
       (comment) => comment.post_id === post.id
     );
-
 
     // 轉換文章詳情
     const transformedPostDetail = transformPostDetail({
