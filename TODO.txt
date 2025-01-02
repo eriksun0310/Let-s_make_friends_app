@@ -18,6 +18,17 @@
 🚀[tag]
 ✅1. 取 post_tags 的資料
 ✅2. 自己輸入的也可以當tag 的邏輯
+3. 搜尋tag 找到對應的貼文 的邏輯
+
+🚀[posts]
+1. 編輯貼文的邏輯
+2. 刪除貼文的邏輯
+
+🚀[post_likes]
+1. 處理按讚、收回讚 可以更新到post_likes db 
+
+🚀[post_comments]
+1. 處理留言 可以更新到post_comments db 
 
 
 ⌛[之後做]
