@@ -56,6 +56,7 @@ export const usePostListeners = () => {
     );
 
     return () => {
+      console.log('usePostListeners unmount');
       subscribe.unsubscribe();
     };
   }, [dispatch, friendList]);
