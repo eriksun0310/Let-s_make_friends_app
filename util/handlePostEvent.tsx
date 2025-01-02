@@ -31,14 +31,28 @@ import {
 import { supabase } from "./supabaseClient";
 
 // 取得 所有的tag(for: 新增文章用的)
-export const getPostTags = async (): Promise<PostTagsDBType[]> => {
-  const { data, error } = await supabase.from("post_tags").select("*");
+export const getPostTags = async (): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: string[];
+}> => {
+  const { data: postTags, error } = await supabase
+    .from("post_tags")
+    .select("*");
 
   if (error) {
     console.error("Error fetching post tags:", error);
-    return [];
+    return {
+      success: false,
+      errorMessage: error.message,
+      data: [],
+    };
   }
-  return data;
+
+  return {
+    success: true,
+    data: postTags.map((tag) => tag.tag),
+  };
 };
 
 //✅ 新增 tag
@@ -350,7 +364,6 @@ export const addPostDB = async ({
   }
 };
 
-
 /*
 ⛔取得所有文章的按讚
 等實際按讚 看看能不能取得正確的按讚數
@@ -395,7 +408,6 @@ export const getPostLikesByPostId = async ({
     };
   }
 };
-
 
 /*
 ⛔取得所有文章的留言

@@ -17,8 +17,8 @@ const Fieldset: React.FC<FieldsetProps> = ({ title, children }) => {
 
 const styles = StyleSheet.create({
   fieldset: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+    borderWidth: 2,
+    borderColor: "#f1f1f1",
 
     padding: 10,
     borderRadius: 5,
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     left: 10,
     paddingHorizontal: 5,
     fontSize: 16,
-    color: "#2e2e2e",
+    color: "#9e9e9e",
   },
 });
 export default Fieldset;

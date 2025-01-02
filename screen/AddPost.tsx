@@ -6,10 +6,11 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  ImageSourcePropType,
 } from "react-native";
 import { Colors } from "../constants/style";
 import CustomIcon from "../components/ui/button/CustomIcon";
-import { Eye, X } from "lucide-react-native";
+import { X } from "lucide-react-native";
 import AlertDialog from "../components/ui/AlertDialog";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import TagSelector from "../components/ui/TagSelector";
@@ -17,12 +18,11 @@ import SelectedTagText from "../components/ui/SelectedTagText";
 import SegmentedButtons from "../components/ui/button/SegmentedButtons";
 import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import ostrich from "../assets/animal/ostrich.png";
+
 import { NavigationProp } from "@react-navigation/native";
 import { addPost, selectUser, useAppDispatch, useAppSelector } from "../store";
 import { addPostDB } from "../util/handlePostEvent";
 import { NewPost, PostVisibility } from "../shared/types";
-import { set } from "firebase/database";
 
 interface AddPostProps {
   navigation: NavigationProp<any>;
@@ -77,8 +77,8 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
   };
 
   // 移除 tag
-  const handleRemoveTag = (item: string) => {
-    setPostTags(postTags.filter((i) => i !== item));
+  const handleRemoveTag = (tag: string) => {
+    setPostTags(postTags.filter((i) => i !== tag));
   };
 
   // 按下發布文章
@@ -150,7 +150,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
           <View style={styles.postContainer}>
             <View style={styles.header}>
               <Image
-                source={personal.headShot.imageUrl}
+                source={personal.headShot.imageUrl as ImageSourcePropType}
                 style={styles.avatar}
               />
               <Text style={styles.username}>{personal.name}</Text>
@@ -202,7 +202,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
 
         {/* tag 選擇器 */}
         <TagSelector
-          defaultTag={postTags}
+          defaultPostTags={postTags}
           modalizeRef={modalizeRef}
           getSelectedItems={(v) => {
             setPostTags(v);
