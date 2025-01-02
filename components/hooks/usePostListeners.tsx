@@ -16,48 +16,49 @@ export const usePostListeners = () => {
   const friendList = useAppSelector(selectFriendList);
 
   useEffect(() => {
-    const subscribe = supabase.channel("public:posts").on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "posts",
-      },
-      async (payload) => {
-        const newPost = payload.new as PostsDBType;
+    const subscribe = supabase
+      .channel("public:posts")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "posts",
+        },
+        async (payload) => {
+          const newPost = payload.new as PostsDBType;
 
-        // 公開
-        if (newPost.visibility === "public") {
-          const postDetail = await getPostDetail({
-            post: newPost,
-          });
-          console.log("postDetail public", postDetail);
+          // 公開
+          if (newPost.visibility === "public") {
+            const postDetail = await getPostDetail({
+              post: newPost,
+            });
 
-          dispatch(addPost(postDetail));
-          // 好友
-        } else if (newPost.visibility === "friends") {
-          // 判斷發文者是否為好友
-          const hasFriendPost = friendList.some(
-            (friend) => friend.userId === newPost.user_id
-          );
+            dispatch(addPost(postDetail));
+            // 好友
+          } else if (newPost.visibility === "friends") {
+            // 判斷發文者是否為好友
+            const hasFriendPost = friendList.some(
+              (friend) => friend.userId === newPost.user_id
+            );
 
-          // 不是好友發的文
-          if (!hasFriendPost) {
-            return;
+            // 不是好友發的文
+            if (!hasFriendPost) {
+              return;
+            }
+
+            const postDetail = await getPostDetail({
+              post: newPost,
+            });
+
+            dispatch(addPost(postDetail));
           }
-
-          const postDetail = await getPostDetail({
-            post: newPost,
-          });
-
-          dispatch(addPost(postDetail));
         }
-      }
-    );
+      )
+      .subscribe();
 
     return () => {
-      console.log('usePostListeners unmount');
       subscribe.unsubscribe();
     };
-  }, [dispatch, friendList]);
+  }, [friendList]);
 };

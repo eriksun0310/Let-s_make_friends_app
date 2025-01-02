@@ -41,7 +41,7 @@ export const getPostTags = async (): Promise<PostTagsDBType[]> => {
   return data;
 };
 
-// 新增 tag
+//✅ 新增 tag
 export const addPostTag = async ({
   tags,
   postId,
@@ -90,7 +90,7 @@ export const addPostTag = async ({
   }
 };
 
-//取得文章內的tag
+//✅ 取得文章內的tag
 export const getPostTagsByPostId = async ({
   postIds,
 }: {
@@ -135,85 +135,111 @@ export const getPostTagsByPostId = async ({
 // 取得所有文章(好友 + 自己+ 非好友但設為公開)的文章
 
 // TODO:　return 回來的資料應該是要包含 發文者的資訊、標籤、留言數、按讚數
+/*
+⛔ 未測試
+將好友移除後 朋友的貼文不會顯示
 
+
+✅ 已測試
+公開的貼文: 不管是好友還是非好友都會顯示
+朋友的貼文: 只有朋友可以看到
+*/
 export const getAllPosts = async ({
   userId,
 }: {
   userId: string;
-}): Promise<PostDetail[]> => {
-  // 取得好友資訊
-  const friendList = await getFriendList(userId);
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: PostDetail[];
+}> => {
+  try {
+    // 取得好友資訊
+    const { data: friendList } = await getFriendList(userId);
 
-  // 提取好友 ID
-  const friendIds = friendList.map((friend) => friend.userId);
+    // 提取好友 ID
+    const friendIds = friendList.map((friend) => friend.userId);
 
-  // 查詢所有文章
-  const { data: postsData, error: postsError } = await supabase
-    .from("posts")
-    .select("*")
-    .or(
-      `user_id.eq.${userId},user_id.in.(${friendIds.join(
-        ","
-      )}),visibility.eq.public`
-    )
-    .order("created_at", { ascending: false }); // 按創建時間排序;
+    // 查詢所有文章
+    const { data: postsData, error: postsError } = await supabase
+      .from("posts")
+      .select("*")
+      .or(
+        `user_id.eq.${userId},user_id.in.(${friendIds.join(
+          ","
+        )}),visibility.eq.public`
+      )
+      .order("created_at", { ascending: false }); // 按創建時間排序;
 
-  if (postsError) {
-    console.log("查詢所有文章 錯誤", postsError);
-    return [];
-  }
+    if (postsError) {
+      console.log("查詢所有文章 錯誤", postsError);
+      return {
+        success: false,
+        errorMessage: (postsError as Error).message,
+        data: [],
+      };
+    }
 
-  // 提取文章id
-  const postIds = postsData.map((post) => post.id);
-  // 提取發文者id
-  const userIds = postsData.map((post) => post.user_id);
+    // 提取文章id
+    const postIds = postsData.map((post) => post.id);
+    // 提取發文者id
+    const userIds = postsData.map((post) => post.user_id);
 
-  // 批量查詢發文者資訊
-  const users = await getFriendDetails(userIds);
+    // 批量查詢發文者資訊
+    const users = await getFriendDetails(userIds);
 
-  // 取得文章標籤
-  const tagsData = (await getPostTagsByPostId({ postIds })).data;
+    // 取得文章標籤
+    const tagsData = (await getPostTagsByPostId({ postIds })).data;
 
-  // 查詢文章按讚
-  const likesData = (await getPostLikesByPostId({ postIds })).data;
+    // 查詢文章按讚
+    const likesData = (await getPostLikesByPostId({ postIds })).data;
 
-  // 查詢文章留言
-  const commentsData = (await getPostCommentsByPostId({ postIds })).data;
+    // 查詢文章留言
+    const commentsData = (await getPostCommentsByPostId({ postIds })).data;
 
-  const postDetails = postsData.map((post) => {
-    // 找到對應的發文者資訊
-    const user = users.find((user) => user.userId === post.user_id);
+    const postDetails = postsData.map((post) => {
+      // 找到對應的發文者資訊
+      const user = users.find((user) => user.userId === post.user_id);
 
-    // 過濾對應的標籤、按讚數和留言
-    const tags = tagsData.filter((tag) => tag.postId === post.id);
-    const likes = likesData.filter((like) => like.postId === post.id);
-    const comments = commentsData.filter(
-      (comment) => comment.postId === post.id
-    );
+      // 過濾對應的標籤、按讚數和留言
+      const tags = tagsData.filter((tag) => tag.postId === post.id);
+      const likes = likesData.filter((like) => like.postId === post.id);
+      const comments = commentsData.filter(
+        (comment) => comment.postId === post.id
+      );
 
-    const transformedPost = transformPost({
-      posts: post,
+      const transformedPost = transformPost({
+        posts: post,
+      });
+
+      // 轉換文章詳情
+      const transformedPostDetail = {
+        post: transformedPost,
+        user: user || ({} as User),
+        tags,
+        postLikes: likes,
+        postComments: comments,
+      };
+
+      return transformedPostDetail;
     });
 
-    // 轉換文章詳情
-    const transformedPostDetail = {
-      post: transformedPost,
-      user: user || ({} as User),
-      tags,
-      postLikes: likes,
-      postComments: comments,
+    return {
+      success: true,
+      data: postDetails,
     };
-
-    return transformedPostDetail;
-  });
-
-  return postDetails;
+  } catch (error) {
+    console.log("取得所有文章失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
 };
 
-// 文章的詳細資訊
 /*
- TODO:
-
+ TODO: 到時候要刪
  return 回來的資料應該是要包含
 1. 發文者資料: users
 2. 留言者資料: users
@@ -223,6 +249,7 @@ export const getAllPosts = async ({
 6. 是否有tag: post_tags
 */
 
+//✅ 取得文章的詳細資訊
 export const getPostDetail = async ({
   post,
 }: {
@@ -255,7 +282,7 @@ export const getPostDetail = async ({
   };
 };
 
-// 新增文章
+//✅ 新增文章
 export const addPostDB = async ({
   newPost,
 }: {
@@ -323,7 +350,11 @@ export const addPostDB = async ({
   }
 };
 
-// 取得所有文章的按讚
+
+/*
+⛔取得所有文章的按讚
+等實際按讚 看看能不能取得正確的按讚數
+*/
 export const getPostLikesByPostId = async ({
   postIds,
 }: {
@@ -365,7 +396,11 @@ export const getPostLikesByPostId = async ({
   }
 };
 
-// 取得文章的留言
+
+/*
+⛔取得所有文章的留言
+等實際按讚 看看能不能取得正確的留言
+*/
 export const getPostCommentsByPostId = async ({
   postIds,
 }: {

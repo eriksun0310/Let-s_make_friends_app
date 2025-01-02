@@ -319,7 +319,13 @@ const updateFriendRequestStatus = async ({
 };
 
 // 取得好友列表
-export const getFriendList = async (currentUserId: string): Promise<User[]> => {
+export const getFriendList = async (
+  currentUserId: string
+): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: User[];
+}> => {
   try {
     const { data: friendsData, error: friendsError } = await supabase
       .from("friends")
@@ -328,12 +334,21 @@ export const getFriendList = async (currentUserId: string): Promise<User[]> => {
 
     if (friendsError) {
       console.error("Error fetching friends:", friendsError);
-      return [];
+
+      return {
+        success: false,
+        errorMessage: friendsError?.message,
+        data: [],
+      };
     }
 
     if (!friendsData || friendsData.length === 0) {
       console.log("No friends found for the user.");
-      return [];
+      return {
+        success: true,
+        errorMessage: "沒有好友",
+        data: [],
+      };
     }
 
     // 獲取每個好友的詳細資料
@@ -345,10 +360,17 @@ export const getFriendList = async (currentUserId: string): Promise<User[]> => {
     );
 
     // 過濾掉返回為空的好友數據
-    return allFriendsDetails.filter((friendDetail) => friendDetail !== null);
+    return {
+      success: true,
+      data: allFriendsDetails.filter((friendDetail) => friendDetail !== null),
+    };
   } catch (error) {
     console.error("Error fetching friends:", error);
-    return [];
+    return {
+      success: false,
+      errorMessage: (error as Error)?.message,
+      data: [],
+    };
   }
 };
 

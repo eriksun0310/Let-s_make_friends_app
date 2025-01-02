@@ -8,12 +8,13 @@
 ➖❌ 未完成
 ➖🚀 要先做  
 ➖⌛ 之後做
-➖⛔ 待測試
+➖⛔ 待測試(已寫)
+➖🈲 目前可能用不到,最後可以刪掉 
 ➖➖➖➖➖➖➖➖➖
 
 
 🚀[要先做]
-1. 2025/1/1 寫了文章監聽器,身為好友的卻沒有顯示文章 
+✅1. 2025/1/1 寫了文章監聽器,身為好友的卻沒有顯示文章 
 🚀[tag]
 1. 取 post_tags 的資料
 2. 自己輸入的也可以當tag 的邏輯
@@ -21,6 +22,7 @@
 
 ⌛[之後做]
 1. 把 firebase.json 刪掉 (等所有的資料表串接好)
+2. 貼文按讚、留言 提醒 的UI (預計放在首頁的左上角 )
 
 
 
@@ -103,22 +105,24 @@ user1_id:A 、user2_id:B
 1. handlePostEvent: 
     [post_tags]:
         ⛔1. getTags: 取得 所有的tag  (資料表:post_tags)
-        ✅2. addTag:  取得 新增tag  (資料表:post_tags)
+        ✅2. addPostTag:  取得 新增tag  (資料表:post_tags)
+        ✅3.getPostTagsByPostId: 取得文章內的tag
     [posts]:
         ⛔1. getAllPosts: 取得所有文章(好友 + 自己 + 非好友但設為公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
-        2. getPostDetail: 取得文章詳細資訊
-        3. getUserPosts: 取得使用者的文章(個人資訊、好友資訊用的)
-        ✅2. addPost: 新增文章, (資料表: posts、post_tags)
+        ✅2. getPostDetail: 取得文章詳細資訊
+        ✅3.. addPost: 新增文章, (資料表: posts、post_tags)
         3. editPost: 編輯文章
         4. deletePost: 刪除文章
     [post_comments]:
-        1. getPostComments: 取得文章留言
+        🈲1. getPostComments: 取得文章留言
         2. addPostComment: 新增文章留言
         3. editPostComment: 編輯文章留言
         4. deletePostComment: 刪除文章留言
+        ⛔5. getPostCommentsByPostId: 取得所有文章的留言
     [post_likes]:
-        1. getPostLikes: 取得文章按讚數
+        🈲1. getPostLikes: 取得文章按讚數
         2. updatePostLikes: 更新文章按讚數 (按讚、收回)
+        ⛔3. getPostLikesByPostId:  取得所有文章的按讚
 
 
 2.  寫 [Policies]
@@ -148,21 +152,12 @@ user1_id:A 、user2_id:B
 
 
 🧭[貼文邏輯]
-1. 可以看到的貼文有: (好友 + 自己 + 非好友但設為公開)的文章
-2. 可以看到的留言: 
-    1. 訪客: 可以看到, 非好友 且 設為(公開)文章的留言
-    2. 好友、自己: 可以看到, 好友設為(公開、好友)文章的留言
-3. 可以看到的按讚數:
-    1. 訪客: 可以看到, 非好友 且設為(公開)文章的按讚的人
-    2. 好友、自己: 可以看到, 好友設為(公開、好友)文章的按讚的人
+公開的貼文: 不管是好友還是非好友都會顯示
+朋友的貼文: 只有朋友可以看到
 
 
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-
-🚀[tag]
-1. 取 post_tags 的資料
-2. 自己輸入的也可以當tag 的邏輯
 
 
 ✏️[新增貼文]

@@ -13,6 +13,7 @@ interface InitialStateProps {
   posts: PostDetail[];
   postComments: PostComments[];
   postLikes: PostLikes[];
+  postMap: Record<string, PostDetail>; // 用於儲存文章id和對應的文章
 }
 
 const initialState: InitialStateProps = {
@@ -20,6 +21,7 @@ const initialState: InitialStateProps = {
   posts: [],
   postComments: [],
   postLikes: [],
+  postMap: {},
 };
 
 const postSlice = createSlice({
@@ -39,6 +41,16 @@ const postSlice = createSlice({
     },
 
     addPost(state, action) {
+      const postId = action.payload.post.id;
+
+      // 檢查是否有重複的貼文
+      if (state.postMap[postId]) {
+        console.log("已有貼文");
+        return;
+      }
+
+      state.postMap[postId] = action.payload;
+
       state.posts.push(action.payload);
       // 排序 貼文
       state.posts.sort(
@@ -47,6 +59,12 @@ const postSlice = createSlice({
           new Date(a.post.createdAt).getTime()
       );
     },
+
+    // 目前還沒用到 重製文章
+    // resetPosts(state) {
+    //   state.posts = [];
+    //   state.postMap = {};
+    // },
 
     updatePost(state, action) {},
     deletePost(state, action) {},

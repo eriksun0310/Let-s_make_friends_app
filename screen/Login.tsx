@@ -85,7 +85,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
         });
 
         dispatch(setUser(userData));
-        navigation.navigate("main", { screen: "chatRoomList" }); // 如果用戶資料完整，跳轉聊天頁面
+        navigation.navigate("main", { screen: "home" }); // 如果用戶資料完整，跳轉聊天頁面
 
         // 新用戶
       } else {

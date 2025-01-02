@@ -43,22 +43,21 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
   //const [friendList, setFriendList] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
 
   // 取得好友列表
   const fetchFriendList = async () => {
-    setLoading(true);
-    try {
-      const data = await getFriendList(personal.userId);
-      dispatch(setFriendList(data));
-    } catch (error) {
-      console.log("取得好友列表 錯誤", error);
-    } finally {
+    const { data, success } = await getFriendList(personal.userId);
+    if (!success) {
+      console.log("取得好友列表 錯誤");
       setLoading(false);
+      return;
     }
+    dispatch(setFriendList(data));
+    setLoading(false);
   };
 
   const renderFriendItem = ({ item }: { item: User }) => (
@@ -105,7 +104,6 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   }, [navigation]);
 
   if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
-
 
   return (
     <View style={styles.screen}>

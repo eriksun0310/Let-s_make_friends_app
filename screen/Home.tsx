@@ -9,6 +9,7 @@ import { PaperProvider } from "react-native-paper";
 import {
   selectPosts,
   selectUser,
+  setFriendList,
   setPosts,
   useAppDispatch,
   useAppSelector,
@@ -16,6 +17,8 @@ import {
 import { getAllPosts } from "../util/handlePostEvent";
 import { NavigationProp } from "@react-navigation/native";
 import { usePostListeners } from "../components/hooks/usePostListeners";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { getFriendList } from "../util/handleFriendsEvent";
 
 // export const postList = Array(14).fill({
 //   date: "2024/08/02",
@@ -26,8 +29,9 @@ interface HomePostProps {
 }
 const Home: React.FC<HomePostProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
-
-  usePostListeners()
+  const [loading, setLoading] = useState(true);
+  // 監聽 新文章變化
+  usePostListeners();
 
   const postData = useAppSelector(selectPosts);
 
@@ -43,19 +47,49 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     });
   }, [navigation]);
 
+  console.log("postData redux", postData);
+
   useEffect(() => {
+    // 初始化加載的文章
     const fetchAllPosts = async () => {
-      const allPosts = await getAllPosts({
+      const {
+        data: allPosts,
+        success,
+        errorMessage: allPostsError,
+      } = await getAllPosts({
         userId: personal.userId,
       });
 
+      if (!success) {
+        console.log("getAllPosts error", allPostsError);
+        setLoading(false);
+        return;
+      }
       dispatch(setPosts(allPosts));
+
+      setLoading(false);
+    };
+
+    // 取得好友列表
+    const fetchFriendList = async () => {
+      const { data: friendList, success } = await getFriendList(
+        personal.userId
+      );
+      if (!success) {
+        console.log("取得好友列表 錯誤");
+        return;
+      }
+
+      dispatch(setFriendList(friendList));
     };
 
     fetchAllPosts();
-  }, [personal.userId]);
+    fetchFriendList();
+  }, [dispatch, personal.userId]);
 
-  console.log("postData redux", postData);
+  if (loading) return <LoadingOverlay message=" searching ..." />;
+
+  
 
   return (
     <PaperProvider>

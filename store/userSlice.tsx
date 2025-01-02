@@ -94,12 +94,20 @@ const userSlice = createSlice({
     setFriendList(state, action) {
       state.friendList = action.payload;
     },
-    //
-    // addFriend(state, action) {
-    //   state.friendList.push(action.payload);
 
-    //   //  好友列表排序(新好友在上面)
-    // },
+    addFriend(state, action) {
+      // 如果好友存在的話 更新
+      const index = state.friendList.findIndex(
+        (friend) => friend.userId === action.payload.userId
+      );
+
+      // 如果好友不存在的話 新增
+      if (index === -1) {
+        state.friendList.push(action.payload);
+      } else {
+        state.friendList[index] = action.payload;
+      }
+    },
   },
 });
 
@@ -169,8 +177,13 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
     console.log("initializeAuth error", err);
   }
 };
-export const { setUser, setSelectedOption, setIsAuthenticated, setFriendList } =
-  userSlice.actions;
+export const {
+  setUser,
+  setSelectedOption,
+  setIsAuthenticated,
+  setFriendList,
+  addFriend,
+} = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
 

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
+import { addFriend, useAppDispatch } from "../../store";
+import { getFriendDetail } from "../../util/handleFriendsEvent";
 
 // 監聽 成為新好友
 export const useNewFriend = (userId: string) => {
+  const dispatch = useAppDispatch();
   const [newFriend, setNewFriend] = useState([]);
   const [newFriendsNumber, setNewFriendsNumber] = useState(0); // 新好友数量
   const [loading, setLoading] = useState(true);
@@ -34,15 +37,18 @@ export const useNewFriend = (userId: string) => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "friends" },
-        (payload) => {
-        
-
+        async (payload) => {
           if (
             payload.eventType === "INSERT" &&
             payload.new.user_id === userId &&
             !payload.new.notified // 確保是未通知的紀錄
           ) {
+            // 取得詳細的好友資料
+            const friendDetails = await getFriendDetail(payload.new.user_id);
+            dispatch(addFriend(friendDetails));
+
             setNewFriend((prev) => [...prev, payload.new]);
+
             setNewFriendsNumber((prev) => prev + 1); // 更新新好友数量
           }
         }
