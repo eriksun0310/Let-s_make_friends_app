@@ -30,15 +30,14 @@ import {
 } from "./handleFriendsEvent";
 import { supabase } from "./supabaseClient";
 
-// 取得 所有的tag(for: 新增文章用的)
-export const getPostTags = async (): Promise<{
+// ✅ 取得 所有的tag(for: 新增文章用的)
+export const getTags = async (): Promise<{
   success: boolean;
   errorMessage?: string;
   data: string[];
 }> => {
-  const { data: postTags, error } = await supabase
-    .from("post_tags")
-    .select("*");
+  const { data: tagsData, error } = await supabase.from("tags").select("name");
+
 
   if (error) {
     console.error("Error fetching post tags:", error);
@@ -51,12 +50,54 @@ export const getPostTags = async (): Promise<{
 
   return {
     success: true,
-    data: postTags.map((tag) => tag.tag),
+    data: tagsData.map((tag) => tag.name) || [],
   };
 };
 
-//✅ 新增 tag
+//✅ 新增 文章標籤
 export const addPostTag = async ({
+  tagIds,
+  postId,
+}: {
+  tagIds: string[];
+  postId: string;
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+}> => {
+  try {
+    console.log("tagIds", tagIds);
+    console.log("postId", postId);
+    const tagsData = tagIds.map((tagId) => ({
+      tag_id: tagId,
+      post_id: postId,
+    }));
+
+    console.log("tagsData", tagsData);
+    //   批量插入
+    const { error } = await supabase.from("post_tags").insert(tagsData);
+    if (error) {
+      console.log("新增文章標籤失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.log("新增標籤失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
+  }
+};
+
+// ✅ 新增所有可用標籤
+export const addTags = async ({
   tags,
   postId,
 }: {
@@ -65,34 +106,41 @@ export const addPostTag = async ({
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  data: PostTags[];
+  data: string[];
 }> => {
   try {
-    const tagsData = tags.map((tag) => ({
-      tag,
-      post_id: postId,
-    }));
+    const tagIds = await Promise.all(
+      tags.map(async (tag) => {
+        const { data: existingTag } = await supabase
+          .from("tags")
+          .select("id")
+          .eq("name", tag)
+          .single();
 
-    //   批量插入
-    const { data, error } = await supabase
-      .from("post_tags")
-      .insert(tagsData)
-      .select("*");
-    if (error) {
-      return {
-        success: false,
-        errorMessage: error.message,
-        data: [],
-      };
-    }
+        if (existingTag) {
+          return existingTag.id; // 如果標籤已存在,返回標籤的ID
+        } else {
+          const { data: newTag } = await supabase
+            .from("tags")
+            .insert({ name: tag })
+            .select("*")
+            .single();
 
-    const transformedPostTags = transformPostTags({
-      postTags: data,
+          console.log("newTag", newTag);
+          return newTag.id; // 如果標籤不存在,創建新標籤後返回新標籤的ID
+        }
+      })
+    );
+
+    // 新增文章標籤
+    await addPostTag({
+      tagIds: tagIds,
+      postId: postId,
     });
 
     return {
       success: true,
-      data: transformedPostTags,
+      data: tags,
     };
   } catch (error) {
     console.log("新增標籤失敗", error);
@@ -104,8 +152,9 @@ export const addPostTag = async ({
   }
 };
 
+
 //✅ 取得文章內的tag
-export const getPostTagsByPostId = async ({
+export const getPostTags = async ({
   postIds,
 }: {
   postIds: string[];
@@ -115,10 +164,9 @@ export const getPostTagsByPostId = async ({
   data: PostTags[];
 }> => {
   try {
-    const { data, error } = await supabase
+    const { data: postTags, error } = await supabase
       .from("post_tags")
-      .select("*")
-      .in("post_id", postIds);
+      .select("post_id , tag_id");
 
     if (error) {
       return {
@@ -128,9 +176,32 @@ export const getPostTagsByPostId = async ({
       };
     }
 
-    const transformedPostTags = transformPostTags({
-      postTags: data,
+    const tagIds = postTags?.map((postTag) => postTag.tag_id);
+
+    const { data: tagsData, error: tagsError } = await supabase
+      .from("tags")
+      .select("id, name")
+      .in("id", tagIds);
+
+    if (tagsError) {
+      console.log("取得文章標籤失敗", tagsError);
+      return {
+        success: false,
+        errorMessage: (tagsError as Error).message,
+        data: [],
+      };
+    }
+
+    const transformedPostTags = postTags?.map((postTag) => {
+      const tag = tagsData?.find((tag) => tag.id === postTag.tag_id);
+      return {
+        id: postTag.tag_id,
+        postId: postTag.post_id,
+        tag: tag?.name || "",
+      };
     });
+
+    console.log("transformedPostTags", transformedPostTags);
 
     return {
       success: true,
@@ -203,7 +274,7 @@ export const getAllPosts = async ({
     const users = await getFriendDetails(userIds);
 
     // 取得文章標籤
-    const tagsData = (await getPostTagsByPostId({ postIds })).data;
+    const tagsData = (await getPostTags({ postIds })).data;
 
     // 查詢文章按讚
     const likesData = (await getPostLikesByPostId({ postIds })).data;
@@ -230,7 +301,7 @@ export const getAllPosts = async ({
       const transformedPostDetail = {
         post: transformedPost,
         user: user || ({} as User),
-        tags,
+        tags: tags?.map((tag) => tag.tag) || [],
         postLikes: likes,
         postComments: comments,
       };
@@ -278,7 +349,9 @@ export const getPostDetail = async ({
   const user = (await getFriendDetail(post.user_id)) || ({} as User);
 
   // 取得文章標籤
-  const tagsData = (await getPostTagsByPostId({ postIds: [post.id] })).data;
+  const tagsData = (await getPostTags({ postIds: [post.id] })).data;
+  // 過濾對應文章的標籤
+  const findTagsData = tagsData.filter((tag) => tag.postId === post.id);
 
   // 查詢文章按讚
   const likesData = (await getPostLikesByPostId({ postIds: [post.id] })).data;
@@ -290,7 +363,7 @@ export const getPostDetail = async ({
   return {
     user: user,
     post: transformedPost,
-    tags: tagsData,
+    tags: findTagsData.map((tag) => tag.tag),
     postLikes: likesData,
     postComments: commentsData,
   };
@@ -327,14 +400,13 @@ export const addPostDB = async ({
       };
     }
 
-    const postId = postData?.id; // 取得新增文章的 id
+    const newPostId = postData?.id; // 取得新增文章的 id
+
     // 新增標籤
-    const tags = (
-      await addPostTag({
-        tags: newPost.tags,
-        postId: postId,
-      })
-    ).data;
+    const { data: tags } = await addTags({
+      tags: newPost.tags,
+      postId: newPostId,
+    });
 
     // 發文者的基本資訊
     const user = await getFriendDetail(postData.user_id);
@@ -360,6 +432,38 @@ export const addPostDB = async ({
       success: false,
       errorMessage: (error as Error).message,
       data: null,
+    };
+  }
+};
+
+//  更新文章
+export const updatePostDB = async () => {};
+
+//⛔ 刪除文章
+export const deletePostDB = async ({
+  postId,
+}: {
+  postId: string;
+}): Promise<Result> => {
+  try {
+    // 刪除文章
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+
+    if (error) {
+      console.log("刪除文章失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
     };
   }
 };

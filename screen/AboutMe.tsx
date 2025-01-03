@@ -62,7 +62,7 @@ const AboutMe: React.FC<AboutMeProps> = ({ navigation }) => {
       await saveAboutMe({
         user: form,
       });
-      navigation.navigate("main", { screen: "chatRoomList" });
+      navigation.navigate("main", { screen: "home" });
     } else {
       Alert.alert(required.requiredText);
     }

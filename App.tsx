@@ -50,7 +50,7 @@ const Stack = createStackNavigator();
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      // initialRouteName="map"
+      initialRouteName="home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           if (route.name === "chatRoomList") {

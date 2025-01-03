@@ -184,7 +184,7 @@ TODO:
 export type PostDetail = {
   post: Post;
   user: User;
-  tags: PostTags[];
+  tags: string[];
   postLikes: PostLikes[];
   postComments: PostComments[];
 };

@@ -67,12 +67,13 @@ const chatSlice = createSlice({
         user2DeletedAt,
       } = action.payload;
 
-      // 找出對應的聊天室
-      const chatRoom = state.chatRooms.find((room) => room.id === id);
+      // 找出對應的聊天室的索引
+      const index = state.chatRooms.findIndex((room) => room.id === id);
 
       // 如果聊天室存在
-      if (chatRoom) {
-        // 更新最後訊息和時間
+      if (index !== -1) {
+        const chatRoom = state.chatRooms[index];
+        // 更新聊天室
         chatRoom.lastMessage = lastMessage;
         chatRoom.lastTime = lastTime;
         chatRoom.unreadCountUser1 += incrementUser1 || 0;
@@ -139,7 +140,6 @@ export const updateOrCreateChatRoom =
     const state = getState();
     const chatRoom = state.chat.chatRooms.find((room) => room.id === id);
 
-
     // 取得聊天室詳細資料
     const chatRoomDetail = await getChatRoomDetail({
       chatRoomId: id,
@@ -170,9 +170,8 @@ export const updateOrCreateChatRoom =
           ? chatRoomDetail.user2Id
           : chatRoomDetail.user1Id;
 
-
       // 取得聊天室好友詳細資料
-      const friend = await getFriendDetail(friendId); 
+      const friend = await getFriendDetail(friendId);
 
       dispatch(
         addChatRoom({

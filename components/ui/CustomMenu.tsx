@@ -3,41 +3,107 @@ import { Menu } from "react-native-paper";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { EllipsisVertical } from "lucide-react-native";
 import { Colors } from "../../constants/style";
-const CustomMenu = () => {
+import { deletePost, useAppDispatch } from "../../store";
+import { deletePostDB } from "../../util/handlePostEvent";
+import AlertDialog from "./AlertDialog";
+const CustomMenu = ({ postId }: { postId: string }) => {
+  const dispatch = useAppDispatch();
+
   const [menuVisible, setMenuVisible] = useState(false);
+
+  // 警告視窗 開啟狀態
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+
+  // 警告提醒
+  const [alertTitle, setAlertTitle] = useState("");
 
   const showMenu = (event: any) => {
     setMenuVisible(true);
   };
-  return (
-    <Menu
-      visible={menuVisible}
-      onDismiss={() => setMenuVisible(false)}
-      anchor={
-        <TouchableOpacity onPress={showMenu} style={styles.menuButton}>
-          <EllipsisVertical color={Colors.icon} />
-        </TouchableOpacity>
-      }
-      contentStyle={[styles.menuContent, { marginTop: -56 }]} // 調整選單位置
-    >
-      <Menu.Item
-        onPress={() => {}}
-        title="編輯"
-        style={{
-          marginHorizontal: 10,
 
-          height: 30,
-        }}
+  // 點擊 menu 編輯
+  const clickEditMenu = () => {
+    // 開啟 addPost 傳mode= 'edit'、updatePost
+  };
+
+  // 點擊 menu 刪除
+  const clickDeleteMenu = async (postId: string) => {
+    console.log("postId", postId);
+    //alert
+    setIsAlertVisible(true);
+    setAlertTitle("確認要刪除這則文章？");
+
+    // call deletePostDB
+
+    // const { success } = await deletePostDB({ postId });
+
+    // if (success) {
+    //   dispatch(deletePost(postId));
+    // }
+    // 更新redux  dispatch(deletePost(postId));
+  };
+
+  const handleCloseAlert = () => {
+    console.log("handleCloseAlert");
+    setIsAlertVisible(false);
+  };
+
+  // 點擊 確認刪除文章
+  const handleClickDelete = async () => {
+    console.log("handleClickConfirm");
+    const { success } = await deletePostDB({ postId });
+    console.log('success', success);
+    
+    if (success) {
+      dispatch(deletePost(postId));
+      setIsAlertVisible(false);
+    }
+  };
+
+  // const handleCloseAlert = () => {};
+  return (
+    <>
+      <AlertDialog
+        alertTitle={alertTitle}
+        leftBtnText="取消"
+        rightBtnText="確認"
+        isVisible={isAlertVisible}
+        leftBtnOnPress={handleCloseAlert}
+        rightBtnOnPress={handleClickDelete}
+        onBackdropPress={handleCloseAlert}
       />
-      <Menu.Item
-        onPress={() => {}}
-        title="刪除"
-        style={{
-          marginHorizontal: 10,
-        }}
-        titleStyle={{ color: "#ff0000" }}
-      />
-    </Menu>
+
+      <Menu
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        anchor={
+          <TouchableOpacity onPress={showMenu} style={styles.menuButton}>
+            <EllipsisVertical color={Colors.icon} />
+          </TouchableOpacity>
+        }
+        contentStyle={[styles.menuContent, { marginTop: -56 }]} // 調整選單位置
+      >
+        <Menu.Item
+          onPress={clickEditMenu}
+          title="編輯"
+          style={{
+            marginHorizontal: 10,
+
+            height: 30,
+          }}
+        />
+        <Menu.Item
+          onPress={() => {
+            clickDeleteMenu(postId);
+          }}
+          title="刪除"
+          style={{
+            marginHorizontal: 10,
+          }}
+          titleStyle={{ color: "#ff0000" }}
+        />
+      </Menu>
+    </>
   );
 };
 

@@ -30,8 +30,10 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
           <Button
             title={leftBtnText}
             onPress={leftBtnOnPress}
-            buttonStyle={[styles.leftButton, { backgroundColor: "#ffcccc" }]}
-            titleStyle={{ color: "#d9534f" }}
+            buttonStyle={[styles.leftButton, { backgroundColor: "#e6e6e6" }]}
+            titleStyle={{ color: "#999999" }}
+            // buttonStyle={[styles.leftButton, { backgroundColor: "#ffcccc" }]}
+            // titleStyle={{ color: "#d9534f" }}
           />
           <Button
             title={rightBtnText}

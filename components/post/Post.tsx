@@ -52,7 +52,7 @@ const Post: React.FC<PostProps> = ({
             {formatTimeWithDayjs(post?.createdAt)}
           </Text>
         </View>
-        {userState === "personal" && <CustomMenu />}
+        {userState === "personal" && <CustomMenu postId={post.id} />}
       </View>
 
       <Text style={styles.content}>{post?.content}</Text>

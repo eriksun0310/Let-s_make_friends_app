@@ -1,9 +1,8 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { PostTags as PostTagsType } from "../../shared/types";
 import { Colors } from "../../constants/style";
-const PostTags = ({ tags }: { tags: PostTagsType[] }) => {
+const PostTags = ({ tags }: { tags: string[] }) => {
   return (
     <View style={styles.tagContainer}>
       <AntDesign
@@ -13,8 +12,8 @@ const PostTags = ({ tags }: { tags: PostTagsType[] }) => {
         color={Colors.tag}
       />
       {tags.map((tag) => (
-        <View style={styles.tag} key={tag.id}>
-          <Text style={styles.tagText}>{tag.tag}</Text>
+        <View style={styles.tag} key={tag}>
+          <Text style={styles.tagText}>{tag}</Text>
         </View>
       ))}
     </View>

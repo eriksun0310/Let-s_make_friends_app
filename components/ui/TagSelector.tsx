@@ -13,7 +13,7 @@ import { Plus, SearchIcon, X } from "lucide-react-native";
 import { Colors } from "../../constants/style";
 import Fieldset from "./Fieldset";
 import SelectedTagText from "./SelectedTagText";
-import { getPostTags } from "../../util/handlePostEvent";
+import { getTags } from "../../util/handlePostEvent";
 
 // 模擬搜尋選項數據
 // const mockOptions = ["嗨", "嗨嗨", "嗨你好", "123456", "4561"];
@@ -74,7 +74,8 @@ const TagSelector = ({
   //   // 如果 searchText 包含非數字，則返回空數組或按其他邏輯處理
   //   return false;
   // });
-
+  
+  
   // 過濾符合條件的tag
   const filteredTag = postTags.filter((tag) =>
     tag.toLowerCase().includes(searchText.toLowerCase())
@@ -100,7 +101,7 @@ const TagSelector = ({
   // 取得 PostTags 資料庫的資料
   useEffect(() => {
     const fetchPostTags = async () => {
-      const { data: postTags } = await getPostTags();
+      const { data: postTags } = await getTags();
       setPostTags(postTags);
     };
 

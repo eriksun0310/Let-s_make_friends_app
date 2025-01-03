@@ -43,7 +43,7 @@ const postSlice = createSlice({
     addPost(state, action) {
       const postId = action.payload.post.id;
 
-      // 檢查是否有重複的貼文
+      //  檢查是否有重複的貼文(for 文章監聽器用的)
       if (state.postMap[postId]) {
         console.log("已有貼文");
         return;
@@ -66,8 +66,26 @@ const postSlice = createSlice({
     //   state.postMap = {};
     // },
 
-    updatePost(state, action) {},
-    deletePost(state, action) {},
+    updatePost(state, action) {
+      const updatedPost = action.payload;
+
+      const index = state.posts.findIndex(
+        (post) => post.post.id === updatedPost.post.id
+      );
+
+      if (index === -1) {
+        console.log("文章不存在");
+        return;
+      }
+
+      // 更新文章
+      state.posts[index] = updatedPost;
+    },
+    deletePost(state, action) {
+      state.posts = state.posts.filter(
+        (post) => post.post.id !== action.payload
+      );
+    },
 
     setPostComments(state, action) {
       state.postComments = action.payload;
