@@ -82,9 +82,15 @@ const postSlice = createSlice({
       state.posts[index] = updatedPost;
     },
     deletePost(state, action) {
-      state.posts = state.posts.filter(
-        (post) => post.post.id !== action.payload
-      );
+      const postId = action.payload;
+
+      // 找到刪除文章的索引
+      const index = state.posts.findIndex((post) => post.post.id === postId);
+
+      // 如果文章存在的話, 就刪除
+      if (index !== -1) {
+        state.posts.splice(index, 1);
+      }
     },
 
     setPostComments(state, action) {

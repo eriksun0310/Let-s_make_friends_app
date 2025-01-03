@@ -1,5 +1,6 @@
 /*
 處理 發文的 db 操作
+tags: 所有可用的標籤
 post_tags: 文章標籤
 posts: 文章
 post_comments: 文章留言
@@ -66,8 +67,6 @@ export const addPostTag = async ({
   errorMessage?: string;
 }> => {
   try {
-    console.log("tagIds", tagIds);
-    console.log("postId", postId);
     const tagsData = tagIds.map((tagId) => ({
       tag_id: tagId,
       post_id: postId,

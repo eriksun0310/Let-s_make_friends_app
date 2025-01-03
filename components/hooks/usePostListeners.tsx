@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
   addPost,
+  deletePost,
   selectFriendList,
   useAppDispatch,
   useAppSelector,
@@ -18,6 +19,7 @@ export const usePostListeners = () => {
   useEffect(() => {
     const subscribe = supabase
       .channel("public:posts")
+      //監聽文章新增事件
       .on(
         "postgres_changes",
         {
@@ -53,6 +55,20 @@ export const usePostListeners = () => {
 
             dispatch(addPost(postDetail));
           }
+        }
+      )
+      //監聽文章刪除事件
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "posts",
+        },
+        async (payload) => {
+          const deletedPost = payload.old as PostsDBType;
+          // 刪除 redux 文章
+          dispatch(deletePost(deletedPost.id));
         }
       )
       .subscribe();
