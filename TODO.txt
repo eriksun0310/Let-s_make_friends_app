@@ -18,8 +18,6 @@
 🚀[tag]
 ✅1. 取 post_tags 的資料
 ✅2. 自己輸入的也可以當tag 的邏輯
-
-
 ✅3. 多開一張表 [tags] 記錄所有可用的tag
 ✅4. [post_tags] 只記錄 post_id、 tag_id
 ✅5. handlePostEvent 中的 getAllPosts 、addPost、getPostDetail 可能要重新整理
@@ -33,7 +31,7 @@
 
 🚀[posts]
 1. 編輯貼文的邏輯
-2. 刪除貼文的邏輯(用supabase ON DELETE CASCADE )
+✅2. 刪除貼文的邏輯(用supabase ON DELETE CASCADE )
 
 🚀[post_likes]
 1. 處理按讚、收回讚 可以更新到post_likes db 
