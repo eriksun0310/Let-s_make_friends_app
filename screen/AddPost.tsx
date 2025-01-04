@@ -20,15 +20,42 @@ import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { NavigationProp } from "@react-navigation/native";
-import { addPost, selectUser, useAppDispatch, useAppSelector } from "../store";
-import { addPostDB } from "../util/handlePostEvent";
-import { NewPost, PostVisibility } from "../shared/types";
+import { addPost, selectUser, updatePost, useAppDispatch, useAppSelector } from "../store";
+import { addPostDB, updatePostDB } from "../util/handlePostEvent";
+import {
+  AddANDUpdatePost,
+  EditPost,
+  NewPost,
+  PostDetail,
+  PostVisibility,
+} from "../shared/types";
+import { update } from "firebase/database";
+
+const title = {
+  edit: "編輯",
+  add: "新增",
+};
+
+const postBtn = {
+  edit: "編輯",
+  add: "發布",
+};
 
 interface AddPostProps {
+  route: {
+    params: {
+      mode: "add" | "edit";
+      editPost: EditPost;
+    };
+  };
   navigation: NavigationProp<any>;
 }
 // 新增文章
-const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
+const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
+  const { mode, editPost } = route.params;
+
+  console.log("editPost", editPost);
+
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
   const modalizeRef = useRef<{
@@ -48,6 +75,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
+  // TODO: rename newPostRef -> newAndUpdatePostRef
   const newPostRef = useRef<NewPost>({
     userId: personal.userId,
     content: postContent,
@@ -82,16 +110,43 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
   };
 
   // 按下發布文章
-  const handleAddPost = async () => {
+  const handleClickPostBtn = async () => {
+    let result = {} as {
+      success: boolean;
+      errorMessage?: string;
+      data: AddANDUpdatePost | null;
+    };
+
+    // 編輯文章
+    if (mode === "edit") {
+      result = await updatePostDB({
+        updatedPost: {
+          postId: editPost.post.id,
+          ...newPostRef.current,
+        },
+      });
+    } else if (mode === "add") {
+      result = await addPostDB({
+        newPost: newPostRef.current,
+      });
+    }
+
+    const resultPost = {
+      ...result.data,
+      user: personal,
+    } as PostDetail;
+
     console.log("finalPost 111111", newPostRef.current);
-    const result = await addPostDB({
-      newPost: newPostRef.current,
-    });
 
     // 發佈文章成功
     if (result.success) {
       console.log("result.resultPost 發布文章", result.data);
-      dispatch(addPost(result.data));
+
+      if (mode === "edit") {
+        dispatch(updatePost(resultPost));
+      } else if (mode === "add") {
+        dispatch(addPost(resultPost));
+      }
 
       // 關閉 新增文章 page
       navigation.goBack();
@@ -100,7 +155,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: "新增文章",
+      title: `${title[mode]}文章`,
       headerTitleAlign: "center",
       headerLeft: () => (
         <CustomIcon
@@ -114,9 +169,9 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{ marginHorizontal: 15 }}
-          onPress={() => handleAddPost()}
+          onPress={() => handleClickPostBtn()}
         >
-          <Text style={{ color: Colors.textBlue }}>發布</Text>
+          <Text style={{ color: Colors.textBlue }}>{postBtn[mode]}</Text>
         </TouchableOpacity>
       ),
     });
@@ -132,6 +187,15 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
   }, [postTags, postContent, visibility, personal.userId]);
 
   //console.log("postContent", postContent);
+
+  // 把編輯文章帶進來
+  useEffect(() => {
+    if (mode === "edit") {
+      setPostContent(editPost.post.content);
+      setVisibility(editPost.post.visibility);
+      setPostTags(editPost.tags);
+    }
+  }, [mode]);
 
   return (
     <>
@@ -161,6 +225,7 @@ const AddPost: React.FC<AddPostProps> = ({ navigation }) => {
               placeholderTextColor="#999"
               multiline
               onChangeText={setPostContent}
+              value={postContent}
             />
 
             {/* 文章標籤 */}

@@ -26,7 +26,11 @@ const CustomFAB: React.FC<CustomFABProps> = ({ navigation }) => {
           {
             icon: "pencil",
             label: "新增文章",
-            onPress: () => navigation.navigate("addPost"),
+            onPress: () =>
+              navigation.navigate("addPost", {
+                mode: "add",
+                editPost: null,
+              }),
             color: Colors.iconBlue,
             style: {
               backgroundColor: "#ffffff",

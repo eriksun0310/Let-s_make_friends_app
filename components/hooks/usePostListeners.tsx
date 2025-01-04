@@ -3,6 +3,7 @@ import {
   addPost,
   deletePost,
   selectFriendList,
+  updatePost,
   useAppDispatch,
   useAppSelector,
 } from "../../store";
@@ -15,6 +16,40 @@ export const usePostListeners = () => {
   const dispatch = useAppDispatch();
 
   const friendList = useAppSelector(selectFriendList);
+
+  // 共用的文章處理函式
+  const handlePostChange = async ({
+    event,
+    post,
+  }: {
+    event: "INSERT" | "UPDATE";
+    post: PostsDBType;
+  }) => {
+    //根據
+    if (post.visibility === "public") {
+      const postDetail = await getPostDetail({ post });
+      if (event === "INSERT") {
+        dispatch(addPost(postDetail));
+      } else if (event === "UPDATE") {
+        dispatch(updatePost(postDetail));
+      }
+    } else if (post.visibility === "friends") {
+      // 判斷是否為好友文章
+      const hasFriendPost = friendList.some(
+        (friend) => friend.userId === post.user_id
+      );
+
+      if (!hasFriendPost) {
+        return; // 非好友文章不處理
+      }
+      const postDetail = await getPostDetail({ post });
+      if (event === "INSERT") {
+        dispatch(addPost(postDetail));
+      } else if (event === "UPDATE") {
+        dispatch(updatePost(postDetail));
+      }
+    }
+  };
 
   useEffect(() => {
     const subscribe = supabase
@@ -30,31 +65,54 @@ export const usePostListeners = () => {
         async (payload) => {
           const newPost = payload.new as PostsDBType;
 
+          await handlePostChange({
+            event: "INSERT",
+            post: newPost,
+          });
+
           // 公開
-          if (newPost.visibility === "public") {
-            const postDetail = await getPostDetail({
-              post: newPost,
-            });
+          // if (newPost.visibility === "public") {
+          //   const postDetail = await getPostDetail({
+          //     post: newPost,
+          //   });
 
-            dispatch(addPost(postDetail));
-            // 好友
-          } else if (newPost.visibility === "friends") {
-            // 判斷發文者是否為好友
-            const hasFriendPost = friendList.some(
-              (friend) => friend.userId === newPost.user_id
-            );
+          //   dispatch(addPost(postDetail));
+          //   // 好友
+          // } else if (newPost.visibility === "friends") {
+          //   // 判斷發文者是否為好友
+          //   const hasFriendPost = friendList.some(
+          //     (friend) => friend.userId === newPost.user_id
+          //   );
 
-            // 不是好友發的文
-            if (!hasFriendPost) {
-              return;
-            }
+          //   // 不是好友發的文
+          //   if (!hasFriendPost) {
+          //     return;
+          //   }
 
-            const postDetail = await getPostDetail({
-              post: newPost,
-            });
+          //   const postDetail = await getPostDetail({
+          //     post: newPost,
+          //   });
 
-            dispatch(addPost(postDetail));
-          }
+          //   dispatch(addPost(postDetail));
+          // }
+        }
+      )
+
+      //監聽文章更新事件
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "posts",
+        },
+        async (payload) => {
+          console.log("payload", payload);
+          const updatedPost = payload.new as PostsDBType;
+          await handlePostChange({
+            event: "UPDATE",
+            post: updatedPost,
+          });
         }
       )
       //監聽文章刪除事件

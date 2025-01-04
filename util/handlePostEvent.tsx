@@ -16,12 +16,14 @@ import {
   transformPostTags,
 } from "../shared/post/postUtils";
 import {
+  AddANDUpdatePost,
   NewPost,
   PostComments,
   PostDetail,
   PostLikes,
   PostTags,
   Result,
+  UpdatedPost,
   User,
 } from "../shared/types";
 import {
@@ -38,7 +40,6 @@ export const getTags = async (): Promise<{
   data: string[];
 }> => {
   const { data: tagsData, error } = await supabase.from("tags").select("name");
-
 
   if (error) {
     console.error("Error fetching post tags:", error);
@@ -74,7 +75,10 @@ export const addPostTag = async ({
 
     console.log("tagsData", tagsData);
     //   批量插入
-    const { error } = await supabase.from("post_tags").insert(tagsData);
+    const { error } = await supabase
+      .from("post_tags")
+      .upsert(tagsData, { onConflict: "tag_id, post_id" });
+      
     if (error) {
       console.log("新增文章標籤失敗", error);
       return {
@@ -95,8 +99,8 @@ export const addPostTag = async ({
   }
 };
 
-// ✅ 新增所有可用標籤
-export const addTags = async ({
+// ✅ 新增所有可用標籤 - origin
+export const addTags1 = async ({
   tags,
   postId,
 }: {
@@ -151,6 +155,201 @@ export const addTags = async ({
   }
 };
 
+// export const addTags = async ({
+//   tags,
+//   postId,
+// }: {
+//   tags: string[];
+//   postId: string;
+// }): Promise<{
+//   success: boolean;
+//   errorMessage?: string;
+//   data: string[];
+// }> => {
+//   try {
+//     // 一次查詢所有標籤是否存在
+//     const { data: existingTags, error: existingError } = await supabase
+//       .from("tags")
+//       .select("id, name")
+//       .in("name", tags);
+
+//     if (existingError) {
+//       console.log("新增標籤失敗", existingError);
+//       return {
+//         success: false,
+//         errorMessage: (existingError as Error).message,
+//         data: [],
+//       };
+//     }
+
+//     const existingTagNames = existingTags?.map((tag) => tag.name);
+
+//     const newTagNames = tags.filter((tag) => !existingTagNames.includes(tag));
+
+//     // 插入不存在的標籤
+//     let newTags = [];
+//     if (newTagNames.length > 0) {
+//       const { data: insertedTags, error: insertError } = await supabase
+//         .from("tags")
+//         .insert(newTagNames.map((name) => ({ name })))
+//         .select("*");
+
+//       if (insertError) {
+//         console.log("新增標籤失敗", insertError);
+//         return {
+//           success: false,
+//           errorMessage: (insertError as Error).message,
+//           data: [],
+//         };
+//       }
+
+//       newTags = insertedTags;
+//     }
+
+//     //合併新舊標籤的ID
+//     const allTagIds = [...existingTags, ...newTags].map((tag) => tag.id);
+
+//     // 新增文章標籤
+//     await addPostTag({
+//       tagIds: allTagIds,
+//       postId: postId,
+//     });
+
+//     return {
+//       success: true,
+//       data: tags,
+//     };
+//   } catch (error) {
+//     console.log("新增標籤失敗", error);
+//     return {
+//       success: false,
+//       errorMessage: (error as Error).message,
+//       data: [],
+//     };
+//   }
+// };
+
+// export const addTags = async({
+//      tags,
+//      postId
+// }: {
+//      tags: string[];
+//    postId: string;
+//    }):Promise<{
+//     success: boolean;
+//     errorMessage?: string;
+//     data: { tag_id: string; name: string }[]; // 返回完整的標籤資料
+//    }>=>{
+//   try{
+//     // 使用upsert 一次性處理標籤新增或返回已存在的標籤
+//     const {data:allTags , error:tagError} = await supabase
+//     .from('tags')
+//     .upsert(tags.map((name)=>({ name})), {onConflict:'name'})
+//     .select('*')
+
+//     if(tagError){
+//       console.log("新增標籤失敗", tagError);
+//       return {
+//         success:false,
+//         errorMessage:(tagError as Error).message,
+//         data:[]
+//       }
+//     }
+
+//     // 提取所有標籤的id
+//     const tagIds = allTags.map((tag)=>tag.tag_id)
+
+//     // 新增文章標籤
+//     const {success, errorMessage } = await addPostTag({
+//       tagIds,
+//       postId
+//     })
+
+//     if(!success){
+//       return {
+//         success:false,
+//         errorMessage,
+//         data:[]
+//       }
+//     }
+//     // 返回完整的標籤資料
+//     return {
+//       success:true,
+//       data:allTags
+//     }
+//   }catch(error){
+
+//     console.log("新增標籤失敗", error);
+//     return {
+//       success:false,
+//       errorMessage:(error as Error).message,
+//       data:[]
+//     }
+//   }
+// }
+
+export const addTags = async ({
+  tags,
+  postId,
+}: {
+  tags: string[];
+  postId: string;
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: { id: string; name: string }[]; // 返回完整的標籤資料
+}> => {
+  try {
+    // 使用 upsert 一次性處理標籤新增或返回已存在的標籤
+    const { data: allTags, error: tagError } = await supabase
+      .from("tags")
+      .upsert(
+        tags.map((name) => ({ name })),
+        { onConflict: "name" }
+      )
+      .select("*");
+
+    if (tagError) {
+      console.log("新增標籤失敗", tagError);
+      return {
+        success: false,
+        errorMessage: tagError.message,
+        data: [],
+      };
+    }
+
+    console.log("新增標籤成功", allTags);
+    // 提取所有標籤的 ID
+    const tagIds = allTags.map((tag) => tag.id);
+
+    // 新增文章標籤
+    const { success, errorMessage } = await addPostTag({
+      tagIds,
+      postId,
+    });
+
+    if (!success) {
+      return {
+        success: false,
+        errorMessage,
+        data: [],
+      };
+    }
+
+    // 返回完整的標籤資料
+    return {
+      success: true,
+      data: allTags,
+    };
+  } catch (error) {
+    console.log("新增標籤失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
+};
 
 //✅ 取得文章內的tag
 export const getPostTags = async ({
@@ -200,7 +399,7 @@ export const getPostTags = async ({
       };
     });
 
-    console.log("transformedPostTags", transformedPostTags);
+    //console.log("transformedPostTags", transformedPostTags);
 
     return {
       success: true,
@@ -376,7 +575,7 @@ export const addPostDB = async ({
 }): Promise<{
   success: boolean;
   errorMessage?: string;
-  data: PostDetail | null;
+  data: AddANDUpdatePost | null;
 }> => {
   try {
     // 新增文章並取得插入的文章 ID
@@ -407,8 +606,9 @@ export const addPostDB = async ({
       postId: newPostId,
     });
 
+    console.log("tags", tags);
     // 發文者的基本資訊
-    const user = await getFriendDetail(postData.user_id);
+    //const user = await getFriendDetail(postData.user_id);
 
     // 轉換文章的資料格式
     const transformedPost = transformPost({
@@ -419,8 +619,7 @@ export const addPostDB = async ({
       success: true,
       data: {
         post: transformedPost,
-        user: user || ({} as User),
-        tags: tags || [], // 如果標籤新增失敗，返回空陣列
+        tags: tags?.map((tag) => tag.name) || [], // 如果標籤新增失敗，返回空陣列
         postLikes: [], // 新文章沒有按讚
         postComments: [], // 新文章沒有留言
       },
@@ -436,7 +635,141 @@ export const addPostDB = async ({
 };
 
 //  更新文章
-export const updatePostDB = async () => {};
+export const updatePostDB = async ({
+  updatedPost,
+}: {
+  updatedPost: UpdatedPost;
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: AddANDUpdatePost | null;
+}> => {
+  try {
+    // 更新文章
+    const { data: updatedPostsData, error } = await supabase
+      .from("posts")
+      .update({
+        content: updatedPost.content,
+        visibility: updatedPost.visibility,
+      })
+      .eq("id", updatedPost.postId)
+      .select("*")
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+        data: null,
+      };
+    }
+
+    //獲取舊的 post_tags
+    const { data: oldPostTags, error: oldTagsError } = await supabase
+      .from("post_tags")
+      .select("tag_id")
+      .eq("post_id", updatedPost.postId);
+
+    if (oldTagsError) {
+      console.log("取得舊的 post_tags 失敗", oldTagsError.message);
+      return {
+        success: false,
+        errorMessage: oldTagsError.message,
+        data: null,
+      };
+    }
+
+    const oldTagIds = oldPostTags?.map((tag) => tag.tag_id);
+
+    //更新標籤
+    const { data: tags } = await addTags({
+      tags: updatedPost.tags,
+      postId: updatedPost.postId,
+    });
+
+    const newTagIds = tags?.map((tag) => tag.id);
+
+    // 比較新舊標籤
+    const tagsToRemove = oldTagIds?.filter((id) => !newTagIds?.includes(id));
+    const tagsToAdd = newTagIds?.filter((id) => !oldTagIds?.includes(id));
+
+    // 刪除不需要的標籤
+    if (tagsToRemove.length > 0) {
+      const { error: deletePostTagsError } = await supabase
+        .from("post_tags")
+        .delete()
+        .in("tag_id", tagsToRemove)
+        .eq("post_id", updatedPost.postId);
+
+      if (deletePostTagsError) {
+        console.log("刪除文章標籤失敗", deletePostTagsError.message);
+        return {
+          success: false,
+          errorMessage: deletePostTagsError.message,
+          data: null,
+        };
+      }
+    }
+
+    // 新增需要的標籤
+    if (tagsToAdd.length > 0) {
+      await addPostTag({ tagIds: tagsToAdd, postId: updatedPost.postId });
+    }
+
+    // 轉換文章的資料格式
+    const transformedPost = transformPost({
+      posts: updatedPostsData,
+    });
+
+    // 更新標籤
+    /*
+
+    1.先刪除 post_tags 中舊標籤
+    2.addTags：返回 tagIds
+    3. addPostTag：新增文章標籤
+    */
+
+    // const { error: deletePostTagsError } = await supabase
+    //   .from("post_tags")
+    //   .delete()
+    //   .in("post_id", [updatedPost.postId]);
+
+    // if (deletePostTagsError) {
+    //   return {
+    //     success: false,
+    //     errorMessage: deletePostTagsError.message,
+    //     data: null,
+    //   };
+    // }
+
+    // 新增標籤
+    // const { data: tags } = await addTags({
+    //   tags: updatedPost.tags,
+    //   postId: updatedPost.postId,
+    // });
+
+    // // 轉換文章的資料格式
+    // const transformedPost = transformPost({
+    //   posts: data,
+    // });
+    console.log("updatePostDB tags", tags);
+    return {
+      success: true,
+      data: {
+        post: transformedPost,
+        tags: tags?.map((tag) => tag.name) || [], // 如果標籤新增失敗，返回空陣列
+        postLikes: [], //TODO: 到時候再改
+        postComments: [], //TODO: 到時候再改
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: null,
+    };
+  }
+};
 
 //⛔ 刪除文章
 export const deletePostDB = async ({

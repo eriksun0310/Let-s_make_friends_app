@@ -47,7 +47,7 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     });
   }, [navigation]);
 
-  console.log("postData redux", postData);
+  // console.log("postData redux", postData);
 
   useEffect(() => {
     // 初始化加載的文章

@@ -3,10 +3,18 @@ import { Menu } from "react-native-paper";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { EllipsisVertical } from "lucide-react-native";
 import { Colors } from "../../constants/style";
-import { deletePost, useAppDispatch } from "../../store";
+import {
+  deletePost,
+  selectPosts,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 import { deletePostDB } from "../../util/handlePostEvent";
 import AlertDialog from "./AlertDialog";
+import { useNavigation } from "@react-navigation/native";
 const CustomMenu = ({ postId }: { postId: string }) => {
+  const navigation = useNavigation();
+  const postData = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -22,7 +30,18 @@ const CustomMenu = ({ postId }: { postId: string }) => {
   };
 
   // 點擊 menu 編輯
-  const clickEditMenu = () => {
+  const clickEditMenu = (postId: string) => {
+    // 找出要編輯的文章
+    const editPost = postData.find((post) => post.post.id === postId);
+
+    console.log("editPost", editPost);
+    navigation.navigate("addPost", {
+      mode: "edit",
+      editPost: {
+        post: editPost?.post,
+        tags: editPost?.tags,
+      },
+    });
     // 開啟 addPost 傳mode= 'edit'、updatePost
   };
 
@@ -52,8 +71,8 @@ const CustomMenu = ({ postId }: { postId: string }) => {
   const handleClickDelete = async () => {
     console.log("handleClickConfirm");
     const { success } = await deletePostDB({ postId });
-    console.log('success', success);
-    
+    console.log("success", success);
+
     if (success) {
       dispatch(deletePost(postId));
       setIsAlertVisible(false);
@@ -84,7 +103,7 @@ const CustomMenu = ({ postId }: { postId: string }) => {
         contentStyle={[styles.menuContent, { marginTop: -56 }]} // 調整選單位置
       >
         <Menu.Item
-          onPress={clickEditMenu}
+          onPress={() => clickEditMenu(postId)}
           title="編輯"
           style={{
             marginHorizontal: 10,

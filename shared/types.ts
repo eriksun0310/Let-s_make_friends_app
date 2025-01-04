@@ -189,8 +189,7 @@ export type PostDetail = {
   postComments: PostComments[];
 };
 
-// 文章詳細資訊
-
+//新增文章
 export type NewPost = {
   userId: string;
   content: string;
@@ -198,7 +197,22 @@ export type NewPost = {
   tags: string[];
 };
 
+// 更新文章
+export type UpdatedPost = NewPost & {
+  postId: string;
+};
+
 export interface SegmentedButtons {
   value: string;
   label: string;
 }
+
+//新增跟更新的貼文
+export type AddANDUpdatePost = {
+  post: Post;
+  tags: string[];
+  postLikes: PostLikes[];
+  postComments: PostComments[];
+};
+
+export type EditPost = Pick<PostDetail, "post" | "tags">;
