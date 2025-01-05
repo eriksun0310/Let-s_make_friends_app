@@ -20,7 +20,13 @@ import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { NavigationProp } from "@react-navigation/native";
-import { addPost, selectUser, updatePost, useAppDispatch, useAppSelector } from "../store";
+import {
+  addPost,
+  selectUser,
+  updatePost,
+  useAppDispatch,
+  useAppSelector,
+} from "../store";
 import { addPostDB, updatePostDB } from "../util/handlePostEvent";
 import {
   AddANDUpdatePost,
@@ -29,7 +35,6 @@ import {
   PostDetail,
   PostVisibility,
 } from "../shared/types";
-import { update } from "firebase/database";
 
 const title = {
   edit: "編輯",
@@ -41,20 +46,26 @@ const postBtn = {
   add: "發布",
 };
 
-interface AddPostProps {
+interface Post {
+  content: string; // 文章內容
+  visibility: PostVisibility; // 文章權限
+  tags: string[]; // 文章標籤
+}
+
+interface PostContentProps {
   route: {
     params: {
       mode: "add" | "edit";
-      editPost: EditPost;
+      editPost: EditPost | null;
     };
   };
   navigation: NavigationProp<any>;
 }
-// 新增文章
-const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
+// 文章內容(add、edit)
+const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
   const { mode, editPost } = route.params;
 
-  console.log("editPost", editPost);
+  //console.log("editPost", editPost);
 
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
@@ -63,25 +74,17 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
     close: () => void;
   }>(null);
 
-  // 文章內容
-  const [postContent, setPostContent] = useState("");
-
-  // 文章權限
-  const [visibility, setVisibility] = useState("public");
-
-  // 顯示在文章上的tag
-  const [postTags, setPostTags] = useState<string[]>([]);
+  const [post, setPost] = useState<Post>({
+    content: "", // 文章內容
+    visibility: "public", // 文章權限
+    tags: [], // 文章標籤
+  });
 
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
-  // TODO: rename newPostRef -> newAndUpdatePostRef
-  const newPostRef = useRef<NewPost>({
-    userId: personal.userId,
-    content: postContent,
-    visibility: visibility as PostVisibility,
-    tags: postTags,
-  });
+  // TODO: rename postContentRef -> newAndUpdatePostRef
+  const postContentRef = useRef<NewPost>();
 
   // 關閉 新增文章 page
   const handleClosePost = () => {
@@ -106,29 +109,30 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
 
   // 移除 tag
   const handleRemoveTag = (tag: string) => {
-    setPostTags(postTags.filter((i) => i !== tag));
+    setPost((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((i) => i !== tag),
+    }));
   };
 
   // 按下發布文章
   const handleClickPostBtn = async () => {
-    let result = {} as {
-      success: boolean;
-      errorMessage?: string;
-      data: AddANDUpdatePost | null;
-    };
+    let result = {};
 
-    // 編輯文章
-    if (mode === "edit") {
-      result = await updatePostDB({
-        updatedPost: {
-          postId: editPost.post.id,
-          ...newPostRef.current,
-        },
-      });
-    } else if (mode === "add") {
-      result = await addPostDB({
-        newPost: newPostRef.current,
-      });
+    if (postContentRef.current) {
+      // 編輯文章
+      if (mode === "edit" && editPost) {
+        result = await updatePostDB({
+          updatedPost: {
+            postId: editPost.post.id,
+            ...postContentRef.current,
+          },
+        });
+      } else if (mode === "add") {
+        result = await addPostDB({
+          newPost: postContentRef.current,
+        });
+      }
     }
 
     const resultPost = {
@@ -136,7 +140,7 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
       user: personal,
     } as PostDetail;
 
-    console.log("finalPost 111111", newPostRef.current);
+    console.log("resultPost 111111", resultPost);
 
     // 發佈文章成功
     if (result.success) {
@@ -151,6 +155,20 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
       // 關閉 新增文章 page
       navigation.goBack();
     }
+  };
+
+  // 處理 post 的狀態設置
+  const handlePostChange = ({
+    name,
+    value,
+  }: {
+    name: "content" | "visibility" | "tags";
+    value: string | string[];
+  }) => {
+    setPost((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -178,22 +196,22 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
   }, [navigation]);
 
   useEffect(() => {
-    newPostRef.current = {
+    postContentRef.current = {
       userId: personal.userId,
-      content: postContent,
-      visibility: visibility as PostVisibility,
-      tags: postTags,
+      content: post.content,
+      visibility: post.visibility as PostVisibility,
+      tags: post.tags,
     };
-  }, [postTags, postContent, visibility, personal.userId]);
-
-  //console.log("postContent", postContent);
+  }, [post, personal.userId]);
 
   // 把編輯文章帶進來
   useEffect(() => {
-    if (mode === "edit") {
-      setPostContent(editPost.post.content);
-      setVisibility(editPost.post.visibility);
-      setPostTags(editPost.tags);
+    if (mode === "edit" && editPost) {
+      setPost({
+        content: editPost.post.content,
+        visibility: editPost.post.visibility,
+        tags: editPost.tags,
+      });
     }
   }, [mode]);
 
@@ -224,8 +242,13 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
               placeholder="在想什麼...."
               placeholderTextColor="#999"
               multiline
-              onChangeText={setPostContent}
-              value={postContent}
+              onChangeText={(v) =>
+                handlePostChange({
+                  name: "content",
+                  value: v,
+                })
+              }
+              value={post.content}
             />
 
             {/* 文章標籤 */}
@@ -238,9 +261,9 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
               </TouchableOpacity>
 
               {/* 文章顯示的tag */}
-              {postTags.length > 0 && (
+              {post.tags.length > 0 && (
                 <SelectedTagText
-                  selectedTags={postTags}
+                  selectedTags={post.tags}
                   removeTag={handleRemoveTag}
                 />
               )}
@@ -258,8 +281,13 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
 
               <SegmentedButtons
                 buttons={segmentedButtons("addPost")}
-                onValueChange={setVisibility}
-                initialValue={visibility}
+                onValueChange={(v) =>
+                  handlePostChange({
+                    name: "visibility",
+                    value: v,
+                  })
+                }
+                initialValue={post.visibility}
               />
             </View>
           </View>
@@ -267,11 +295,14 @@ const AddPost: React.FC<AddPostProps> = ({ route, navigation }) => {
 
         {/* tag 選擇器 */}
         <TagSelector
-          defaultPostTags={postTags}
+          defaultPostTags={post.tags}
           modalizeRef={modalizeRef}
-          getSelectedItems={(v) => {
-            setPostTags(v);
-          }}
+          getSelectedItems={(v) =>
+            handlePostChange({
+              name: "tags",
+              value: v,
+            })
+          }
           onCloseDrawer={handleCloseDrawer}
         />
       </>
@@ -326,4 +357,4 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
-export default AddPost;
+export default PostContent;

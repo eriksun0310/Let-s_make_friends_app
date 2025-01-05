@@ -26,7 +26,6 @@ import FriendInvitation from "./screen/FriendInvitation";
 import UserInfo from "./screen/UserInfo";
 import PostDetail from "./screen/PostDetail";
 import Search from "./screen/Search";
-import AddPost from "./screen/AddPost";
 import "react-native-gesture-handler";
 import {
   useAppDispatch,
@@ -37,9 +36,8 @@ import {
   selectIsNewUser,
   AppReduxProvider,
 } from "./store";
-
-import BackButton from "./components/ui/button/BackButton";
 import { ChatContextProvider } from "./shared/chat/ChatContext";
+import PostContent from "./screen/PostContent";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -208,7 +206,7 @@ const AuthenticatedStack = () => {
       {/* 搜尋頁面 */}
       <Stack.Screen name="search" component={Search} />
       {/* 新增文章 */}
-      <Stack.Screen name="addPost" component={AddPost} />
+      <Stack.Screen name="postContent" component={PostContent} />
     </Stack.Navigator>
   );
 };

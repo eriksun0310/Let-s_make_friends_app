@@ -3,6 +3,7 @@ import {
   addPost,
   deletePost,
   selectFriendList,
+  selectUser,
   updatePost,
   useAppDispatch,
   useAppSelector,
@@ -15,6 +16,8 @@ import { getPostDetail } from "../../util/handlePostEvent";
 export const usePostListeners = () => {
   const dispatch = useAppDispatch();
 
+  const personal = useAppSelector(selectUser);
+
   const friendList = useAppSelector(selectFriendList);
 
   // 共用的文章處理函式
@@ -25,12 +28,21 @@ export const usePostListeners = () => {
     event: "INSERT" | "UPDATE";
     post: PostsDBType;
   }) => {
+
+    
+    // 判斷是否為自己的文章
+    if(post.user_id === personal.userId){
+      console.log('自己的文章不處理');
+      return
+    }
+
+    const postDetail = await getPostDetail({ post });
     //根據
     if (post.visibility === "public") {
-      const postDetail = await getPostDetail({ post });
       if (event === "INSERT") {
         dispatch(addPost(postDetail));
       } else if (event === "UPDATE") {
+        // console.log("postDetail 1111111", postDetail);
         dispatch(updatePost(postDetail));
       }
     } else if (post.visibility === "friends") {
@@ -42,10 +54,11 @@ export const usePostListeners = () => {
       if (!hasFriendPost) {
         return; // 非好友文章不處理
       }
-      const postDetail = await getPostDetail({ post });
+
       if (event === "INSERT") {
         dispatch(addPost(postDetail));
       } else if (event === "UPDATE") {
+        // console.log("postDetail 22222", postDetail);
         dispatch(updatePost(postDetail));
       }
     }
@@ -63,6 +76,7 @@ export const usePostListeners = () => {
           table: "posts",
         },
         async (payload) => {
+          //console.log('測試 11111')
           const newPost = payload.new as PostsDBType;
 
           await handlePostChange({
@@ -107,6 +121,7 @@ export const usePostListeners = () => {
           table: "posts",
         },
         async (payload) => {
+          //console.log('測試 22222')
           console.log("payload", payload);
           const updatedPost = payload.new as PostsDBType;
           await handlePostChange({

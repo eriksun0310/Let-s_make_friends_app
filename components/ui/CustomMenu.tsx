@@ -17,6 +17,7 @@ const CustomMenu = ({ postId }: { postId: string }) => {
   const postData = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
 
+  // menu 狀態
   const [menuVisible, setMenuVisible] = useState(false);
 
   // 警告視窗 開啟狀態
@@ -25,17 +26,17 @@ const CustomMenu = ({ postId }: { postId: string }) => {
   // 警告提醒
   const [alertTitle, setAlertTitle] = useState("");
 
-  const showMenu = (event: any) => {
+  const showMenu = () => {
     setMenuVisible(true);
   };
 
   // 點擊 menu 編輯
   const clickEditMenu = (postId: string) => {
+    setMenuVisible(false);
     // 找出要編輯的文章
     const editPost = postData.find((post) => post.post.id === postId);
 
-    console.log("editPost", editPost);
-    navigation.navigate("addPost", {
+    navigation.navigate("postContent", {
       mode: "edit",
       editPost: {
         post: editPost?.post,
@@ -46,40 +47,26 @@ const CustomMenu = ({ postId }: { postId: string }) => {
   };
 
   // 點擊 menu 刪除
-  const clickDeleteMenu = async (postId: string) => {
-    console.log("postId", postId);
+  const clickDeleteMenu = async () => {
+    setMenuVisible(false);
     //alert
     setIsAlertVisible(true);
     setAlertTitle("確認要刪除這則文章？");
-
-    // call deletePostDB
-
-    // const { success } = await deletePostDB({ postId });
-
-    // if (success) {
-    //   dispatch(deletePost(postId));
-    // }
-    // 更新redux  dispatch(deletePost(postId));
   };
 
   const handleCloseAlert = () => {
-    console.log("handleCloseAlert");
     setIsAlertVisible(false);
   };
 
   // 點擊 確認刪除文章
   const handleClickDelete = async () => {
-    console.log("handleClickConfirm");
     const { success } = await deletePostDB({ postId });
-    console.log("success", success);
-
     if (success) {
       dispatch(deletePost(postId));
       setIsAlertVisible(false);
     }
   };
 
-  // const handleCloseAlert = () => {};
   return (
     <>
       <AlertDialog
@@ -107,14 +94,11 @@ const CustomMenu = ({ postId }: { postId: string }) => {
           title="編輯"
           style={{
             marginHorizontal: 10,
-
             height: 30,
           }}
         />
         <Menu.Item
-          onPress={() => {
-            clickDeleteMenu(postId);
-          }}
+          onPress={clickDeleteMenu}
           title="刪除"
           style={{
             marginHorizontal: 10,

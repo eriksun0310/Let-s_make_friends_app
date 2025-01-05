@@ -47,8 +47,6 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     });
   }, [navigation]);
 
-  // console.log("postData redux", postData);
-
   useEffect(() => {
     // 初始化加載的文章
     const fetchAllPosts = async () => {
@@ -89,8 +87,6 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
 
   if (loading) return <LoadingOverlay message=" searching ..." />;
 
-  
-
   return (
     <PaperProvider>
       <View style={styles.screen}>
@@ -100,14 +96,16 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
               key={post.post.id}
               onPress={() =>
                 navigation.navigate("postDetail", {
-                  postDetail: post,
+                  postId: post.post.id,
                 })
               }
             >
+              {/* 
+              TODO:userState 是用來判斷要不要出現  menu的 所以到時候可以rename
+              showMenu
+              首頁還是不要出現 可以編輯或刪除, 要點進去內文才可以 */}
               <Post
-                userState={
-                  post.user.userId === personal.userId ? "personal" : "friend"
-                } // 這個到時候 要看說是訪客還是朋友
+                userState={"friend"} // 這個到時候 要看說是訪客還是朋友
                 postDetail={post}
               />
             </TouchableOpacity>

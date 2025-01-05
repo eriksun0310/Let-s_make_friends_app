@@ -78,7 +78,7 @@ export const addPostTag = async ({
     const { error } = await supabase
       .from("post_tags")
       .upsert(tagsData, { onConflict: "tag_id, post_id" });
-      
+
     if (error) {
       console.log("新增文章標籤失敗", error);
       return {
@@ -548,9 +548,10 @@ export const getPostDetail = async ({
 
   // 取得文章標籤
   const tagsData = (await getPostTags({ postIds: [post.id] })).data;
+  console.log("tagsData 2222222", tagsData);
   // 過濾對應文章的標籤
   const findTagsData = tagsData.filter((tag) => tag.postId === post.id);
-
+  console.log("findTagsData 222222", findTagsData);
   // 查詢文章按讚
   const likesData = (await getPostLikesByPostId({ postIds: [post.id] })).data;
 
@@ -752,7 +753,7 @@ export const updatePostDB = async ({
     // const transformedPost = transformPost({
     //   posts: data,
     // });
-    console.log("updatePostDB tags", tags);
+    //console.log("updatePostDB tags", tags);
     return {
       success: true,
       data: {

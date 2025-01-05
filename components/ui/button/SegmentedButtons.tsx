@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Colors } from "../../../constants/style";
-import { SegmentedButtons as SegmentedButtonsType } from "../../../shared/types";
+import {
+  PostVisibility,
+  SegmentedButtons as SegmentedButtonsType,
+} from "../../../shared/types";
+
+type SegmentedButtonType = PostVisibility | "all";
 
 interface SegmentedButtonProps {
   buttons: SegmentedButtonsType[];
-  onValueChange: (value: string) => void;
+  onValueChange: (value: SegmentedButtonType) => void;
   initialValue?: string;
 }
 

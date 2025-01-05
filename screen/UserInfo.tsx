@@ -95,7 +95,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   // 檢查文章是否為自己發的
   const hasMyPost = postData?.some((post) => post.user.userId === user.userId);
 
-
   useEffect(() => {
     // console.log("好友資料 当前导航堆栈:", navigation.getState());
     navigation.setOptions({
@@ -151,7 +150,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("postDetail", {
-                      postDetail: post,
+                      postId: post.post.id,
                     })
                   }
                 >

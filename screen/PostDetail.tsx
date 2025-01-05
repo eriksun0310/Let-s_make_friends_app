@@ -10,20 +10,26 @@ import Post from "../components/post/Post";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import BackButton from "../components/ui/button/BackButton";
-import { selectUser, useAppSelector } from "../store";
+import { selectPosts, selectUser, useAppSelector } from "../store";
 import { PostDetail as PostDetailType } from "../shared/types";
 
 interface PostDetailProps {
   route: {
     params: {
-      postDetail: PostDetailType;
+      postId: string;
     };
   };
   navigation: NavigationProp<any>;
 }
 //貼文內容
 const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
-  const { postDetail } = route.params;
+  const { postId } = route.params;
+  const postData = useAppSelector(selectPosts);
+
+  // 目前的貼文
+  const currentPost = postData.find(
+    (post) => post.post.id === postId
+  ) as PostDetailType;
 
   const personal = useAppSelector(selectUser);
 
@@ -35,7 +41,6 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
     });
   }, [navigation]);
 
-  console.log("postDetail", postDetail);
   return (
     <PaperProvider>
       <View style={styles.container}>
@@ -43,9 +48,11 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
           {/* 貼文內容 */}
           <Post
             userState={
-              postDetail.user.userId === personal.userId ? "personal" : "friend"
+              currentPost.user.userId === personal.userId
+                ? "personal"
+                : "friend"
             } // 這個到時候 要看說是訪客還是朋友
-            postDetail={postDetail}
+            postDetail={currentPost}
             showTags={true}
           />
 
@@ -55,7 +62,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
             }}
           />
           {/* 留言 */}
-          {postDetail.postComments.map((comment) => {
+          {currentPost.postComments.map((comment) => {
             return <Comments />;
           })}
         </ScrollView>

@@ -14,31 +14,43 @@
 
 
 🚀[要先做]
-✅1. 2025/1/1 寫了文章監聽器,身為好友的卻沒有顯示文章 
-🚀[addPost.tsx]
-1. 關於edit 跟add 會用到的重新rename
-2. 繼續測試還沒完成的編輯貼文
+🐛1.編輯貼文 有問題 
+目前看來自己編輯貼文 內容跟tags 會取正確的
+如果是對方剛好在當下的文, 有時候的tags 會是上一次的舊tags,  不過內容會是新的
 
 
 
+
+
+🚀[posts]
+🐛1. 編輯貼文的邏輯
+✅2. 刪除貼文的邏輯(用supabase ON DELETE CASCADE )
+
+
+
+
+
+
+
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+⌛[之後做]
+
+[post_likes]
+1. 處理按讚、收回讚 可以更新到post_likes db 
+
+[post_comments]
+1. 處理留言 可以更新到post_comments db 
 
 [tags]
 3. 搜尋tag 找到對應的貼文 的UI
 4. 搜尋tag 找到對應的貼文 的邏輯
 
 
-🚀[posts]
-1. 編輯貼文的邏輯
-✅2. 刪除貼文的邏輯(用supabase ON DELETE CASCADE )
-
-🚀[post_likes]
-1. 處理按讚、收回讚 可以更新到post_likes db 
-
-🚀[post_comments]
-1. 處理留言 可以更新到post_comments db 
+⌛[個人資料]
+1. 文章權限設定, 點了之後要過濾不屬於該文章的權限
 
 
-⌛[之後做]
 1. 把 firebase.json 刪掉 (等所有的資料表串接好)
 2. 貼文按讚、留言 提醒 的UI (預計放在首頁的左上角 )
 

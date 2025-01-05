@@ -27,7 +27,7 @@ const CustomFAB: React.FC<CustomFABProps> = ({ navigation }) => {
             icon: "pencil",
             label: "新增文章",
             onPress: () =>
-              navigation.navigate("addPost", {
+              navigation.navigate("postContent", {
                 mode: "add",
                 editPost: null,
               }),
