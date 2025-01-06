@@ -43,22 +43,22 @@ const Post: React.FC<PostProps> = ({
       <View style={styles.header}>
         <Avatar
           rounded
-          source={user.headShot?.imageUrl as ImageSourcePropType}
+          source={user?.headShot?.imageUrl as ImageSourcePropType}
           size="medium"
         />
         <View style={styles.headerText}>
-          <Text style={styles.username}>{user.name}</Text>
+          <Text style={styles.username}>{user?.name}</Text>
           <Text style={styles.timestamp}>
             {formatTimeWithDayjs(post?.createdAt)}
           </Text>
         </View>
-        {userState === "personal" && <CustomMenu postId={post.id} />}
+        {userState === "personal" && <CustomMenu postId={post?.id} />}
       </View>
 
       <Text style={styles.content}>{post?.content}</Text>
 
       {/* 文章標籤 */}
-      {tags.length > 0 && showTags && <PostTags tags={tags} />}
+      {tags?.length > 0 && showTags && <PostTags tags={tags} />}
 
       {userState !== "visitor" && (
         <View style={styles.footer}>
@@ -73,7 +73,7 @@ const Post: React.FC<PostProps> = ({
               </TouchableOpacity>
             )}
 
-            <Text style={styles.iconText}>{postLikes.length}</Text>
+            <Text style={styles.iconText}>{postLikes?.length}</Text>
           </View>
           <View style={styles.iconContainer}>
             <Icon
@@ -81,7 +81,7 @@ const Post: React.FC<PostProps> = ({
               type="material-community"
               color={Colors.iconBlue}
             />
-            <Text style={styles.iconText}>{postComments.length}</Text>
+            <Text style={styles.iconText}>{postComments?.length}</Text>
           </View>
         </View>
       )}

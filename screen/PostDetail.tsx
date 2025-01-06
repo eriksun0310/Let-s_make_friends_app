@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import React, { useEffect } from "react";
 
 import { NavigationProp } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import { RootState } from "../store/store";
 import BackButton from "../components/ui/button/BackButton";
 import { selectPosts, selectUser, useAppSelector } from "../store";
 import { PostDetail as PostDetailType } from "../shared/types";
+import { set } from "firebase/database";
 
 interface PostDetailProps {
   route: {
@@ -41,34 +42,52 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
     });
   }, [navigation]);
 
+  console.log("currentPost", currentPost);
+
+  useEffect(() => {
+    // 文章被刪除
+    if (!currentPost) {
+      const timeoutId = setTimeout(() => {
+        navigation.goBack();
+      }, 1500);
+
+      // 清除定時器
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentPost]);
+
   return (
     <PaperProvider>
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* 貼文內容 */}
-          <Post
-            userState={
-              currentPost.user.userId === personal.userId
-                ? "personal"
-                : "friend"
-            } // 這個到時候 要看說是訪客還是朋友
-            postDetail={currentPost}
-            showTags={true}
-          />
+          {!currentPost ? (
+            <View style={styles.deleteTextView}>
+              <Text style={styles.deleteText}>
+                文章已被刪除,即將返回首頁....
+              </Text>
+            </View>
+          ) : (
+            <Post
+              userState={
+                currentPost?.user?.userId === personal?.userId
+                  ? "personal"
+                  : "friend"
+              } // 這個到時候 要看說是訪客還是朋友
+              postDetail={currentPost || {}}
+              showTags={true}
+            />
+          )}
 
-          <View
-            style={{
-              marginTop: 10,
-            }}
-          />
+          <View style={{ marginTop: 10 }} />
           {/* 留言 */}
-          {currentPost.postComments.map((comment) => {
+          {currentPost?.postComments.map((comment) => {
             return <Comments />;
           })}
         </ScrollView>
 
         {/* 輸入留言 */}
-        <EnterComments />
+        {currentPost && <EnterComments />}
       </View>
     </PaperProvider>
   );
@@ -84,6 +103,13 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  deleteTextView: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+  deleteText: {
+    fontSize: 20,
   },
 });
 

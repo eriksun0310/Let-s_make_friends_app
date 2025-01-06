@@ -64,6 +64,7 @@ const CustomMenu = ({ postId }: { postId: string }) => {
     if (success) {
       dispatch(deletePost(postId));
       setIsAlertVisible(false);
+      navigation.goBack();
     }
   };
 
