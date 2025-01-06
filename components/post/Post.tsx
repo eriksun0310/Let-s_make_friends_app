@@ -19,7 +19,8 @@ import { Colors } from "../../constants/style";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import PostTags from "./PostTags";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
+import { UserRound } from "lucide-react-native";
+import Fontisto from "@expo/vector-icons/Fontisto";
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;
@@ -49,9 +50,16 @@ const Post: React.FC<PostProps> = ({
         <View style={styles.headerText}>
           <Text style={styles.username}>{user?.name}</Text>
           <Text style={styles.timestamp}>
-            {formatTimeWithDayjs(post?.createdAt)}
+            {formatTimeWithDayjs(post?.createdAt)}{" "}
           </Text>
+          <View></View>
         </View>
+        {post.visibility === "public" ? (
+          <AntDesign name="earth" size={20} color={Colors.icon} />
+        ) : (
+          <UserRound color={Colors.icon} size={24} />
+        )}
+
         {userState === "personal" && <CustomMenu postId={post?.id} />}
       </View>
 

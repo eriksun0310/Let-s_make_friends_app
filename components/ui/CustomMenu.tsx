@@ -84,7 +84,7 @@ const CustomMenu = ({ postId }: { postId: string }) => {
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
         anchor={
-          <TouchableOpacity onPress={showMenu} style={styles.menuButton}>
+          <TouchableOpacity onPress={showMenu}>
             <EllipsisVertical color={Colors.icon} />
           </TouchableOpacity>
         }
@@ -112,9 +112,6 @@ const CustomMenu = ({ postId }: { postId: string }) => {
 };
 
 const styles = StyleSheet.create({
-  menuButton: {
-    padding: 8,
-  },
   menuContent: {
     backgroundColor: "#fff",
     elevation: 8,
