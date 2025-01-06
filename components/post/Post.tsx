@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserRound } from "lucide-react-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { selectUser, useAppSelector } from "../../store";
+import { updatePostLikeDB } from "../../util/handlePostEvent";
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;
@@ -40,7 +41,46 @@ const Post: React.FC<PostProps> = ({
   const { post, user, tags, postLikes, postComments } = postDetail;
 
   const [like, setLike] = useState(false);
- 
+
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // 處理 按讚、收回讚
+  const handleLikeChange = useCallback(async () => {
+    setIsProcessing(true); // 開始處理
+    setLike(!like); // 樂觀更新
+    try {
+      const { success } = await updatePostLikeDB({
+        postId: post?.id,
+        userId: personal.userId,
+        like: !like,
+      });
+
+      if (!success) {
+        console.log("更新按讚失敗");
+        setLike(!like);
+      }
+    } catch (error) {
+      console.log(" 按讚失敗", error);
+    } finally {
+      setIsProcessing(false); // 恢復按鈕可點擊狀態
+    }
+  }, [like, post?.id, personal.userId]);
+
+  useEffect(() => {
+    const updateLike = async () => {
+      const { success } = await updatePostLikeDB({
+        postId: post?.id,
+        userId: personal.userId,
+        like: like,
+      });
+      if (success) {
+        // 更新redux
+      }
+    };
+
+    updateLike();
+  }, [like]);
+
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
@@ -78,15 +118,16 @@ const Post: React.FC<PostProps> = ({
       {(post.visibility === "public" || userState !== "visitor") && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
-            {like ? (
-              <TouchableOpacity onPress={() => setLike(false)}>
-                <AntDesign name="heart" size={24} color="#ff6666" />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => setLike(true)}>
-                <AntDesign name="hearto" size={24} color={Colors.icon} />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              onPress={handleLikeChange}
+              disabled={isProcessing} // 禁用按鈕
+            >
+              <AntDesign
+                name={like ? "heart" : "hearto"}
+                size={24}
+                color={like ? "#ff6666" : Colors.icon}
+              />
+            </TouchableOpacity>
 
             <Text style={styles.iconText}>{postLikes?.length}</Text>
           </View>

@@ -37,6 +37,7 @@
 
 🧘‍♂️[post_likes]
 1. 處理按讚、收回讚 可以更新到post_likes db 
+2. 誰按了讚的UI
 
 
 
@@ -139,15 +140,15 @@ user1_id:A 、user2_id:B
 ✏️[發文 大致操作資料的流程]
 1. handlePostEvent: 
     [post_tags]:
-        ⛔1. getTags: 取得 所有的tag  (資料表:post_tags)
+        ✅1. getTags: 取得 所有的tag  (資料表:post_tags)
         ✅2. addPostTag:  取得 新增tag  (資料表:post_tags)
         ✅3.getPostTagsByPostId: 取得文章內的tag
     [posts]:
-        ⛔1. getAllPosts: 取得所有文章(好友 + 自己 + 非好友但設為公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
+        ✅1. getAllPosts: 取得所有文章(好友 + 自己 + 非好友但設為公開)的文章 (資料表: posts、post_tags 、post_comments、post_likes、friends、users)
         ✅2. getPostDetail: 取得文章詳細資訊
         ✅3.. addPost: 新增文章, (資料表: posts、post_tags)
-        3. editPost: 編輯文章
-        4. deletePost: 刪除文章
+        ✅3. editPost: 編輯文章
+        ✅4. deletePost: 刪除文章
     [post_comments]:
         🈲1. getPostComments: 取得文章留言
         2. addPostComment: 新增文章留言

@@ -891,3 +891,38 @@ export const getPostCommentsByPostId = async ({
     };
   }
 };
+
+//更新文章按讚、收回讚
+export const updatePostLikeDB = async ({
+  postId,
+  userId,
+  like,
+}: {
+  postId: string;
+  userId: string;
+  like: boolean;
+}): Promise<{
+  success: boolean;
+}> => {
+  try {
+    if (like) {
+      await supabase
+        .from("post_likes")
+        .upsert({ post_id: postId, user_id: userId });
+    } else {
+      await supabase
+        .from("post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", userId);
+    }
+    return { success: true };
+  } catch (error) {
+
+    console.log('更新文章按讚失敗', error);
+    return {
+      success: false,
+
+    };
+  }
+};
