@@ -45,7 +45,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
   // 點擊 好友資訊
   const clickSearch = () => {
     navigation.navigate?.("userInfoFriend", {
-      userState: "friend",
+      userState: "visitor",
       friend: friend,
     });
   };

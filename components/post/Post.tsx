@@ -21,6 +21,7 @@ import PostTags from "./PostTags";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserRound } from "lucide-react-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import { selectUser, useAppSelector } from "../../store";
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;
@@ -35,10 +36,11 @@ const Post: React.FC<PostProps> = ({
   postDetail,
   showTags = false,
 }) => {
+  const personal = useAppSelector(selectUser);
   const { post, user, tags, postLikes, postComments } = postDetail;
 
   const [like, setLike] = useState(false);
-
+ 
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
@@ -54,10 +56,14 @@ const Post: React.FC<PostProps> = ({
           </Text>
           <View></View>
         </View>
-        {post.visibility === "public" ? (
-          <AntDesign name="earth" size={20} color={Colors.icon} />
-        ) : (
-          <UserRound color={Colors.icon} size={24} />
+        {post.userId === personal.userId && (
+          <>
+            {post.visibility === "public" ? (
+              <AntDesign name="earth" size={20} color={Colors.icon} />
+            ) : (
+              <UserRound color={Colors.icon} size={24} />
+            )}
+          </>
         )}
 
         {userState === "personal" && <CustomMenu postId={post?.id} />}
@@ -68,7 +74,8 @@ const Post: React.FC<PostProps> = ({
       {/* 文章標籤 */}
       {tags?.length > 0 && showTags && <PostTags tags={tags} />}
 
-      {userState !== "visitor" && (
+      {/* 訪客看不到留言與按讚 數 */}
+      {(post.visibility === "public" || userState !== "visitor") && (
         <View style={styles.footer}>
           <View style={styles.iconContainer}>
             {like ? (

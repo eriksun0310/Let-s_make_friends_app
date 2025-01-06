@@ -23,7 +23,6 @@ import {
 } from "../store";
 import { resetDeleteChatRoomState } from "../shared/chat/chatFuncs";
 
-
 interface UserInfoProps {
   route: {
     params: {
@@ -170,7 +169,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
                   }
                 >
                   <Post
-                    userState="personal" // 這個到時候 要看說是訪客還是朋友
+                    // userState={
+                    //   post.user.userId === personal.userId
+                    //     ? "personal"
+                    //     : "friend"
+                    // } // 這個到時候 要看說是訪客還是朋友
+                    userState={userState}
                     postDetail={post}
                   />
                 </TouchableOpacity>
