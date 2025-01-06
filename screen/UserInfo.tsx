@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
-import { RootState } from "../store/store";
-
-import { useSelector } from "react-redux";
 import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
-import { User, UserState } from "../shared/types";
+import { SegmentedButtonType, User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
@@ -25,6 +22,7 @@ import {
   useAppSelector,
 } from "../store";
 import { resetDeleteChatRoomState } from "../shared/chat/chatFuncs";
+
 
 interface UserInfoProps {
   route: {
@@ -47,6 +45,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     friend,
     isShowMsgIcon = false,
   } = route.params || { userState: "personal" };
+
+  const [permissions, setPermissions] = useState<SegmentedButtonType>("all");
 
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
@@ -95,6 +95,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   // 檢查文章是否為自己發的
   const hasMyPost = postData?.some((post) => post.user.userId === user.userId);
 
+  // 過濾掉不符合的文章權限
+  const filteredPost = postData?.filter((post) => {
+    if (permissions === "all") {
+      return true;
+    } else {
+      return post.post.visibility === permissions;
+    }
+  });
+
   useEffect(() => {
     // console.log("好友資料 当前导航堆栈:", navigation.getState());
     navigation.setOptions({
@@ -116,6 +125,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       },
     });
   }, [navigation, userState, isShowMsgIcon]);
+
   return (
     <PaperProvider>
       <View style={styles.container}>
@@ -140,11 +150,16 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             }}
           />
 
-          {hasMyPost && userState === "personal" && <PostPermissionsSettings />}
+          {hasMyPost && userState === "personal" && (
+            <PostPermissionsSettings
+              permissions={permissions}
+              setPermissions={setPermissions}
+            />
+          )}
 
           <View style={{ marginTop: 10 }} />
 
-          {postData?.map((post) => {
+          {filteredPost?.map((post) => {
             if (post.user.userId === user.userId) {
               return (
                 <TouchableOpacity

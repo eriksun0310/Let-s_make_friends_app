@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import SegmentedButtons from "../ui/button/SegmentedButtons";
 import { segmentedButtons } from "../../shared/static";
 import { Colors } from "../../constants/style";
+import { SegmentedButtonType } from "../../shared/types";
+
+interface PostPermissionsSettingsProps {
+  permissions: SegmentedButtonType;
+  setPermissions: (permissions: SegmentedButtonType) => void;
+}
 
 // 貼文權限設定
-const PostPermissionsSettings = () => {
-  const [permissions, setPermissions] = useState("all");
+const PostPermissionsSettings: React.FC<PostPermissionsSettingsProps> = ({
+  permissions,
+  setPermissions,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>

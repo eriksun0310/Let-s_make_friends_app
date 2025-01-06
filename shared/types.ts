@@ -203,7 +203,7 @@ export type UpdatedPost = NewPost & {
 };
 
 export interface SegmentedButtons {
-  value: string;
+  value: SegmentedButtonType;
   label: string;
 }
 
@@ -216,3 +216,5 @@ export type AddANDUpdatePost = {
 };
 
 export type EditPost = Pick<PostDetail, "post" | "tags">;
+
+export type SegmentedButtonType = PostVisibility | "all";

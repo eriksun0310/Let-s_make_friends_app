@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Colors } from "../../../constants/style";
 import {
-  PostVisibility,
   SegmentedButtons as SegmentedButtonsType,
+  SegmentedButtonType,
 } from "../../../shared/types";
-
-type SegmentedButtonType = PostVisibility | "all";
 
 interface SegmentedButtonProps {
   buttons: SegmentedButtonsType[];
   onValueChange: (value: SegmentedButtonType) => void;
-  initialValue?: string;
+  initialValue?: SegmentedButtonType;
 }
 
 const SegmentedButtons: React.FC<SegmentedButtonProps> = ({
@@ -23,7 +21,7 @@ const SegmentedButtons: React.FC<SegmentedButtonProps> = ({
     initialValue || buttons[0].value
   );
 
-  const handlePress = (value: string) => {
+  const handlePress = (value: SegmentedButtonType) => {
     setSelectedValue(value);
     onValueChange(value);
   };
@@ -59,15 +57,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     borderRadius: 8,
-    // borderColor: "#E5E5E5",
   },
   button: {
-    // flex: 1,
     width: 50,
     paddingVertical: 10,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "white",
+
     borderWidth: 1,
     borderColor: "#cecece",
   },
