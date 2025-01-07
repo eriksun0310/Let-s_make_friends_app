@@ -38,6 +38,7 @@ import {
 } from "./store";
 import { ChatContextProvider } from "./shared/chat/ChatContext";
 import PostContent from "./screen/PostContent";
+import Settings from "./screen/Settings";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -207,6 +208,9 @@ const AuthenticatedStack = () => {
       <Stack.Screen name="search" component={Search} />
       {/* 新增文章 */}
       <Stack.Screen name="postContent" component={PostContent} />
+
+      {/* 設定 */}
+      <Stack.Screen name="settings" component={Settings} />
     </Stack.Navigator>
   );
 };

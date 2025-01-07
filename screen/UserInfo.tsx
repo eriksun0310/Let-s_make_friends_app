@@ -10,7 +10,12 @@ import { SegmentedButtonType, User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
-import { MessageCircleMore } from "lucide-react-native";
+import {
+  MessageCircleMore,
+  Settings,
+  Settings2,
+  Wrench,
+} from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
@@ -91,6 +96,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     });
   };
 
+  // 設定
+  const handleSettingsPress = () => {
+    navigation.navigate("settings");
+  };
+
   // 檢查文章是否為自己發的
   const hasMyPost = postData?.some((post) => post.user.userId === user.userId);
 
@@ -120,10 +130,21 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
               <MessageCircleMore color={Colors.icon} />
             </CustomIcon>
           );
+        } else if (userState === "personal") {
+          return (
+            <CustomIcon onPress={handleSettingsPress}>
+              <Settings2 color={Colors.icon} />
+              {/* <Wrench color={Colors.icon} /> */}
+              {/* <Settings color={Colors.icon} /> */}
+              {/* <MessageCircleMore color={Colors.icon} /> */}
+            </CustomIcon>
+          );
         } else return null;
       },
     });
   }, [navigation, userState, isShowMsgIcon]);
+
+  console.log("userState", userState);
 
   return (
     <PaperProvider>
