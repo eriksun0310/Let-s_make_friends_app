@@ -8,6 +8,7 @@ users:個人資料
 user_selected_option:興趣選項
 user_head_shot: 大頭貼
 user_online_status: 用戶在線狀態
+user_settings: 用戶設定
 */
 
 // 取得用戶資料
@@ -242,5 +243,92 @@ export const updateUserOnlineStatus = async ({
     }
   } catch (error) {
     console.error("Unexpected error updating user online status:", error);
+  }
+};
+
+// 取得用戶設定
+export const getUserSettings = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<{
+  success?: boolean;
+  hideLikes?: boolean;
+  hideComments?: boolean;
+  markAsRead?: boolean;
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from("user_settings")
+      .select("hide_likes, hide_comments, mark_as_read")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.log("取得用戶設定失敗", error);
+      return {
+        success: false,
+      };
+    }
+
+    if (data) {
+      return {
+        success: true,
+        hideLikes: data.hide_likes,
+        hideComments: data.hide_comments,
+        markAsRead: data.mark_as_read,
+      };
+    }
+  } catch (error) {
+    console.log("取得用戶設定失敗", error);
+
+    return {
+      success: false,
+    };
+  }
+};
+
+// 儲存用戶設定
+export const saveUserSettings = async ({
+  userId,
+  hideLikes,
+  hideComments,
+  markAsRead,
+}: {
+  userId: string;
+  hideLikes: boolean;
+  hideComments: boolean;
+  markAsRead: boolean;
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+}> => {
+  try {
+    const { error } = await supabase
+      .from("user_settings")
+      .upsert({
+        hide_likes: hideLikes,
+        hide_comments: hideComments,
+        mark_as_read: markAsRead,
+      })
+      .eq("user_id", userId);
+
+    if (error) {
+      console.log("更新 user_settings 失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.log("更新 user_settings 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };

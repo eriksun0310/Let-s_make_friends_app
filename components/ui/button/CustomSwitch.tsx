@@ -2,8 +2,17 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Switch } from "react-native-paper";
 import { Colors } from "../../../constants/style";
-const CustomSwitch = ({ label }: { label: string }) => {
-  const [checked, setChecked] = useState(false);
+
+interface CustomSwitchProps {
+  label: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+}
+const CustomSwitch: React.FC<CustomSwitchProps> = ({
+  label,
+  value,
+  onChange,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.labelView}>
@@ -13,8 +22,8 @@ const CustomSwitch = ({ label }: { label: string }) => {
       <View style={styles.switchView}>
         <Switch
           color={Colors.iconBlue}
-          value={checked}
-          onValueChange={(value) => setChecked(value)}
+          value={value}
+          onValueChange={(value) => onChange(value)}
           style={styles.switch}
         />
       </View>
@@ -25,7 +34,7 @@ const CustomSwitch = ({ label }: { label: string }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    marginVertical: 8,
+    marginVertical: 5,
     marginHorizontal: 15,
   },
   labelView: {
@@ -42,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   switch: {
-    transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
+    // transform: [{ scaleX: 1.0 }, { scaleY: 1.0 }],
   },
 });
 export default CustomSwitch;
