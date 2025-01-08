@@ -11,23 +11,27 @@ interface SettingsProps {
   navigation: NavigationProp<any, any>;
 }
 
+interface UserSettings {
+  hideLikes: boolean;
+  hideComments: boolean;
+  markAsRead: boolean;
+}
+
 const Settings: React.FC<SettingsProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
 
-  const [userSettings, setUserSettings] = useState({
+  const [userSettings, setUserSettings] = useState<UserSettings>({
     hideLikes: false,
     hideComments: false,
     markAsRead: false,
   });
 
-  const handleBackPress = async () => {
+  const handleBackPress = async (currentUserSettings: UserSettings) => {
+    console.log("currentUserSettings 11111", currentUserSettings);
     // 在這裡保存資料到 user_setting
     const success = await saveUserSettings({
-      ...userSettings,
+      ...currentUserSettings,
       userId: personal.userId,
-      // hideLikes: userSettings.hideLikes,
-      // hideComments: userSettings.hideComments,
-      // markAsRead: userSettings.markAsRead,
     });
 
     if (success) {
@@ -53,20 +57,23 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
       headerTitle: "隱私設定",
       headerTitleAlign: "center",
       gestureEnabled: false, // 禁用手勢返回
-      headerLeft: () => <BackButton onPress={handleBackPress} />,
+      headerLeft: () => (
+        <BackButton onPress={() => handleBackPress(userSettings)} />
+      ),
     });
-  }, [navigation]);
+  }, [navigation, userSettings]);
 
   useEffect(() => {
     const fetchUserSettings = async () => {
       const userSettings = await getUserSettings({ userId: personal.userId });
-      console.log("userSettings", userSettings);
 
       if (userSettings.success) {
+        const { hideLikes, hideComments, markAsRead } = userSettings;
+
         setUserSettings({
-          hideLikes: userSettings.hideLikes,
-          hideComments: userSettings.hideComments,
-          markAsRead: userSettings.markAsRead,
+          hideLikes: hideLikes,
+          hideComments: hideComments,
+          markAsRead: markAsRead,
         });
       }
     };
@@ -76,7 +83,8 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        handleBackPress();
+        // TODO: 明天用安卓模擬器試看看這個要不要
+        //handleBackPress();
         return true; // 攔截返回按鈕
       }
     );

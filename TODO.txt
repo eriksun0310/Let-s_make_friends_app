@@ -34,8 +34,10 @@
 
 🧘‍♂️[設定]
 ✅1. 設定畫面UI
-2. 開一張表, settings, 存到資料庫
-3. 串接user_settings 的 function
+✅2. 開一張表, settings, 存到資料庫
+✅3. 串接user_settings 的 function
+4. 可以將user_settings 的狀態存到redux 就不用每次都需要查詢db
+5. 實作設定的相關邏輯, 聊天室、貼文按讚、貼文留言
 
 
 

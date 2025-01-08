@@ -252,11 +252,16 @@ export const getUserSettings = async ({
 }: {
   userId: string;
 }): Promise<{
-  success?: boolean;
-  hideLikes?: boolean;
-  hideComments?: boolean;
-  markAsRead?: boolean;
+  success: boolean;
+  hideLikes: boolean;
+  hideComments: boolean;
+  markAsRead: boolean;
 }> => {
+  const initial = {
+    hideLikes: false,
+    hideComments: false,
+    markAsRead: false,
+  };
   try {
     const { data, error } = await supabase
       .from("user_settings")
@@ -268,9 +273,11 @@ export const getUserSettings = async ({
       console.log("取得用戶設定失敗", error);
       return {
         success: false,
+        ...initial,
       };
     }
 
+    console.log("取得用戶設定", data);
     if (data) {
       return {
         success: true,
@@ -278,12 +285,18 @@ export const getUserSettings = async ({
         hideComments: data.hide_comments,
         markAsRead: data.mark_as_read,
       };
+    } else {
+      return {
+        success: true,
+        ...initial,
+      };
     }
   } catch (error) {
     console.log("取得用戶設定失敗", error);
 
     return {
       success: false,
+      ...initial,
     };
   }
 };
@@ -304,14 +317,12 @@ export const saveUserSettings = async ({
   errorMessage?: string;
 }> => {
   try {
-    const { error } = await supabase
-      .from("user_settings")
-      .upsert({
-        hide_likes: hideLikes,
-        hide_comments: hideComments,
-        mark_as_read: markAsRead,
-      })
-      .eq("user_id", userId);
+    const { error } = await supabase.from("user_settings").upsert({
+      user_id: userId,
+      hide_likes: hideLikes,
+      hide_comments: hideComments,
+      mark_as_read: markAsRead,
+    });
 
     if (error) {
       console.log("更新 user_settings 失敗", error);

@@ -28,12 +28,7 @@ import {
   useAppSelector,
 } from "../store";
 import { addPostDB, updatePostDB } from "../util/handlePostEvent";
-import {
-  EditPost,
-  NewPost,
-  PostDetail,
-  PostVisibility,
-} from "../shared/types";
+import { EditPost, NewPost, PostDetail, PostVisibility } from "../shared/types";
 
 const title = {
   edit: "編輯",
@@ -45,7 +40,8 @@ const postBtn = {
   add: "發布",
 };
 
-interface Post {
+interface PostState {
+  userId: string;
   content: string; // 文章內容
   visibility: PostVisibility; // 文章權限
   tags: string[]; // 文章標籤
@@ -64,8 +60,6 @@ interface PostContentProps {
 const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
   const { mode, editPost } = route.params;
 
-  //console.log("editPost", editPost);
-
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
   const modalizeRef = useRef<{
@@ -73,7 +67,8 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
     close: () => void;
   }>(null);
 
-  const [post, setPost] = useState<Post>({
+  const [post, setPost] = useState<PostState>({
+    userId: personal.userId,
     content: "", // 文章內容
     visibility: "public", // 文章權限
     tags: [], // 文章標籤
@@ -81,9 +76,6 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
 
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
-
-  // TODO: rename postContentRef -> newAndUpdatePostRef
-  const postContentRef = useRef<NewPost>();
 
   // 關閉 新增文章 page
   const handleClosePost = () => {
@@ -115,23 +107,21 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
   };
 
   // 按下發布文章
-  const handleClickPostBtn = async () => {
+  const handleClickPostBtn = async (currentPost: PostState) => {
     let result = {};
 
-    if (postContentRef.current) {
-      // 編輯文章
-      if (mode === "edit" && editPost) {
-        result = await updatePostDB({
-          updatedPost: {
-            postId: editPost.post.id,
-            ...postContentRef.current,
-          },
-        });
-      } else if (mode === "add") {
-        result = await addPostDB({
-          newPost: postContentRef.current,
-        });
-      }
+    // 編輯文章
+    if (mode === "edit" && editPost) {
+      result = await updatePostDB({
+        updatedPost: {
+          postId: editPost.post.id,
+          ...currentPost,
+        },
+      });
+    } else if (mode === "add") {
+      result = await addPostDB({
+        newPost: currentPost,
+      });
     }
 
     const resultPost = {
@@ -186,27 +176,19 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{ marginHorizontal: 15 }}
-          onPress={() => handleClickPostBtn()}
+          onPress={() => handleClickPostBtn(post)}
         >
           <Text style={{ color: Colors.textBlue }}>{postBtn[mode]}</Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
-
-  useEffect(() => {
-    postContentRef.current = {
-      userId: personal.userId,
-      content: post.content,
-      visibility: post.visibility as PostVisibility,
-      tags: post.tags,
-    };
-  }, [post, personal.userId]);
+  }, [navigation, post]);
 
   // 把編輯文章帶進來
   useEffect(() => {
     if (mode === "edit" && editPost) {
       setPost({
+        userId: editPost.post.userId,
         content: editPost.post.content,
         visibility: editPost.post.visibility,
         tags: editPost.tags,
