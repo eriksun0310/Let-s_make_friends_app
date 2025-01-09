@@ -1,7 +1,12 @@
-import { transformUser } from "../shared/user/userUtils";
+import {
+  transformAllUserSettings,
+  transformUser,
+  transformUserSettings,
+} from "../shared/user/userUtils";
 import { User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
 import { initUserSettings } from "../shared/static";
+import { UserSettingsDBType } from "../shared/dbType";
 
 /*
 處理 個人資料 db 操作
@@ -85,6 +90,9 @@ export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
 
     // 儲存自己的在線狀態
     await updateUserOnlineStatus({ userId: user.userId, isOnline: true });
+
+    // 儲存自己的設定
+    await saveUserSettings({ ...initUserSettings, userId: user.userId });
   } catch (error) {
     console.error("Error updating saveAboutMe:", error);
   }
@@ -254,7 +262,7 @@ export const getUserSettings = async ({
   try {
     const { data, error } = await supabase
       .from("user_settings")
-      .select("hide_likes, hide_comments, mark_as_read")
+      .select("user_id, hide_likes, hide_comments, mark_as_read")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -268,15 +276,11 @@ export const getUserSettings = async ({
       };
     }
 
-    console.log("取得用戶設定", data);
     if (data) {
+      const transformedUserSettings = transformUserSettings(data);
       return {
         success: true,
-        data: {
-          hideLikes: data.hide_likes,
-          hideComments: data.hide_comments,
-          markAsRead: data.mark_as_read,
-        },
+        data: transformedUserSettings,
       };
     } else {
       return {
@@ -294,6 +298,43 @@ export const getUserSettings = async ({
       data: {
         ...initUserSettings,
       },
+    };
+  }
+};
+
+// 批量查詢所有用戶設定的API
+export const getAllUsersSettings = async ({
+  userIds,
+}: {
+  userIds: string[];
+}): Promise<{
+  success: boolean;
+  data: UserSettings[];
+}> => {
+  try {
+    const { data, error } = await supabase
+      .from("user_settings")
+      .select("user_id, hide_likes, hide_comments, mark_as_read")
+      .in("user_id", userIds);
+
+    if (error) {
+      return {
+        success: false,
+        data: [],
+      };
+    }
+
+    const transformedUserSettings = transformAllUserSettings(data);
+
+    return {
+      success: true,
+      data: transformedUserSettings,
+    };
+  } catch (error) {
+    console.log("取得用戶設定失敗", error);
+    return {
+      success: false,
+      data: [],
     };
   }
 };

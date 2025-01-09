@@ -111,3 +111,11 @@ export type PostLikesDBType = {
   user_id: string;
   created_at: Date;
 };
+
+//用戶設定
+export type UserSettingsDBType = {
+  user_id: string;
+  hide_likes: boolean;
+  hide_comments: boolean;
+  mark_as_read: boolean;
+};

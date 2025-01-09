@@ -2,8 +2,9 @@ import {
   UserHeadShotDBType,
   UsersDBType,
   UserSelectedOptionDBType,
+  UserSettingsDBType,
 } from "../dbType";
-import { User } from "../types";
+import { ImageType, User, UserSettings } from "../types";
 
 export const transformUser = ({
   users,
@@ -59,4 +60,19 @@ export const transformUser = ({
     headShot,
     selectedOption,
   };
+};
+
+export const transformUserSettings = (
+  userSettings: UserSettingsDBType
+): UserSettings => ({
+  userId: userSettings.user_id,
+  hideComments: userSettings.hide_comments,
+  hideLikes: userSettings.hide_likes,
+  markAsRead: userSettings.mark_as_read,
+});
+
+export const transformAllUserSettings = (
+  userSettings: UserSettingsDBType[]
+): UserSettings[] => {
+  return (userSettings || []).map(transformUserSettings);
 };

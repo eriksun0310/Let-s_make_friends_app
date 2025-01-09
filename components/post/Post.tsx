@@ -8,19 +8,15 @@ import {
 } from "react-native";
 import {
   PostDetail,
-  Post as PostType,
-  User,
   UserState,
 } from "../../shared/types";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
-
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import PostTags from "./PostTags";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserRound } from "lucide-react-native";
-import Fontisto from "@expo/vector-icons/Fontisto";
 import { selectUser, useAppSelector } from "../../store";
 import { updatePostLikeDB } from "../../util/handlePostEvent";
 interface PostProps {

@@ -13,7 +13,6 @@ import {
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
 import { UserSettings } from "../shared/types";
-import { initUserSettings } from "../shared/static";
 
 interface SettingsProps {
   navigation: NavigationProp<any, any>;

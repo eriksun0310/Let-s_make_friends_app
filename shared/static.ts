@@ -1,4 +1,3 @@
-import { ButtonConfig } from "../components/ui/button/SegmentedButtons";
 import {
   OptionList,
   SegmentedButtons,
@@ -75,7 +74,8 @@ export const updateUserTitle = {
 };
 
 export const initUserSettings: UserSettings = {
+  userId: "",
   hideComments: false,
   hideLikes: false,
-  markAsRead: false,
+  markAsRead: true,
 };

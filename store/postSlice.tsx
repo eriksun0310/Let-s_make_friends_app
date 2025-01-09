@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import {
   PostTags,
-  Post,
   PostComments,
   PostLikes,
   PostDetail,

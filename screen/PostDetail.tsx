@@ -1,18 +1,13 @@
 import { View, StyleSheet, ScrollView, Text } from "react-native";
 import React, { useEffect } from "react";
-
 import { NavigationProp } from "@react-navigation/native";
 import Comments from "../components/post/Comments";
-
 import EnterComments from "../components/post/EnterComments";
 import { PaperProvider } from "react-native-paper";
 import Post from "../components/post/Post";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import BackButton from "../components/ui/button/BackButton";
 import { selectPosts, selectUser, useAppSelector } from "../store";
 import { PostDetail as PostDetailType } from "../shared/types";
-import { set } from "firebase/database";
 
 interface PostDetailProps {
   route: {

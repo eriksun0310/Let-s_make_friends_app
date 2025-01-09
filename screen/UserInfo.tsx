@@ -151,7 +151,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       });
 
       if (userSettingsSuccess) {
-        console.log('取得用戶設定資料 userInfo', data);
         dispatch(setUserSettings(data));
       }
     };

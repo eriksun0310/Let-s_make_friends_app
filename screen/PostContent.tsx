@@ -18,7 +18,6 @@ import SelectedTagText from "../components/ui/SelectedTagText";
 import SegmentedButtons from "../components/ui/button/SegmentedButtons";
 import { segmentedButtons } from "../shared/static";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-
 import { NavigationProp } from "@react-navigation/native";
 import {
   addPost,
@@ -28,7 +27,7 @@ import {
   useAppSelector,
 } from "../store";
 import { addPostDB, updatePostDB } from "../util/handlePostEvent";
-import { EditPost, NewPost, PostDetail, PostVisibility } from "../shared/types";
+import { EditPost, PostDetail, PostVisibility } from "../shared/types";
 
 const title = {
   edit: "編輯",

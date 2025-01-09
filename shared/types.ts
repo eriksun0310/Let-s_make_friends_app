@@ -187,6 +187,7 @@ export type PostDetail = {
   tags: string[];
   postLikes: PostLikes[];
   postComments: PostComments[];
+  userSettings: UserSettings;
 };
 
 //新增文章
@@ -220,6 +221,7 @@ export type EditPost = Pick<PostDetail, "post" | "tags">;
 export type SegmentedButtonType = PostVisibility | "all";
 
 export type UserSettings = {
+  userId: string;
   hideComments: boolean;
   hideLikes: boolean;
   markAsRead: boolean;

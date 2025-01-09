@@ -7,13 +7,11 @@ post_comments: 文章留言
 post_likes: 文章按讚
 */
 
-import { PostsDBType, PostTagsDBType } from "../shared/dbType";
+import { PostsDBType } from "../shared/dbType";
 import {
   transformPost,
   transformPostComments,
-  transformPostDetail,
   transformPostLikes,
-  transformPostTags,
 } from "../shared/post/postUtils";
 import {
   AddANDUpdatePost,
@@ -31,6 +29,7 @@ import {
   getFriendDetails,
   getFriendList,
 } from "./handleFriendsEvent";
+import { getAllUsersSettings, getUserSettings } from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
 
 // ✅ 取得 所有的tag(for: 新增文章用的)
@@ -100,60 +99,60 @@ export const addPostTag = async ({
 };
 
 // ✅ 新增所有可用標籤 - origin
-export const addTags1 = async ({
-  tags,
-  postId,
-}: {
-  tags: string[];
-  postId: string;
-}): Promise<{
-  success: boolean;
-  errorMessage?: string;
-  data: string[];
-}> => {
-  try {
-    const tagIds = await Promise.all(
-      tags.map(async (tag) => {
-        const { data: existingTag } = await supabase
-          .from("tags")
-          .select("id")
-          .eq("name", tag)
-          .single();
+// export const addTags1 = async ({
+//   tags,
+//   postId,
+// }: {
+//   tags: string[];
+//   postId: string;
+// }): Promise<{
+//   success: boolean;
+//   errorMessage?: string;
+//   data: string[];
+// }> => {
+//   try {
+//     const tagIds = await Promise.all(
+//       tags.map(async (tag) => {
+//         const { data: existingTag } = await supabase
+//           .from("tags")
+//           .select("id")
+//           .eq("name", tag)
+//           .single();
 
-        if (existingTag) {
-          return existingTag.id; // 如果標籤已存在,返回標籤的ID
-        } else {
-          const { data: newTag } = await supabase
-            .from("tags")
-            .insert({ name: tag })
-            .select("*")
-            .single();
+//         if (existingTag) {
+//           return existingTag.id; // 如果標籤已存在,返回標籤的ID
+//         } else {
+//           const { data: newTag } = await supabase
+//             .from("tags")
+//             .insert({ name: tag })
+//             .select("*")
+//             .single();
 
-          console.log("newTag", newTag);
-          return newTag.id; // 如果標籤不存在,創建新標籤後返回新標籤的ID
-        }
-      })
-    );
+//           console.log("newTag", newTag);
+//           return newTag.id; // 如果標籤不存在,創建新標籤後返回新標籤的ID
+//         }
+//       })
+//     );
 
-    // 新增文章標籤
-    await addPostTag({
-      tagIds: tagIds,
-      postId: postId,
-    });
+//     // 新增文章標籤
+//     await addPostTag({
+//       tagIds: tagIds,
+//       postId: postId,
+//     });
 
-    return {
-      success: true,
-      data: tags,
-    };
-  } catch (error) {
-    console.log("新增標籤失敗", error);
-    return {
-      success: false,
-      errorMessage: (error as Error).message,
-      data: [],
-    };
-  }
-};
+//     return {
+//       success: true,
+//       data: tags,
+//     };
+//   } catch (error) {
+//     console.log("新增標籤失敗", error);
+//     return {
+//       success: false,
+//       errorMessage: (error as Error).message,
+//       data: [],
+//     };
+//   }
+// };
 
 // export const addTags = async ({
 //   tags,
@@ -288,6 +287,7 @@ export const addTags1 = async ({
 //   }
 // }
 
+// ✅ 新增所有可用標籤
 export const addTags = async ({
   tags,
   postId,
@@ -471,6 +471,9 @@ export const getAllPosts = async ({
     // 批量查詢發文者資訊
     const users = await getFriendDetails(userIds);
 
+    // 取得所有用戶設定
+    const { data: allUsersSettings } = await getAllUsersSettings({ userIds });
+
     // 取得文章標籤
     const tagsData = (await getPostTags({ postIds })).data;
 
@@ -484,6 +487,11 @@ export const getAllPosts = async ({
       // 找到對應的發文者資訊
       const user = users.find((user) => user.userId === post.user_id);
 
+      //找到對應的用戶設定
+      const userSettings = allUsersSettings?.find(
+        (setting) => setting.userId === post.user_id
+      );
+
       // 過濾對應的標籤、按讚數和留言
       const tags = tagsData.filter((tag) => tag.postId === post.id);
       const likes = likesData.filter((like) => like.postId === post.id);
@@ -496,12 +504,13 @@ export const getAllPosts = async ({
       });
 
       // 轉換文章詳情
-      const transformedPostDetail = {
+      const transformedPostDetail: PostDetail = {
         post: transformedPost,
         user: user || ({} as User),
         tags: tags?.map((tag) => tag.tag) || [],
         postLikes: likes,
         postComments: comments,
+        userSettings: userSettings,
       };
 
       return transformedPostDetail;
@@ -918,11 +927,9 @@ export const updatePostLikeDB = async ({
     }
     return { success: true };
   } catch (error) {
-
-    console.log('更新文章按讚失敗', error);
+    console.log("更新文章按讚失敗", error);
     return {
       success: false,
-
     };
   }
 };
