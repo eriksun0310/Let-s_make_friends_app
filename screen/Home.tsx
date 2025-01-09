@@ -85,6 +85,8 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     fetchFriendList();
   }, [dispatch, personal.userId]);
 
+  console.log('postData', postData);
+
   if (loading) return <LoadingOverlay message=" searching ..." />;
 
   return (

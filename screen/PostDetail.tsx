@@ -17,6 +17,7 @@ interface PostDetailProps {
   };
   navigation: NavigationProp<any>;
 }
+
 //貼文內容
 const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
   const { postId } = route.params;
@@ -76,9 +77,14 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
 
           <View style={{ marginTop: 10 }} />
           {/* 留言 */}
-          {currentPost?.postComments.map((comment) => {
-            return <Comments />;
-          })}
+          {!currentPost.userSettings.hideComments &&
+            currentPost.userSettings.userId === personal.userId && (
+              <>
+                {currentPost?.postComments.map((comment) => {
+                  return <Comments />;
+                })}
+              </>
+            )}
         </ScrollView>
 
         {/* 輸入留言 */}

@@ -312,6 +312,7 @@ export const getAllUsersSettings = async ({
   data: UserSettings[];
 }> => {
   try {
+    console.log("userIds", userIds);
     const { data, error } = await supabase
       .from("user_settings")
       .select("user_id, hide_likes, hide_comments, mark_as_read")
@@ -324,6 +325,7 @@ export const getAllUsersSettings = async ({
       };
     }
 
+    console.log("取得所有用戶設定", data);
     const transformedUserSettings = transformAllUserSettings(data);
 
     return {

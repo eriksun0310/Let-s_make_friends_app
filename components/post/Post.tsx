@@ -6,10 +6,7 @@ import {
   ImageSourcePropType,
   TouchableOpacity,
 } from "react-native";
-import {
-  PostDetail,
-  UserState,
-} from "../../shared/types";
+import { PostDetail, UserState } from "../../shared/types";
 import CustomMenu from "../ui/CustomMenu";
 import { Card, Avatar, Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";
@@ -34,7 +31,8 @@ const Post: React.FC<PostProps> = ({
   showTags = false,
 }) => {
   const personal = useAppSelector(selectUser);
-  const { post, user, tags, postLikes, postComments } = postDetail;
+  const { post, user, tags, postLikes, postComments, userSettings } =
+    postDetail;
 
   const [like, setLike] = useState(false);
 
@@ -76,6 +74,8 @@ const Post: React.FC<PostProps> = ({
 
     updateLike();
   }, [like]);
+
+  console.log("userSettings", userSettings);
 
   return (
     <Card containerStyle={styles.cardContainer}>
@@ -124,17 +124,25 @@ const Post: React.FC<PostProps> = ({
                 color={like ? "#ff6666" : Colors.icon}
               />
             </TouchableOpacity>
-
-            <Text style={styles.iconText}>{postLikes?.length}</Text>
+            {!userSettings.hideLikes && (
+              <Text style={styles.iconText}>{postLikes?.length}</Text>
+            )}
+            {post.userId === personal.userId && (
+              <TouchableOpacity>
+                <Text>查看</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <View style={styles.iconContainer}>
-            <Icon
-              name="comment"
-              type="material-community"
-              color={Colors.iconBlue}
-            />
-            <Text style={styles.iconText}>{postComments?.length}</Text>
-          </View>
+          {!userSettings.hideComments && (
+            <View style={styles.iconContainer}>
+              <Icon
+                name="comment"
+                type="material-community"
+                color={Colors.iconBlue}
+              />
+              <Text style={styles.iconText}>{postComments?.length}</Text>
+            </View>
+          )}
         </View>
       )}
     </Card>
