@@ -1,6 +1,7 @@
 import { transformUser } from "../shared/user/userUtils";
-import { User } from "../shared/types";
+import { User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
+import { initUserSettings } from "../shared/static";
 
 /*
 處理 個人資料 db 操作
@@ -109,7 +110,6 @@ export const updateUser = async ({
       .from("users")
       .update({
         [fieldName]: fieldValue,
-        updated_at: new Date().toISOString(),
       })
       .eq("id", userId);
 
@@ -132,8 +132,6 @@ export const saveUser = async ({ user }: { user: User }): Promise<void> => {
         introduce: user.introduce,
         birthday: user.birthday,
         email: user.email,
-        updated_at: new Date().toISOString(), // 如果是更新，記錄更新時間
-        //created_at: new Date().toISOString(), // 如果是插入，記錄建立時間
       },
       { onConflict: "id" } // 指定衝突鍵
     );
@@ -158,7 +156,6 @@ export const saveUserHeadShot = async ({
         user_id: user.userId,
         image_url: user.headShot.imageUrl,
         image_type: user.headShot.imageType,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" } // 衝突鍵為 user_id
     );
@@ -184,7 +181,6 @@ export const saveUserSelectedOption = async ({
         interests: user.selectedOption?.interests,
         favorite_food: user.selectedOption?.favoriteFood,
         disliked_food: user.selectedOption?.dislikedFood,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" } // 衝突鍵為 user_id
     );
@@ -253,15 +249,8 @@ export const getUserSettings = async ({
   userId: string;
 }): Promise<{
   success: boolean;
-  hideLikes: boolean;
-  hideComments: boolean;
-  markAsRead: boolean;
+  data: UserSettings;
 }> => {
-  const initial = {
-    hideLikes: false,
-    hideComments: false,
-    markAsRead: false,
-  };
   try {
     const { data, error } = await supabase
       .from("user_settings")
@@ -273,7 +262,9 @@ export const getUserSettings = async ({
       console.log("取得用戶設定失敗", error);
       return {
         success: false,
-        ...initial,
+        data: {
+          ...initUserSettings,
+        },
       };
     }
 
@@ -281,14 +272,18 @@ export const getUserSettings = async ({
     if (data) {
       return {
         success: true,
-        hideLikes: data.hide_likes,
-        hideComments: data.hide_comments,
-        markAsRead: data.mark_as_read,
+        data: {
+          hideLikes: data.hide_likes,
+          hideComments: data.hide_comments,
+          markAsRead: data.mark_as_read,
+        },
       };
     } else {
       return {
         success: true,
-        ...initial,
+        data: {
+          ...initUserSettings,
+        },
       };
     }
   } catch (error) {
@@ -296,7 +291,9 @@ export const getUserSettings = async ({
 
     return {
       success: false,
-      ...initial,
+      data: {
+        ...initUserSettings,
+      },
     };
   }
 };
@@ -317,12 +314,15 @@ export const saveUserSettings = async ({
   errorMessage?: string;
 }> => {
   try {
-    const { error } = await supabase.from("user_settings").upsert({
-      user_id: userId,
-      hide_likes: hideLikes,
-      hide_comments: hideComments,
-      mark_as_read: markAsRead,
-    });
+    const { error } = await supabase.from("user_settings").upsert(
+      {
+        user_id: userId,
+        hide_likes: hideLikes,
+        hide_comments: hideComments,
+        mark_as_read: markAsRead,
+      },
+      { onConflict: "user_id" } // 用來決定 要更新還是插入
+    );
 
     if (error) {
       console.log("更新 user_settings 失敗", error);

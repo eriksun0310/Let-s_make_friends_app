@@ -303,7 +303,7 @@ const updateFriendRequestStatus = async ({
     .from("friend_requests")
     .update({
       status: status,
-      updated_at: new Date().toISOString(),
+      //updated_at: new Date().toISOString(),
     })
     .eq("sender_id", senderId)
     .eq("receiver_id", receiverId);

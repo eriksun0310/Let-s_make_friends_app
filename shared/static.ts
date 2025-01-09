@@ -1,5 +1,11 @@
 import { ButtonConfig } from "../components/ui/button/SegmentedButtons";
-import { OptionList, SegmentedButtons, Tabs, User } from "./types";
+import {
+  OptionList,
+  SegmentedButtons,
+  Tabs,
+  User,
+  UserSettings,
+} from "./types";
 
 export const tabs: Tabs = {
   interests: "興趣",
@@ -66,4 +72,10 @@ export const userInit: User = {
 export const updateUserTitle = {
   name: "姓名",
   introduce: "自我介紹",
+};
+
+export const initUserSettings: UserSettings = {
+  hideComments: false,
+  hideLikes: false,
+  markAsRead: false,
 };

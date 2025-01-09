@@ -10,12 +10,7 @@ import { SegmentedButtonType, User, UserState } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
-import {
-  MessageCircleMore,
-  Settings,
-  Settings2,
-  Wrench,
-} from "lucide-react-native";
+import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
@@ -23,10 +18,12 @@ import {
   selectPosts,
   selectUser,
   setCurrentChatRoomId,
+  setUserSettings,
   useAppDispatch,
   useAppSelector,
 } from "../store";
 import { resetDeleteChatRoomState } from "../shared/chat/chatFuncs";
+import { getUserSettings } from "../util/handleUserEvent";
 
 interface UserInfoProps {
   route: {
@@ -145,6 +142,22 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   }, [navigation, userState, isShowMsgIcon]);
 
   console.log("userState", userState);
+
+  useEffect(() => {
+    // 取得用戶設定資料
+    const fetchUserSettings = async () => {
+      const { success: userSettingsSuccess, data } = await getUserSettings({
+        userId: personal.userId,
+      });
+
+      if (userSettingsSuccess) {
+        console.log('取得用戶設定資料 userInfo', data);
+        dispatch(setUserSettings(data));
+      }
+    };
+
+    fetchUserSettings();
+  }, [personal.userId]);
 
   return (
     <PaperProvider>

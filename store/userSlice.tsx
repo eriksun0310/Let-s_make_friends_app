@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
-import { User } from "../shared/types";
+import { User, UserSettings } from "../shared/types";
 import { getUserData, updateUserOnlineStatus } from "../util/handleUserEvent";
 import { supabase } from "../util/supabaseClient";
-import AddFriend from "../screen/AddFriend";
+import { initUserSettings } from "../shared/static";
 
 interface InitialStateProps {
   user: User;
@@ -11,6 +11,7 @@ interface InitialStateProps {
   initialized: boolean; // 應用程序這個初始化步驟已完成
   isNewUser: boolean; // 是否是新用戶
   friendList: User[]; // 好友列表
+  userSettings: UserSettings;
 }
 
 const initialState: InitialStateProps = {
@@ -35,6 +36,7 @@ const initialState: InitialStateProps = {
   initialized: false, // 應用程序這個初始化步驟已完成,
   isNewUser: false,
   friendList: [],
+  userSettings: initUserSettings,
 };
 
 // slice 定義
@@ -107,6 +109,10 @@ const userSlice = createSlice({
       } else {
         state.friendList[index] = action.payload;
       }
+    },
+
+    setUserSettings(state, action) {
+      state.userSettings = action.payload;
     },
   },
 });
@@ -183,6 +189,7 @@ export const {
   setIsAuthenticated,
   setFriendList,
   addFriend,
+  setUserSettings,
 } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
@@ -195,5 +202,7 @@ export const selectIsAuthenticated = (state: RootState) =>
 export const selectInitialized = (state: RootState) => state.user.initialized;
 
 export const selectFriendList = (state: RootState) => state.user.friendList;
+
+export const selectUserSettings = (state: RootState) => state.user.userSettings;
 
 export default userSlice.reducer;

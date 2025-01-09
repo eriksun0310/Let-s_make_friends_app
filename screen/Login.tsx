@@ -5,8 +5,12 @@ import { login } from "../util/auth";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
-import { setUser } from "../store/userSlice";
-import { getUserData, updateUserOnlineStatus } from "../util/handleUserEvent";
+import { setUser, setUserSettings } from "../store/userSlice";
+import {
+  getUserData,
+  getUserSettings,
+  updateUserOnlineStatus,
+} from "../util/handleUserEvent";
 import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {
@@ -84,7 +88,16 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
           isOnline: true,
         });
 
+        // 取得用戶設定資料
+        const { success: userSettingsSuccess, data } = await getUserSettings({
+          userId,
+        });
+
         dispatch(setUser(userData));
+        if (userSettingsSuccess) {
+          dispatch(setUserSettings(data));
+        }
+
         navigation.navigate("main", { screen: "home" }); // 如果用戶資料完整，跳轉聊天頁面
 
         // 新用戶
