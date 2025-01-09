@@ -39,6 +39,7 @@
 ✅4. 可以將user_settings 的狀態存到redux 就不用每次都需要查詢db
 5. 實作設定的相關邏輯, 聊天室、貼文按讚、貼文留言
 6. getAllPosts 要取得個別的使用者設定
+✅7. 在關於我的時候, 給上initUserSettings 預設值
 
 
 
