@@ -56,21 +56,22 @@ export const transformPostComments = ({
   }));
 };
 
+export const transformPostLike = (postLikes: PostLikesDBType): PostLikes => ({
+  postId: postLikes.post_id,
+  userId: postLikes.user_id,
+  createdAt: postLikes.created_at,
+});
+
 // 文章按讚數
-export const transformPostLikes = ({
-  postLikes,
-}: {
-  postLikes: PostLikesDBType[];
-}): PostLikes[] => {
-  return (postLikes || []).map((like) => ({
-    id: like.id,
-    postId: like.post_id,
-    userId: like.user_id,
-    createdAt: like.created_at,
-  }));
+export const transformPostLikes = (
+  postLikes: PostLikesDBType[]
+): PostLikes[] => {
+  return (postLikes || []).map(transformPostLike);
 };
 
 // 文章詳細資訊
+
+// 目前用不到
 export const transformPostDetail = ({
   posts,
   user,
@@ -92,7 +93,8 @@ export const transformPostDetail = ({
   // 文章標籤
   const transformedTags = transformPostTags({
     postTags: tags,
-  });
+  })?.map((tag) => tag.tag);
+
 
   //文章留言
   const transformedPostComments = transformPostComments({
@@ -100,9 +102,7 @@ export const transformPostDetail = ({
   });
 
   //文章按讚
-  const transformedPostLikes = transformPostLikes({
-    postLikes,
-  });
+  const transformedPostLikes = transformPostLikes(postLikes);
 
   return {
     user,

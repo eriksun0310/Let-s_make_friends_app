@@ -555,12 +555,16 @@ export const getPostDetail = async ({
   // 取得發文者資訊
   const user = (await getFriendDetail(post.user_id)) || ({} as User);
 
+  // 取得用戶設定
+  const { data: userSettings } = await getUserSettings({
+    userId: post.user_id,
+  });
   // 取得文章標籤
   const tagsData = (await getPostTags({ postIds: [post.id] })).data;
-  console.log("tagsData 2222222", tagsData);
+
   // 過濾對應文章的標籤
   const findTagsData = tagsData.filter((tag) => tag.postId === post.id);
-  console.log("findTagsData 222222", findTagsData);
+
   // 查詢文章按讚
   const likesData = (await getPostLikesByPostId({ postIds: [post.id] })).data;
 
@@ -570,6 +574,7 @@ export const getPostDetail = async ({
 
   return {
     user: user,
+    userSettings: userSettings,
     post: transformedPost,
     tags: findTagsData.map((tag) => tag.tag),
     postLikes: likesData,
@@ -837,9 +842,7 @@ export const getPostLikesByPostId = async ({
         data: [],
       };
     }
-    const transformedPostLikes = transformPostLikes({
-      postLikes: data,
-    });
+    const transformedPostLikes = transformPostLikes(data);
 
     return {
       success: true,
@@ -917,7 +920,12 @@ export const updatePostLikeDB = async ({
     if (like) {
       await supabase
         .from("post_likes")
-        .upsert({ post_id: postId, user_id: userId });
+        .upsert(
+          { post_id: postId, user_id: userId },
+          {
+            onConflict: "post_id, user_id",
+          }
+        );
     } else {
       await supabase
         .from("post_likes")

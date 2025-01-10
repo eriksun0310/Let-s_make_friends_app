@@ -202,6 +202,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
                   }
                 >
                   <Post
+                    screen="home"
                     // userState={
                     //   post.user.userId === personal.userId
                     //     ? "personal"

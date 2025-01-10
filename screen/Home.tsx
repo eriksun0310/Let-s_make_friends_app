@@ -19,6 +19,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { usePostListeners } from "../components/hooks/usePostListeners";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { getFriendList } from "../util/handleFriendsEvent";
+import { usePostLikesListeners } from "../components/hooks/usePostLikesListeners";
 
 // export const postList = Array(14).fill({
 //   date: "2024/08/02",
@@ -32,6 +33,9 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   // 監聽 新文章變化
   usePostListeners();
+
+  // 間聽文章按讚
+  usePostLikesListeners();
 
   const postData = useAppSelector(selectPosts);
 
@@ -85,7 +89,7 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     fetchFriendList();
   }, [dispatch, personal.userId]);
 
-  console.log('postData', postData);
+  console.log("postData", postData);
 
   if (loading) return <LoadingOverlay message=" searching ..." />;
 
@@ -107,6 +111,7 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
               showMenu
               首頁還是不要出現 可以編輯或刪除, 要點進去內文才可以 */}
               <Post
+                screen="home"
                 userState={"friend"} // 這個到時候 要看說是訪客還是朋友
                 postDetail={post}
               />

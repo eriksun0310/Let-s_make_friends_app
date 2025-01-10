@@ -1,31 +1,27 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ImageSourcePropType,
-  TouchableOpacity,
-} from "react-native";
-import { PostDetail, UserState } from "../../shared/types";
+import React from "react";
+import { View, StyleSheet, Text, ImageSourcePropType } from "react-native";
+import { PostDetail, PostScreen, UserState } from "../../shared/types";
 import CustomMenu from "../ui/CustomMenu";
-import { Card, Avatar, Icon } from "@rneui/themed";
+import { Card, Avatar } from "@rneui/themed";
 import { Colors } from "../../constants/style";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import PostTags from "./PostTags";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserRound } from "lucide-react-native";
 import { selectUser, useAppSelector } from "../../store";
-import { updatePostLikeDB } from "../../util/handlePostEvent";
+import LikesAndComments from "./LikesAndComments";
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;
   showTags?: boolean;
+  screen?: PostScreen;
 }
 export const tagList = Array(5).fill({
   text: "大家好",
 });
 
 const Post: React.FC<PostProps> = ({
+  screen = "home",
   userState,
   postDetail,
   showTags = false,
@@ -34,48 +30,48 @@ const Post: React.FC<PostProps> = ({
   const { post, user, tags, postLikes, postComments, userSettings } =
     postDetail;
 
-  const [like, setLike] = useState(false);
+  // const [like, setLike] = useState(false);
 
-  const [isProcessing, setIsProcessing] = useState(false);
+  // const [isProcessing, setIsProcessing] = useState(false);
 
   // 處理 按讚、收回讚
-  const handleLikeChange = useCallback(async () => {
-    setIsProcessing(true); // 開始處理
-    setLike(!like); // 樂觀更新
-    try {
-      const { success } = await updatePostLikeDB({
-        postId: post?.id,
-        userId: personal.userId,
-        like: !like,
-      });
+  // const handleLikeChange = useCallback(async () => {
+  //   setIsProcessing(true); // 開始處理
+  //   setLike(!like); // 樂觀更新
+  //   try {
+  //     const { success } = await updatePostLikeDB({
+  //       postId: post?.id,
+  //       userId: personal.userId,
+  //       like: !like,
+  //     });
 
-      if (!success) {
-        console.log("更新按讚失敗");
-        setLike(!like);
-      }
-    } catch (error) {
-      console.log(" 按讚失敗", error);
-    } finally {
-      setIsProcessing(false); // 恢復按鈕可點擊狀態
-    }
-  }, [like, post?.id, personal.userId]);
+  //     if (!success) {
+  //       console.log("更新按讚失敗");
+  //       setLike(!like);
+  //     }
+  //   } catch (error) {
+  //     console.log(" 按讚失敗", error);
+  //   } finally {
+  //     setIsProcessing(false); // 恢復按鈕可點擊狀態
+  //   }
+  // }, [like, post?.id, personal.userId]);
 
-  useEffect(() => {
-    const updateLike = async () => {
-      const { success } = await updatePostLikeDB({
-        postId: post?.id,
-        userId: personal.userId,
-        like: like,
-      });
-      if (success) {
-        // 更新redux
-      }
-    };
+  // useEffect(() => {
+  //   const updateLike = async () => {
+  //     const { success } = await updatePostLikeDB({
+  //       postId: post?.id,
+  //       userId: personal.userId,
+  //       like: like,
+  //     });
+  //     if (success) {
+  //       // 更新redux
+  //     }
+  //   };
 
-    updateLike();
-  }, [like]);
+  //   updateLike();
+  // }, [like]);
 
-  console.log("userSettings", userSettings);
+  // console.log("userSettings", userSettings);
 
   return (
     <Card containerStyle={styles.cardContainer}>
@@ -112,38 +108,7 @@ const Post: React.FC<PostProps> = ({
 
       {/* 訪客看不到留言與按讚 數 */}
       {(post.visibility === "public" || userState !== "visitor") && (
-        <View style={styles.footer}>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={handleLikeChange}
-              disabled={isProcessing} // 禁用按鈕
-            >
-              <AntDesign
-                name={like ? "heart" : "hearto"}
-                size={24}
-                color={like ? "#ff6666" : Colors.icon}
-              />
-            </TouchableOpacity>
-            {!userSettings.hideLikes && (
-              <Text style={styles.iconText}>{postLikes?.length}</Text>
-            )}
-            {post.userId === personal.userId && (
-              <TouchableOpacity>
-                <Text>查看</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {!userSettings.hideComments && (
-            <View style={styles.iconContainer}>
-              <Icon
-                name="comment"
-                type="material-community"
-                color={Colors.iconBlue}
-              />
-              <Text style={styles.iconText}>{postComments?.length}</Text>
-            </View>
-          )}
-        </View>
+        <LikesAndComments postDetail={postDetail} screen={screen} />
       )}
     </Card>
   );

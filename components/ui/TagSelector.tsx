@@ -112,7 +112,7 @@ const TagSelector = ({
       ref={modalizeRef}
       snapPoint={650}
       modalHeight={650}
-      closeOnOverlayTap={false} // 點擊背景 不要關閉
+      // closeOnOverlayTap={false} // 點擊背景 不要關閉
     >
       <View style={styles.container}>
         <View style={styles.searchContainer}>

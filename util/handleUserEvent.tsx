@@ -250,7 +250,7 @@ export const updateUserOnlineStatus = async ({
   }
 };
 
-// 取得用戶設定
+// 取得個別用戶設定
 export const getUserSettings = async ({
   userId,
 }: {

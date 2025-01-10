@@ -156,7 +156,6 @@ export type PostComments = {
 };
 
 export type PostLikes = {
-  id: string;
   postId: string;
   userId: string;
   createdAt: Date;
@@ -226,3 +225,7 @@ export type UserSettings = {
   hideLikes: boolean;
   markAsRead: boolean;
 };
+
+
+
+export type PostScreen = 'home' | 'postDetail'

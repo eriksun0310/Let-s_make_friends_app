@@ -106,7 +106,6 @@ export type PostCommentsDBType = {
 
 // 文章按讚數
 export type PostLikesDBType = {
-  id: string;
   post_id: string;
   user_id: string;
   created_at: Date;
