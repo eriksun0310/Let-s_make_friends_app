@@ -1,10 +1,19 @@
 import React from "react";
-import { ImageSourcePropType, View, StyleSheet, Text } from "react-native";
+import {
+  ImageSourcePropType,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Avatar } from "react-native-elements";
-import { User } from "../../../shared/types";
+import { PostLikeUser } from "../../../shared/types";
+import { UserRoundMinus, UserRoundPlus } from "lucide-react-native";
+import { Colors } from "../../../constants/style";
 
 interface LikeUserProps {
-  item: User;
+  item: PostLikeUser;
 }
 const LikeUser: React.FC<LikeUserProps> = ({ item }) => {
   return (
@@ -15,6 +24,15 @@ const LikeUser: React.FC<LikeUserProps> = ({ item }) => {
         size="medium"
       />
       <Text style={styles.likeUserName}>{item.name}</Text>
+      {item.userState !== "personal" && (
+        <TouchableOpacity>
+          {item?.userState === "friend" ? (
+            <UserRoundMinus color={Colors.icon} />
+          ) : (
+            <UserRoundPlus color={Colors.icon} />
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

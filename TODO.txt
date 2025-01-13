@@ -40,17 +40,31 @@
 5. 實作設定的相關邏輯, 聊天室、✅貼文按讚、✅貼文留言
 ✅6. getAllPosts 要取得個別的使用者設定
 ✅7. 在關於我的時候, 給上initUserSettings 預設值
-✅8.串接 usePostLikesListeners 收到insert  取得完整的好友資訊 更新redux addPostLike 
-✅9. 實作已說讚的人, render 用戶出來
-10.點了已說讚的用戶,可以導向用戶個人資訊
+
+
+
 
 
 
 🧘‍♂️[post_likes]
-1. 處理按讚、收回讚 可以更新到post_likes db 
-2. 已說讚的人的UI , 類似tag drawer 的顯示方式
+✅1. 處理按讚、收回讚 可以更新到post_likes db 
+✅2. 已說讚的人的UI , 類似tag drawer 的顯示方式
+✅3.串接 usePostLikesListeners 收到insert  取得完整的好友資訊 更新redux addPostLike 
+✅4. 實作已說讚的人, render 用戶出來
+5.點了已說讚的用戶,可以導向用戶個人資訊, 除了自己以外不可點
+6.如果是訪客的話,旁邊可以出現加好友
+🧘‍♂️7. postLikes: 加userState
+
+[post_likes BUG]
+1. 在home 收回讚不會同步到 文章詳細 元件
 
 
+[post_likes UI]
+1. LikeDrawer 根據 用戶狀態顯示
+    1. friend: 刪除好友的icon
+    2. visitor: 加好友的icon
+2. 點了 用戶頭貼, 也要顯示 刪除好友的icon 、加好友的icon
+3.search bar 搜尋好友
 
 
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖

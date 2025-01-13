@@ -163,6 +163,8 @@ export type PostLikes = {
 
 export type PostLikeUser = User & {
   postId: string;
+  userState:UserState
+  
   // userId: string;
   // createdAt: Date;
 };

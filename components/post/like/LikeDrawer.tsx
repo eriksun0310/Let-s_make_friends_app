@@ -7,12 +7,12 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
-import { User } from "../../../shared/types";
+import { PostLikeUser } from "../../../shared/types";
 import LikeUser from "./LikeUser";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 interface LikeDrawerProps {
-  postLikes: User[];
+  postLikes: PostLikeUser[];
 }
 
 const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
@@ -25,8 +25,7 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
 
   const likeDrawer = useAppSelector(selectLikeDrawer);
 
-  const renderLikeUser = ({ item }: { item: User }) => {
-    console.log("item", item);
+  const renderLikeUser = ({ item }: { item: PostLikeUser }) => {
     return <LikeUser item={item} />;
   };
 

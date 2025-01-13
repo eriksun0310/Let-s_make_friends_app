@@ -31,6 +31,7 @@ export const usePostLikesListeners = () => {
         addPostLike({
           ...personal,
           postId: newPostLike.post_id,
+          userState: "personal",
         })
       );
       return;
@@ -39,6 +40,8 @@ export const usePostLikesListeners = () => {
     const hasFriendPostLike = friendList.some(
       (friend) => friend.userId === newPostLike.user_id
     );
+
+    console.log('hasFriendPostLike', hasFriendPostLike);
 
     // 好友按讚
     if (hasFriendPostLike) {
@@ -51,6 +54,7 @@ export const usePostLikesListeners = () => {
         addPostLike({
           ...findFriend,
           postId: newPostLike.post_id,
+          userState: "friend",
         })
       );
 
@@ -61,6 +65,7 @@ export const usePostLikesListeners = () => {
         addPostLike({
           ...findVisitor,
           postId: newPostLike.post_id,
+          userState: "visitor",
         })
       );
     }

@@ -7,7 +7,12 @@ post_comments: 文章留言
 post_likes: 文章按讚
 */
 
-import { PostsDBType } from "../shared/dbType";
+import {
+  PostsDBType,
+  UserHeadShotDBType,
+  UsersDBType,
+  UserSelectedOptionDBType,
+} from "../shared/dbType";
 import {
   transformPost,
   transformPostComments,
@@ -26,6 +31,7 @@ import {
   User,
   UserSettings,
 } from "../shared/types";
+import { transformUser } from "../shared/user/userUtils";
 import {
   getFriendDetail,
   getFriendDetails,
@@ -479,19 +485,11 @@ export const getAllPosts = async ({
     // 取得文章標籤
     const tagsData = (await getPostTags({ postIds })).data;
 
-    // 查詢文章按讚
-    const postLikes = (await getPostLikesByPostId({ postIds })).data;
-
     // 查詢文章按讚的用戶資料
-    const postLikesUsers = await getFriendDetails(
-      postLikes.map((like) => like.userId)
-    );
-
-    // 將文章按讚的用戶資料與文章按讚的資料合併
-    const combinedPostLikesUsers = postLikes.map((like) => ({
-      postId: like.postId,
-      ...postLikesUsers.find((user) => user.userId === like.userId),
-    }));
+    const { data: postLikesWithUsers } = await getPostLikesWithUsers({
+      currentUserId: userId,
+      postIds: postIds,
+    });
 
     // 查詢文章留言
     const commentsData = (await getPostCommentsByPostId({ postIds })).data;
@@ -507,9 +505,10 @@ export const getAllPosts = async ({
 
       // 過濾對應的標籤、按讚數和留言
       const tags = tagsData.filter((tag) => tag.postId === post.id);
-      const postLikes = combinedPostLikesUsers.filter(
+      const postLikes = postLikesWithUsers?.filter(
         (like) => like.postId === post.id
       ) as PostLikeUser[];
+
       const comments = commentsData.filter(
         (comment) => comment.postId === post.id
       );
@@ -518,7 +517,6 @@ export const getAllPosts = async ({
         posts: post,
       });
 
-      // console.log("likes 333333333", likes);
       // 轉換文章詳情
       const transformedPostDetail: PostDetail = {
         post: transformedPost,
@@ -952,6 +950,124 @@ export const updatePostLikeDB = async ({
     console.log("更新文章按讚失敗", error);
     return {
       success: false,
+    };
+  }
+};
+
+// 取得文章按讚者資訊
+export const getPostLikesWithUsers = async ({
+  currentUserId,
+  postIds,
+}: {
+  currentUserId: string;
+  postIds: string[];
+}): Promise<{
+  success: boolean;
+  errorMessage?: string;
+  data: PostLikeUser[];
+}> => {
+  try {
+    // 查詢文章按讚
+    const { data: postLikesData, error: postLikesError } = await supabase
+      .from("post_likes")
+      .select("*")
+      .in("post_id", postIds);
+
+    if (postLikesError) {
+      console.log("取得文章按讚失敗", postLikesError);
+      return {
+        success: false,
+        errorMessage: (postLikesError as Error).message,
+        data: [],
+      };
+    }
+
+    // 提取按讚者 ID
+    const userIds = postLikesData.map((like) => like.user_id);
+
+    // 查詢按讚者資訊
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select(
+        `
+        id, 
+        name, 
+        gender, 
+        introduce, 
+        birthday, 
+        email, 
+        created_at, 
+        updated_at,
+        user_head_shot(image_url, image_type),
+        user_selected_option(interests, favorite_food, disliked_food)
+        `
+      )
+      .in("id", userIds);
+
+    if (usersError) {
+      console.error("Error fetching users:", usersError);
+      return {
+        success: false,
+        errorMessage: (usersError as Error).message,
+        data: [],
+      };
+    }
+
+    const transformedUsers = usersData.map((user) =>
+      transformUser({
+        users: user,
+        userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
+        userSelectedOption:
+          user.user_selected_option as unknown as UserSelectedOptionDBType,
+      })
+    );
+
+    // 查詢好友列表
+    const { data: friendsData, error: friendsError } = await supabase
+      .from("friends")
+      .select("friend_id")
+      .in("user_id", userIds);
+
+    if (friendsError) {
+      console.log("取得好友列表失敗", friendsError);
+      return {
+        success: false,
+        errorMessage: (friendsError as Error).message,
+        data: [],
+      };
+    }
+
+    const friendList = friendsData?.map((friend) => friend.friend_id);
+
+    // 合併文章按讚和按讚者資訊
+    const combinedPostLikesUsers = postLikesData.map((like) => {
+      const user = transformedUsers.find(
+        (user) => user.userId === like.user_id
+      );
+      const userState =
+        like.user_id === currentUserId
+          ? "personal"
+          : friendList.includes(like.user_id)
+          ? "friend"
+          : "visitor";
+
+      return {
+        postId: like.post_id,
+        userId: like.user_id,
+        ...user,
+        userState,
+      };
+    });
+    return {
+      success: true,
+      data: combinedPostLikesUsers,
+    };
+  } catch (error) {
+    console.log("取得文章按讚失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
     };
   }
 };
