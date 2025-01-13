@@ -7,6 +7,7 @@ import { Colors } from "../constants/style";
 import CustomFAB from "../components/ui/CustomFAB";
 import { PaperProvider } from "react-native-paper";
 import {
+  selectFriendList,
   selectPosts,
   selectUser,
   setFriendList,
@@ -40,6 +41,7 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
   const postData = useAppSelector(selectPosts);
 
   const personal = useAppSelector(selectUser);
+  const friendList = useAppSelector(selectFriendList);
 
   useEffect(() => {
     navigation.setOptions({
@@ -88,9 +90,6 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     fetchAllPosts();
     fetchFriendList();
   }, [dispatch, personal.userId]);
-
-  console.log("postData", postData);
-
   if (loading) return <LoadingOverlay message=" searching ..." />;
 
   return (

@@ -161,6 +161,12 @@ export type PostLikes = {
   createdAt: Date;
 };
 
+export type PostLikeUser = User & {
+  postId: string;
+  // userId: string;
+  // createdAt: Date;
+};
+
 /*
 
 TODO:
@@ -184,7 +190,7 @@ export type PostDetail = {
   post: Post;
   user: User;
   tags: string[];
-  postLikes: PostLikes[];
+  postLikes: PostLikeUser[];
   postComments: PostComments[];
   userSettings: UserSettings;
 };
@@ -226,6 +232,4 @@ export type UserSettings = {
   markAsRead: boolean;
 };
 
-
-
-export type PostScreen = 'home' | 'postDetail'
+export type PostScreen = "home" | "postDetail";

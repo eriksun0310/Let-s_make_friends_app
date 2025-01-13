@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, View, Text } from "react-native";
 import { Modalize } from "react-native-modalize";
 import {
   selectLikeDrawer,
@@ -7,11 +7,12 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
-import { PostLikes } from "../../../shared/types";
-import { Avatar } from "react-native-elements";
-import ostrich from "../../../assets/animal/ostrich.png";
+import { User } from "../../../shared/types";
+import LikeUser from "./LikeUser";
+
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface LikeDrawerProps {
-  postLikes: PostLikes[];
+  postLikes: User[];
 }
 
 const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
@@ -24,14 +25,9 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
 
   const likeDrawer = useAppSelector(selectLikeDrawer);
 
-  const renderLikeUser = ({ item }) => {
+  const renderLikeUser = ({ item }: { item: User }) => {
     console.log("item", item);
-    return (
-      <View style={styles.likeItem}>
-        <Avatar rounded source={ostrich} size="medium" />
-        <Text style={styles.likeUser}>{item.userId}</Text>
-      </View>
-    );
+    return <LikeUser item={item} />;
   };
 
   useEffect(() => {
@@ -53,15 +49,29 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
 
       //   closeOnOverlayTap={false} // 點擊背景 不要關閉
     >
-      {/* <View style={styles.container}>
-        <Text>LikeDrawer</Text>
-      </View> */}
+      <View style={styles.container}>
+        <View style={styles.totalHeart}>
+          <Text>說讚的用戶</Text>
+        </View>
+        <View style={styles.totalHeart}>
+          <AntDesign name="heart" size={24} color="#ff6666" />
+          <View style={{ marginLeft: 5 }}>
+            <Text>{postLikes.length}</Text>
+          </View>
+        </View>
 
-      <FlatList
-        data={postLikes}
-        renderItem={renderLikeUser}
-        keyExtractor={(item) => item?.userId}
-      />
+        <View style={styles.totalHeart}>
+          <Text style={{ fontSize: 12, color: "gray" }}>
+            只有你可以看到這則貼文的總按讚數
+          </Text>
+        </View>
+
+        <FlatList
+          data={postLikes}
+          renderItem={renderLikeUser}
+          keyExtractor={(item) => item?.userId}
+        />
+      </View>
     </Modalize>
   );
 };
@@ -69,19 +79,14 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // borderWidth: 5,
   },
-  likeItem: {
+  totalHeart: {
+    marginVertical: 10,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
     marginHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  likeUser: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
+    justifyContent: "center",
   },
 });
 export default LikeDrawer;

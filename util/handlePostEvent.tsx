@@ -19,10 +19,12 @@ import {
   PostComments,
   PostDetail,
   PostLikes,
+  PostLikeUser,
   PostTags,
   Result,
   UpdatedPost,
   User,
+  UserSettings,
 } from "../shared/types";
 import {
   getFriendDetail,
@@ -478,7 +480,18 @@ export const getAllPosts = async ({
     const tagsData = (await getPostTags({ postIds })).data;
 
     // 查詢文章按讚
-    const likesData = (await getPostLikesByPostId({ postIds })).data;
+    const postLikes = (await getPostLikesByPostId({ postIds })).data;
+
+    // 查詢文章按讚的用戶資料
+    const postLikesUsers = await getFriendDetails(
+      postLikes.map((like) => like.userId)
+    );
+
+    // 將文章按讚的用戶資料與文章按讚的資料合併
+    const combinedPostLikesUsers = postLikes.map((like) => ({
+      postId: like.postId,
+      ...postLikesUsers.find((user) => user.userId === like.userId),
+    }));
 
     // 查詢文章留言
     const commentsData = (await getPostCommentsByPostId({ postIds })).data;
@@ -490,11 +503,13 @@ export const getAllPosts = async ({
       //找到對應的用戶設定
       const userSettings = allUsersSettings?.find(
         (setting) => setting.userId === post.user_id
-      );
+      ) as UserSettings;
 
       // 過濾對應的標籤、按讚數和留言
       const tags = tagsData.filter((tag) => tag.postId === post.id);
-      const likes = likesData.filter((like) => like.postId === post.id);
+      const postLikes = combinedPostLikesUsers.filter(
+        (like) => like.postId === post.id
+      ) as PostLikeUser[];
       const comments = commentsData.filter(
         (comment) => comment.postId === post.id
       );
@@ -503,12 +518,13 @@ export const getAllPosts = async ({
         posts: post,
       });
 
+      // console.log("likes 333333333", likes);
       // 轉換文章詳情
       const transformedPostDetail: PostDetail = {
         post: transformedPost,
         user: user || ({} as User),
         tags: tags?.map((tag) => tag.tag) || [],
-        postLikes: likes,
+        postLikes: postLikes,
         postComments: comments,
         userSettings: userSettings,
       };
@@ -918,14 +934,12 @@ export const updatePostLikeDB = async ({
 }> => {
   try {
     if (like) {
-      await supabase
-        .from("post_likes")
-        .upsert(
-          { post_id: postId, user_id: userId },
-          {
-            onConflict: "post_id, user_id",
-          }
-        );
+      await supabase.from("post_likes").upsert(
+        { post_id: postId, user_id: userId },
+        {
+          onConflict: "post_id, user_id",
+        }
+      );
     } else {
       await supabase
         .from("post_likes")

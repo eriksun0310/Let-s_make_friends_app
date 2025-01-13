@@ -43,12 +43,6 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
     close: () => void;
   }>(null);
 
-  const openBottomDrawer = () => {
-    modalizeRef.current?.open();
-  };
-  const handleCloseDrawer = () => {
-    modalizeRef.current?.close();
-  };
   useEffect(() => {
     navigation.setOptions({
       title: null,
