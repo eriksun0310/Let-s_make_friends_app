@@ -1,4 +1,10 @@
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import React, { useEffect, useRef } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import Comments from "../components/post/Comments";
@@ -105,11 +111,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
         {currentPost && <EnterComments />}
       </View>
 
-      <TouchableOpacity onPress={openBottomDrawer}>
-        <Text style={{ color: Colors.textGrey }}>已說讚的人</Text>
-      </TouchableOpacity>
-
-      <LikeDrawer modalizeRef={modalizeRef} onClose={handleCloseDrawer} />
+      <LikeDrawer postLikes={currentPost?.postLikes} />
     </PaperProvider>
   );
 };

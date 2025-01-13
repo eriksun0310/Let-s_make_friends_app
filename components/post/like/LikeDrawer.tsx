@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { Modalize } from "react-native-modalize";
 import {
   selectLikeDrawer,
@@ -7,8 +7,14 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
+import { PostLikes } from "../../../shared/types";
+import { Avatar } from "react-native-elements";
+import ostrich from "../../../assets/animal/ostrich.png";
+interface LikeDrawerProps {
+  postLikes: PostLikes[];
+}
 
-const LikeDrawer = ({}) => {
+const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
   const modalizeRef = useRef<{
     open: () => void;
     close: () => void;
@@ -17,6 +23,16 @@ const LikeDrawer = ({}) => {
   const dispatch = useAppDispatch();
 
   const likeDrawer = useAppSelector(selectLikeDrawer);
+
+  const renderLikeUser = ({ item }) => {
+    console.log("item", item);
+    return (
+      <View style={styles.likeItem}>
+        <Avatar rounded source={ostrich} size="medium" />
+        <Text style={styles.likeUser}>{item.userId}</Text>
+      </View>
+    );
+  };
 
   useEffect(() => {
     if (likeDrawer) {
@@ -33,13 +49,19 @@ const LikeDrawer = ({}) => {
       modalHeight={650}
       onOpen={() => dispatch(setLikeDrawer(true))} // 當開啟時更新 Redux 狀態
       onClose={() => dispatch(setLikeDrawer(false))} // 當關閉時更新 Redux 狀態
-    //   isOpen={likeDrawer} // 透過 Redux 控制開啟/關閉
+      //   isOpen={likeDrawer} // 透過 Redux 控制開啟/關閉
 
       //   closeOnOverlayTap={false} // 點擊背景 不要關閉
     >
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <Text>LikeDrawer</Text>
-      </View>
+      </View> */}
+
+      <FlatList
+        data={postLikes}
+        renderItem={renderLikeUser}
+        keyExtractor={(item) => item?.userId}
+      />
     </Modalize>
   );
 };
@@ -47,6 +69,19 @@ const LikeDrawer = ({}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  likeItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    marginHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  likeUser: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
   },
 });
 export default LikeDrawer;

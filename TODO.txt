@@ -41,6 +41,7 @@
 ✅6. getAllPosts 要取得個別的使用者設定
 ✅7. 在關於我的時候, 給上initUserSettings 預設值
 8.串接 usePostLikesListeners 收到insert 更新redux addPostLike 
+🧘‍♂️9. 實作已說讚的人, render 用戶出來
 
 
 
