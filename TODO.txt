@@ -67,6 +67,20 @@
 3.search bar 搜尋好友
 
 
+
+[userInfo]
+1. 加好友 AddFriend.tsx -> userInfoFriend ->  拒絕、加好友
+2. 好友邀請 FriendInvitation.tsx -> userInfoFriend -> 拒絕、確認
+3. 好友列表(已經是好友) FriendItem.tsx 、likeDrawer.tsx 進去 -> userInfoFriend ->  刪除好友、 聊天室
+
+[FriendCard]
+✅1. 點了card 就等於是search
+✅2. 左:拒絕、右:(確認、加)
+
+
+[加好友]
+1. 444 點了 888 刪除好友, 要同步888 的加好友 的頁面
+
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
 ⌛[之後做]

@@ -12,7 +12,7 @@ interface FriendInvitationItemProps {
 }
 
 const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
-  loading1,
+  // loading,
   friendRequest,
   navigation,
 }) => {
@@ -38,25 +38,13 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
   return (
     Object.keys(senderData || {}).length > 0 && (
       <FriendCard
-        friendState="accepted"
+        screen="friendInvitation"
         key={friendRequest.senderId}
         index={friendRequest.senderId}
         friend={senderData}
         navigation={navigation}
       />
     )
-
-    // sendersData?.map((sender) => {
-    //   return (
-    //     <FriendCard
-    //       friendState="confirm"
-    //       key={friendRequest.sender_id}
-    //       index={friendRequest.sender_id}
-    //       friend={sender}
-    //       navigation={navigation}
-    //     />
-    //   );
-    // })
   );
 };
 

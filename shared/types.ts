@@ -73,7 +73,7 @@ export type User = {
 
 export type UserState = "personal" | "friend" | "visitor";
 
-export type FriendState = "add" | "accepted";
+export type FriendState = "add" | "accepted" | "rejected";
 
 export type FriendRequestStatus = "pending" | "accepted" | "rejected";
 
@@ -163,8 +163,8 @@ export type PostLikes = {
 
 export type PostLikeUser = User & {
   postId: string;
-  userState:UserState
-  
+  userState: UserState;
+
   // userId: string;
   // createdAt: Date;
 };
@@ -235,3 +235,5 @@ export type UserSettings = {
 };
 
 export type PostScreen = "home" | "postDetail";
+
+export type UserInfoScreen = "addFriend" | "friendInvitation";

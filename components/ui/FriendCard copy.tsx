@@ -18,30 +18,21 @@ import {
 } from "../../util/handleFriendsEvent";
 import { selectUser, useAppSelector } from "../../store";
 
-const translateBtnLoading = {
-  addFriend: "add",
-  friendInvitation: "accepted",
-};
+type FriendActionType = "accepted" | "rejected";
 
 interface FriendCardProps {
-  screen: "addFriend" | "friendInvitation";
+  friendState: FriendState;
   index: number | string;
   friend: User;
   navigation: NavigationProp<any>;
-  onHandleAddFriendFunc?: ({
-    friendState,
-    receiverId,
-  }: {
-    friendState: Omit<FriendState, "accepted">;
-    receiverId: string;
-  }) => Promise<void>;
+  onAddFriend?: (receiverId: string) => Promise<void>;
 }
 const FriendCard: React.FC<FriendCardProps> = ({
-  screen,
+  friendState,
   index,
   friend,
   navigation,
-  onHandleAddFriendFunc,
+  onAddFriend,
 }) => {
   const [buttonLoading, setButtonLoading] = useState({
     add: false,
@@ -55,76 +46,34 @@ const FriendCard: React.FC<FriendCardProps> = ({
     navigation.navigate?.("userInfoFriend", {
       userState: "visitor",
       friend: friend,
-      screen: screen,
+      screen: friendState === "add" ? "addFriend" : "friendInvitation",
     });
   };
 
-  // 這是 AddFriend.tsx 共用的函示 (friendState: add、reject)
-  const handleAddFriendFunc = async ({
-    friendId,
-    friendState,
-  }: {
-    friendId: string;
-    friendState: Omit<FriendState, "accepted">;
-  }) => {
-    setButtonLoading((prev) => ({
-      ...prev,
-      [friendState as FriendState]: true,
-    }));
-
-    await onHandleAddFriendFunc?.({
-      friendState: friendState,
-      receiverId: friendId,
-    });
-    setButtonLoading((prev) => ({
-      ...prev,
-      [friendState as FriendState]: false,
-    }));
-  };
-
-  // 點擊 好友卡片上的按鈕(add、accepted、rejected)
-  const clickFriendCardBtn = ({
-    friendState,
-    friendId,
-  }: {
-    friendState: FriendState;
-    friendId: string;
-  }) => {
-    if (screen === "addFriend") {
-      handleAddFriendFunc({
-        friendId,
-        friendState: friendState, // only add、rejected
-      });
-    } else if (screen === "friendInvitation") {
-      handleFriendInvitationFunc({
-        friendState: friendState,
-        targetUserId: friendId, // only accepted、rejected
-      });
-    }
-  };
-
-  // 這是給 FriendInvitation.tsx 共用 (friendState: accepted、rejected)
-  const handleFriendInvitationFunc = async ({
-    friendState,
+  //
+  const handleFriendAction = async ({
+    actionType,
     targetUserId,
   }: {
-    friendState: Omit<FriendState, "add">;
+    actionType: FriendActionType;
     targetUserId: string;
   }) => {
     setButtonLoading((prev) => ({
       ...prev,
-      [friendState as FriendState]: true,
+      [actionType]: true,
     }));
 
     try {
       let result;
-      switch (friendState) {
+      switch (actionType) {
         case "accepted":
           result = await acceptedFriendRequest({
             senderId: targetUserId,
             receiverId: personal.userId,
           });
+
           break;
+
         case "rejected":
           result = await updateRejectedFriendRequest({
             senderId: targetUserId,
@@ -138,14 +87,14 @@ const FriendCard: React.FC<FriendCardProps> = ({
       }
 
       if (!result.success) {
-        console.error(`Failed to ${friendState} friend`);
+        console.error(`Failed to ${actionType} friend`);
       }
     } catch (error) {
-      console.error(`Error while performing ${friendState} action:`, error);
+      console.error(`Error while performing ${actionType} action:`, error);
     } finally {
       setButtonLoading((prev) => ({
         ...prev,
-        [friendState as FriendState]: false,
+        [actionType]: false,
       }));
     }
   };
@@ -169,9 +118,9 @@ const FriendCard: React.FC<FriendCardProps> = ({
             disabled={buttonLoading["rejected"]}
             style={styles.actionButton}
             onPress={async () => {
-              clickFriendCardBtn({
-                friendState: "rejected",
-                friendId: friend.userId,
+              handleFriendAction({
+                actionType: "rejected",
+                targetUserId: friend.userId,
               });
             }}
           >
@@ -182,18 +131,30 @@ const FriendCard: React.FC<FriendCardProps> = ({
             )}
           </TouchableOpacity>
           <TouchableOpacity
-            disabled={buttonLoading[translateBtnLoading[screen] as FriendState]}
+            disabled={buttonLoading[friendState]}
             style={styles.actionButton}
             onPress={async () => {
-              clickFriendCardBtn({
-                friendState: screen === "addFriend" ? "add" : "accepted",
-                friendId: friend.userId,
-              });
+              if (friendState === "add") {
+                setButtonLoading((prev) => ({
+                  ...prev,
+                  [friendState]: true,
+                }));
+                await onAddFriend?.(friend.userId);
+                setButtonLoading((prev) => ({
+                  ...prev,
+                  [friendState]: false,
+                }));
+              } else {
+                handleFriendAction({
+                  actionType: "accepted",
+                  targetUserId: friend.userId,
+                });
+              }
             }}
           >
-            {buttonLoading[translateBtnLoading[screen] as FriendState] ? (
+            {buttonLoading[friendState] ? (
               <ActivityIndicator size="small" color={Colors.icon} /> // 加載動畫
-            ) : screen === "addFriend" ? (
+            ) : friendState === "add" ? (
               <Plus color={Colors.icon} />
             ) : (
               <Check color={Colors.icon} />

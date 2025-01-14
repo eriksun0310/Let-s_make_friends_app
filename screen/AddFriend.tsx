@@ -6,9 +6,13 @@ import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
-import { getAllUsers, sendFriendRequest } from "../util/handleFriendsEvent";
+import {
+  getAllUsers,
+  insertRejectedFriendRequest,
+  sendFriendRequest,
+} from "../util/handleFriendsEvent";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
-import { User } from "../shared/types";
+import { FriendState, User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
 import { selectUser, useAppSelector } from "../store";
@@ -52,13 +56,29 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     }
   };
 
-  //點擊 加好友
-  const clickAddFriend = async (receiverId: string) => {
+  //點擊 加好友、拒絕好友
+  const clickAddRejectedFriend = async ({
+    friendState,
+    receiverId,
+  }: {
+    friendState: Omit<FriendState, "accepted">;
+    receiverId: string;
+  }) => {
     try {
-      const result = await sendFriendRequest({
-        senderId: personal.userId,
-        receiverId: receiverId,
-      });
+      let result = {} as {
+        success: boolean;
+      };
+      if (friendState === "add") {
+        result = await sendFriendRequest({
+          senderId: personal.userId,
+          receiverId: receiverId,
+        });
+      } else if (friendState === "rejected") {
+        result = await insertRejectedFriendRequest({
+          senderId: personal.userId,
+          receiverId: receiverId,
+        });
+      }
       if (!result.success) {
         console.error(`Failed to add friend`);
       }
@@ -126,12 +146,12 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
         {allUsers?.map((user) => {
           return (
             <FriendCard
-              friendState="add"
+              screen="addFriend"
               key={user.userId}
               index={user.userId}
               friend={user}
               navigation={navigation}
-              onAddFriend={clickAddFriend}
+              onHandleAddFriendFunc={clickAddRejectedFriend}
             />
           );
         })}

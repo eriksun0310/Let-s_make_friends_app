@@ -1,12 +1,8 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useEffect } from "react";
-import { friendCards } from "./AddFriend";
-import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
@@ -40,7 +36,7 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
         {Object.entries(friendRequests).map(([requestId, friendRequest]) => {
           return (
             <FriendInvitationItem
-              loading={loading}
+              // loading={loading}
               key={requestId}
               friendRequest={friendRequest}
               navigation={navigation}

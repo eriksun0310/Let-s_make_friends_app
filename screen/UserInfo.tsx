@@ -6,11 +6,19 @@ import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
 import Post from "../components/post/Post";
-import { SegmentedButtonType, User, UserState } from "../shared/types";
+import {
+  SegmentedButtonType,
+  User,
+  UserInfoScreen,
+  UserState,
+} from "../shared/types";
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
-import { MessageCircleMore, Settings2 } from "lucide-react-native";
+import {
+  MessageCircleMore,
+  Settings2,
+} from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
@@ -30,7 +38,7 @@ interface UserInfoProps {
     params: {
       userState: UserState;
       friend: User;
-      isShowMsgIcon: boolean; // 是否顯示聊天按鈕(只有成為好友才顯示)
+      screen: UserInfoScreen;
     };
   };
   navigation: NavigationProp<any>;
@@ -41,11 +49,9 @@ export const postList = Array(14).fill({
 });
 
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
-  const {
-    userState,
-    friend,
-    isShowMsgIcon = false,
-  } = route.params || { userState: "personal" };
+  const { userState, friend, screen } = route.params || {
+    userState: "personal",
+  };
 
   const [permissions, setPermissions] = useState<SegmentedButtonType>("all");
 
@@ -110,6 +116,28 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     }
   });
 
+  const handleHeaderRight = ({
+    userState,
+    screen,
+  }: {
+    userState: UserState;
+    screen: UserInfoScreen;
+  }) => {
+    if (userState === "friend") {
+      return (
+        <CustomIcon onPress={handleChatRoomPress}>
+          <MessageCircleMore color={Colors.icon} />
+        </CustomIcon>
+      );
+    } else if (userState === "personal") {
+      return (
+        <CustomIcon onPress={handleSettingsPress}>
+          <Settings2 color={Colors.icon} />
+        </CustomIcon>
+      );
+    }else return null;
+  };
+
   useEffect(() => {
     // console.log("好友資料 当前导航堆栈:", navigation.getState());
     navigation.setOptions({
@@ -120,28 +148,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           return <BackButton onPress={() => navigation.goBack()} />;
         } else return null;
       },
-      headerRight: () => {
-        if (isShowMsgIcon) {
-          return (
-            <CustomIcon onPress={handleChatRoomPress}>
-              <MessageCircleMore color={Colors.icon} />
-            </CustomIcon>
-          );
-        } else if (userState === "personal") {
-          return (
-            <CustomIcon onPress={handleSettingsPress}>
-              <Settings2 color={Colors.icon} />
-              {/* <Wrench color={Colors.icon} /> */}
-              {/* <Settings color={Colors.icon} /> */}
-              {/* <MessageCircleMore color={Colors.icon} /> */}
-            </CustomIcon>
-          );
-        } else return null;
-      },
+      headerRight: () =>
+        handleHeaderRight({
+          userState,
+          screen,
+        }),
     });
-  }, [navigation, userState, isShowMsgIcon]);
-
-  console.log("userState", userState);
+  }, [navigation, userState, screen]);
 
   useEffect(() => {
     // 取得用戶設定資料

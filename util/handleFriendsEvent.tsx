@@ -307,7 +307,6 @@ const updateFriendRequestStatus = async ({
     })
     .eq("sender_id", senderId)
     .eq("receiver_id", receiverId);
-
   if (error) {
     console.error("Error updating friend request status:", error);
     return { success: false, errorMessage: error?.message };
@@ -317,7 +316,6 @@ const updateFriendRequestStatus = async ({
     success: true,
   };
 };
-
 // 取得好友列表
 export const getFriendList = async (
   currentUserId: string
@@ -445,11 +443,42 @@ export const acceptedFriendRequest = async ({
   }
 };
 
-// 拒絕交友邀請
-export const rejectedFriendRequest = async ({
+// 這是給 加好友想刪除好友用的(因為friend_requests 沒有資料要用insert)
+export const insertRejectedFriendRequest = async ({
   senderId,
   receiverId,
 }: FriendProps): Promise<Result> => {
+  try {
+    const { error } = await supabase.from("friend_requests").insert({
+      sender_id: senderId,
+      receiver_id: receiverId,
+      status: "rejected",
+      is_read: true, // 設置為已讀
+    });
+    if (error) {
+      console.error("Error sending friend request:", error);
+      return {
+        success: false,
+        errorMessage: "Failed to send friend request. Please try again later.",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      errorMessage: "An error occurred. Please try again later.",
+    };
+  }
+};
+
+// 拒絕交友邀請(給對方有寄送交友邀請用的)
+export const updateRejectedFriendRequest = async ({
+  senderId,
+  receiverId,
+}: FriendProps): Promise<Result> => {
+  console.log("senderId:", senderId, "receiverId:", receiverId);
   try {
     const { success, errorMessage } = await updateFriendRequestStatus({
       senderId,
