@@ -9,7 +9,7 @@ import { initUserSettings } from "../shared/static";
 import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
 
 /*
-✅: 已經整理好的
+☑️: 已經整理好的
 處理 個人資料 db 操作
 users:個人資料
 user_selected_option:興趣選項
@@ -17,7 +17,7 @@ user_head_shot: 大頭貼
 user_settings: 用戶設定
 */
 
-// ✅取得用戶資料
+// ☑️取得用戶資料
 // export const getUserDetail = async ({
 //   userId,
 // }: {
@@ -100,7 +100,7 @@ user_settings: 用戶設定
 type GetUserDataReturn = Result & {
   data: User | null;
 };
-// ✅取得用戶詳細資料
+// ☑️取得用戶詳細資料
 export const getUserDetail = async ({
   userId,
 }: {
@@ -170,7 +170,7 @@ type GetUsersDetailReturn = Result & {
   data: User[];
 };
 
-// ✅批量查詢所有用戶的詳細資料
+// ☑️批量查詢所有用戶的詳細資料
 export const getUsersDetail = async ({
   userIds,
 }: {
@@ -236,7 +236,7 @@ export const getUsersDetail = async ({
   }
 };
 
-//✅ 點擊 關於我的儲存
+//☑️ 點擊 關於我的儲存
 export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
   try {
     // 儲存自己的基本資料
@@ -255,7 +255,7 @@ export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
   }
 };
 
-// ✅更新 個人資料的單一欄位(name、introduce)
+// ☑️更新 個人資料的單一欄位(name、introduce)
 export const updateUserField = async ({
   userId,
   fieldName,
@@ -300,7 +300,7 @@ export const updateUserField = async ({
   }
 };
 
-// ✅儲存自己的基本資料(for aboutMe 的儲存)
+// ☑️儲存自己的基本資料(for aboutMe 的儲存)
 export const saveUser = async ({ user }: { user: User }): Promise<Result> => {
   try {
     const { error } = await supabase.from("users").upsert(
@@ -335,7 +335,7 @@ export const saveUser = async ({ user }: { user: User }): Promise<Result> => {
   }
 };
 
-// ✅儲存自己的大頭貼
+// ☑️儲存自己的大頭貼
 export const saveUserHeadShot = async ({
   user,
 }: {
@@ -371,7 +371,7 @@ export const saveUserHeadShot = async ({
   }
 };
 
-// ✅儲存用戶興趣選項
+// ☑️儲存用戶興趣選項
 export const saveUserSelectedOption = async ({
   user,
 }: {
@@ -412,7 +412,7 @@ type GetUserSettingsReturn = Result & {
   data: UserSettings;
 };
 
-// ✅取得個別用戶設定
+// ☑️取得個別用戶設定
 export const getUserSettings = async ({
   userId,
 }: {
@@ -467,7 +467,7 @@ type GetAllUsersSettingsReturn = Result & {
   data: UserSettings[];
 };
 
-// ✅批量查詢所有用戶設定
+// ☑️批量查詢所有用戶設定
 export const getAllUsersSettings = async ({
   userIds,
 }: {
@@ -503,7 +503,7 @@ export const getAllUsersSettings = async ({
   }
 };
 
-// ✅儲存用戶設定
+// ☑️儲存用戶設定
 export const saveUserSettings = async ({
   userId,
   hideLikes,

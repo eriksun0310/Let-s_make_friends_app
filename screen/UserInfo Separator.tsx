@@ -54,7 +54,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   //登出
   const handleLogout = () => {
-    dispatch(logout).then(() => {
+    dispatch(logout()).then(() => {
       navigation.navigate("login");
     });
   };
@@ -147,9 +147,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           <View style={{ marginTop: 10 }} />
 
           {postList?.map((post) => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("postDetail")}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("postDetail")}>
               <Post userState="personal" date={post.date} user={user} />
             </TouchableOpacity>
           ))}

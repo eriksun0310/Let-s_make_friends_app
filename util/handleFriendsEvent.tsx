@@ -218,7 +218,7 @@ type GetAllUsersReturn = {
   data: User[];
 };
 
-// ✅取得可以成為好友的用戶
+// ☑️取得可以成為好友的用戶
 export const getBeFriendUsers = async ({
   currentUserId,
 }: {
@@ -303,7 +303,7 @@ ex:111 寄給 222
 senderId: 111.user_id
 receiverId: 222.user_id
 */
-// ✅發送交友邀請
+// ☑️發送交友邀請
 export const sendFriendRequest = async ({
   senderId,
   receiverId,
@@ -333,7 +333,7 @@ export const sendFriendRequest = async ({
   }
 };
 
-// ✅更新 friend_requests 狀態 (接受或拒絕)
+// ☑️更新 friend_requests 狀態 (接受或拒絕)
 const updateFriendRequestStatus = async ({
   senderId,
   receiverId,
@@ -375,7 +375,7 @@ const updateFriendRequestStatus = async ({
 type GetFriendListReturn = Result & {
   data: User[];
 };
-// ✅取得好友列表
+// ☑️取得好友列表
 export const getFriendList = async ({
   currentUserId,
 }: {
@@ -435,7 +435,7 @@ export const getFriendList = async ({
   }
 };
 
-// ✅新增 好友資訊到 friends 表
+// ☑️新增 好友資訊到 friends 表
 const insertFriend = async ({
   userId,
   friendId,
@@ -484,7 +484,7 @@ const insertFriend = async ({
   }
 };
 
-// ✅接受交友邀請
+// ☑️接受交友邀請
 export const acceptedFriendRequest = async ({
   senderId,
   receiverId,
@@ -520,7 +520,7 @@ export const acceptedFriendRequest = async ({
   }
 };
 
-// ✅這是給 加好友想刪除好友用的(因為friend_requests 沒有資料要用insert)
+// ☑️這是給 加好友想刪除好友用的(因為friend_requests 沒有資料要用insert)
 export const insertRejectedFriendRequest = async ({
   senderId,
   receiverId,
@@ -550,7 +550,7 @@ export const insertRejectedFriendRequest = async ({
   }
 };
 
-// ✅拒絕交友邀請(給對方有寄送交友邀請用的)
+// ☑️拒絕交友邀請(給對方有寄送交友邀請用的)
 export const updateRejectedFriendRequest = async ({
   senderId,
   receiverId,
@@ -580,7 +580,7 @@ export const updateRejectedFriendRequest = async ({
   }
 };
 
-//✅刪除(單一)好友
+//☑️刪除(單一)好友
 export const deleteFriend = async ({
   userId,
   friendId,

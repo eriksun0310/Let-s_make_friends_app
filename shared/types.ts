@@ -190,7 +190,7 @@ TODO:
 */
 export type PostDetail = {
   post: Post;
-  user: User;
+  user: User | null;
   tags: string[];
   postLikes: PostLikeUser[];
   postComments: PostComments[];

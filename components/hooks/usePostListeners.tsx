@@ -28,15 +28,16 @@ export const usePostListeners = () => {
     event: "INSERT" | "UPDATE";
     post: PostsDBType;
   }) => {
-
-    
     // 判斷是否為自己的文章
-    if(post.user_id === personal.userId){
-      console.log('自己的文章不處理');
-      return
+    if (post.user_id === personal.userId) {
+      console.log("自己的文章不處理");
+      return;
     }
 
-    const postDetail = await getPostDetail({ post });
+    const postDetail = await getPostDetail({
+      currentUserId: personal.userId,
+      post,
+    });
     //根據
     if (post.visibility === "public") {
       if (event === "INSERT") {

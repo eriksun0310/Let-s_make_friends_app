@@ -118,3 +118,9 @@ export type UserSettingsDBType = {
   hide_comments: boolean;
   mark_as_read: boolean;
 };
+
+// 可用標籤
+export type TagsDBType = {
+  id: string;
+  name: string;
+};

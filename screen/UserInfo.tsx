@@ -64,7 +64,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   //登出
   const handleLogout = () => {
-    dispatch(logout).then(() => {
+    dispatch(logout()).then(() => {
       navigation.navigate("login");
     });
   };

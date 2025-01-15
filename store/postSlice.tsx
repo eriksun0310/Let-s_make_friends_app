@@ -103,7 +103,6 @@ const postSlice = createSlice({
     addPostLike(state, action) {
       const postLike = action.payload as PostLikes;
 
-      console.log("postLike", postLike);
       // 找到對應的post
       const index = state.posts.findIndex(
         (post) => post.post.id === postLike.postId
@@ -119,9 +118,6 @@ const postSlice = createSlice({
           (like) => like.userId === postLike.userId
         );
 
-        console.log("existingPostLikes", existingPostLikes);
-        console.log("postLike", postLike);
-
         // 如果不存在
         if (!likeExists) {
           //創建一個新的posts 陣列並更新目標的post的postLikes
@@ -131,8 +127,6 @@ const postSlice = createSlice({
           };
         }
       }
-
-      console.log("state.posts[index]", state.posts[index]);
     },
 
     // deletePostLike(state, action) {
