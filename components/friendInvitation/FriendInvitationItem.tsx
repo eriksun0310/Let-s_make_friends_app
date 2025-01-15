@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getFriendDetail } from "../../util/handleFriendsEvent";
 import FriendCard from "../ui/FriendCard";
 import { NavigationProp } from "@react-navigation/native";
 import { FriendRequest, User } from "../../shared/types";
 import { userInit } from "../../shared/static";
-import LoadingOverlay from "../ui/LoadingOverlay";
+import { getUserDetail } from "../../util/handleUserEvent";
 
 interface FriendInvitationItemProps {
   friendRequest: FriendRequest;
@@ -22,9 +21,13 @@ const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
   useEffect(() => {
     const fetchSenderData = async () => {
       try {
-        const data = await getFriendDetail(friendRequest.senderId);
+        const { data } = await getUserDetail({
+          userId: friendRequest.senderId,
+        });
 
-        setSenderData(data);
+        if (data) {
+          setSenderData(data);
+        }
       } catch (error) {
         console.log("error");
       } finally {

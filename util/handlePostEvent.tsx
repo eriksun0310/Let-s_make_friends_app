@@ -32,12 +32,12 @@ import {
   UserSettings,
 } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
+import { getFriendDetails, getFriendList } from "./handleFriendsEvent";
 import {
-  getFriendDetail,
-  getFriendDetails,
-  getFriendList,
-} from "./handleFriendsEvent";
-import { getAllUsersSettings, getUserSettings } from "./handleUserEvent";
+  getAllUsersSettings,
+  getUserDetail,
+  getUserSettings,
+} from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
 
 // ✅ 取得 所有的tag(for: 新增文章用的)
@@ -105,7 +105,6 @@ export const addPostTag = async ({
     };
   }
 };
-
 
 // ✅ 新增所有可用標籤
 export const addTags = async ({
@@ -379,7 +378,10 @@ export const getPostDetail = async ({
   });
 
   // 取得發文者資訊
-  const user = (await getFriendDetail(post.user_id)) || ({} as User);
+  const { data: user } =
+    (await getUserDetail({
+      userId: post.user_id,
+    })) || ({} as User);
 
   // 取得用戶設定
   const { data: userSettings } = await getUserSettings({
@@ -446,11 +448,7 @@ export const addPostDB = async ({
       tags: newPost.tags,
       postId: newPostId,
     });
-
-    console.log("tags", tags);
-    // 發文者的基本資訊
-    //const user = await getFriendDetail(postData.user_id);
-
+  
     // 轉換文章的資料格式
     const transformedPost = transformPost({
       posts: postData,

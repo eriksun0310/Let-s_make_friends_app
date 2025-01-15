@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
 import { addFriend, useAppDispatch } from "../../store";
-import { getFriendDetail } from "../../util/handleFriendsEvent";
+import { getUserDetail } from "../../util/handleUserEvent";
 
 // 監聽 成為新好友
 export const useNewFriend = (userId: string) => {
@@ -44,7 +44,9 @@ export const useNewFriend = (userId: string) => {
             !payload.new.notified // 確保是未通知的紀錄
           ) {
             // 取得詳細的好友資料
-            const friendDetails = await getFriendDetail(payload.new.user_id);
+            const { data: friendDetails } = await getUserDetail({
+              userId: payload.new.user_id,
+            });
             dispatch(addFriend(friendDetails));
 
             setNewFriend((prev) => [...prev, payload.new]);

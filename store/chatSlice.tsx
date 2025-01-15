@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ChatRoom } from "../shared/types";
-import { getFriendDetail } from "../util/handleFriendsEvent";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
+import { getUserDetail } from "../util/handleUserEvent";
 interface InitialStateProps {
   chatRooms: ChatRoom[];
   currentChatRoomId?: string | null;
@@ -171,7 +171,9 @@ export const updateOrCreateChatRoom =
           : chatRoomDetail.user1Id;
 
       // 取得聊天室好友詳細資料
-      const friend = await getFriendDetail(friendId);
+      const { data: friend } = await getUserDetail({
+        userId: friendId,
+      });
 
       dispatch(
         addChatRoom({

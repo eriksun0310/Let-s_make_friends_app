@@ -6,7 +6,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 import { setUser, setUserSettings } from "../store/userSlice";
-import { getUserData, getUserSettings } from "../util/handleUserEvent";
+import { getUserDetail, getUserSettings } from "../util/handleUserEvent";
 import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {
@@ -72,7 +72,7 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       const { userId, email } = await login(form.email, form.password);
 
       // 取得用戶資料
-      const { data: userData } = await getUserData({
+      const { data: userData } = await getUserDetail({
         userId,
       });
 

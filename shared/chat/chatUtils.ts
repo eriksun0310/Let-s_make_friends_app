@@ -10,7 +10,7 @@ export const transformChatRoom = ({
 }: {
   data: ChatRoomsDBType;
   options?: {
-    friend: User;
+    friend: User | null;
     lastMessageData?: { created_at: Date; content: string };
   };
 }): ChatRoom => {

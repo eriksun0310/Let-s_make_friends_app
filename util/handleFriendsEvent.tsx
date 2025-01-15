@@ -1,6 +1,7 @@
 import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
 import { Result, User } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
+import { getUserDetail } from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
 
 interface FriendProps {
@@ -14,49 +15,66 @@ friend_requests: 好友邀請
 friends: 好友列表
 */
 
+// type GetFriendDetailReturn = Result & {
+//   data: User | null;
+// };
+
 //取得(單一)好友詳細資料
-export const getFriendDetail = async (
-  friendId: string
-): Promise<User | null> => {
-  try {
-    // 查詢 users
-    const { data, error } = await supabase
-      .from("users")
-      .select(
-        `
-        id, 
-        name, 
-        gender, 
-        introduce, 
-        birthday, 
-        email, 
-        created_at, 
-        updated_at,
-        user_head_shot(image_url, image_type),
-        user_selected_option(interests, favorite_food, disliked_food)
-        `
-      )
-      .eq("id", friendId)
-      .single(); // 單筆記錄，因為 friendId 是唯一的
+// export const getFriendDetail = async ({
+//   friendId,
+// }: {
+//   friendId: string;
+// }): Promise<GetFriendDetailReturn> => {
+//   try {
+//     // 查詢 users
+//     const { data, error } = await supabase
+//       .from("users")
+//       .select(
+//         `
+//         id, 
+//         name, 
+//         gender, 
+//         introduce, 
+//         birthday, 
+//         email, 
+//         created_at, 
+//         updated_at,
+//         user_head_shot(image_url, image_type),
+//         user_selected_option(interests, favorite_food, disliked_food)
+//         `
+//       )
+//       .eq("id", friendId)
+//       .single(); // 單筆記錄，因為 friendId 是唯一的
 
-    if (error) {
-      console.error("Error fetching users:", error);
-      return null;
-    }
+//     if (error) {
+//       console.error("Error fetching users:", error);
+//       return {
+//         success: false,
+//         errorMessage: error.message,
+//         data: null,
+//       };
+//     }
 
-    const transformedUser = transformUser({
-      users: data,
-      userHeadShot: data.user_head_shot as unknown as UserHeadShotDBType,
-      userSelectedOption:
-        data.user_selected_option as unknown as UserSelectedOptionDBType,
-    });
+//     const transformedUser = transformUser({
+//       users: data,
+//       userHeadShot: data.user_head_shot as unknown as UserHeadShotDBType,
+//       userSelectedOption:
+//         data.user_selected_option as unknown as UserSelectedOptionDBType,
+//     });
 
-    return transformedUser;
-  } catch (error) {
-    console.log("取得好友詳細資料錯誤", error);
-    return null;
-  }
-};
+//     return {
+//       success: true,
+//       data: transformedUser,
+//     };
+//   } catch (error) {
+//     console.log("取得好友詳細資料錯誤", error);
+//     return {
+//       success: false,
+//       errorMessage: (error as Error).message,
+//       data: null,
+//     };
+//   }
+// };
 
 export const getFriendDetails = async (
   friendIds: string[]
@@ -352,7 +370,9 @@ export const getFriendList = async (
     // 獲取每個好友的詳細資料
     const allFriendsDetails = await Promise.all(
       friendsData.map(async (friend) => {
-        const friendDetail = await getFriendDetail(friend.friend_id);
+        const { data: friendDetail } = await getUserDetail({
+          userId: friend.friend_id,
+        });
         return friendDetail; // 返回每個好友的詳細資料
       })
     );

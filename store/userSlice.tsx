@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "./store";
 import { User, UserSettings } from "../shared/types";
-import { getUserData } from "../util/handleUserEvent";
+import { getUserDetail } from "../util/handleUserEvent";
 import { supabase } from "../util/supabaseClient";
 import { initUserSettings } from "../shared/static";
 
@@ -140,7 +140,7 @@ export const initializeAuth = (): AppThunk => async (dispatch) => {
       // 不管是註冊還是登入都會有 session
       if (session) {
         const user = session.user;
-        const userData = await getUserData({
+        const { data: userData } = await getUserDetail({
           userId: user.id,
         }); // 取得用戶資料
 

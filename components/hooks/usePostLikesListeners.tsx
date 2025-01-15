@@ -10,7 +10,7 @@ import {
 import { supabase } from "../../util/supabaseClient";
 import { PostLikesDBType } from "../../shared/dbType";
 import { transformPostLike } from "../../shared/post/postUtils";
-import { getFriendDetail } from "../../util/handleFriendsEvent";
+import { getUserDetail } from "../../util/handleUserEvent";
 
 // 監聽文章的按讚數
 export const usePostLikesListeners = () => {
@@ -41,7 +41,7 @@ export const usePostLikesListeners = () => {
       (friend) => friend.userId === newPostLike.user_id
     );
 
-    console.log('hasFriendPostLike', hasFriendPostLike);
+    console.log("hasFriendPostLike", hasFriendPostLike);
 
     // 好友按讚
     if (hasFriendPostLike) {
@@ -60,7 +60,9 @@ export const usePostLikesListeners = () => {
 
       // 訪客按讚
     } else {
-      const findVisitor = await getFriendDetail(newPostLike.user_id);
+      const { data: findVisitor } = await getUserDetail({
+        userId: newPostLike.user_id,
+      });
       dispatch(
         addPostLike({
           ...findVisitor,
@@ -86,46 +88,6 @@ export const usePostLikesListeners = () => {
           handlePostLike({
             newPostLike: payload.new as PostLikesDBType,
           });
-          // const newPostLike = payload.new as PostLikesDBType;
-          // // 自己點讚
-          // if (newPostLike.user_id === personal.userId) {
-          //   dispatch(
-          //     addPostLike({
-          //       ...personal,
-          //       postId: newPostLike.post_id,
-          //     })
-          //   );
-          //   return;
-          // }
-
-          // const hasFriendPostLike = friendList.some(
-          //   (friend) => friend.userId === newPostLike.user_id
-          // );
-
-          // // 好友按讚
-          // if (hasFriendPostLike) {
-          //   const findFriend = friendList.find(
-          //     (friend) => friend.userId === newPostLike.user_id
-          //   );
-          //   // TODO: 用userId 來取得用戶資料
-
-          //   dispatch(
-          //     addPostLike({
-          //       ...findFriend,
-          //       postId: newPostLike.post_id,
-          //     })
-          //   );
-
-          //   // 訪客按讚
-          // } else {
-          //   const findVisitor = await getFriendDetail(newPostLike.user_id);
-          //   dispatch(
-          //     addPostLike({
-          //       ...findVisitor,
-          //       postId: newPostLike.post_id,
-          //     })
-          //   );
-          // }
         }
       )
       .on(
@@ -139,21 +101,6 @@ export const usePostLikesListeners = () => {
           handlePostLike({
             newPostLike: payload.new as PostLikesDBType,
           });
-          // const newPostLike = payload.new as PostLikesDBType;
-          // 判斷是否為自己點讚
-          // if (newPostLike.user_id === personal.userId) {
-          //   console.log("自己點讚不處理");
-          //   return;
-          // }
-
-          // console.log("newPostLike 監聽器 2222", newPostLike);
-          // const transformedPostLike = transformPostLike(newPostLike);
-
-          // console.log("transformedPostLike 監聽器 2222", transformedPostLike);
-
-          // // TODO: 用userId 來取得用戶資料
-
-          // dispatch(addPostLike(transformedPostLike));
         }
       )
 

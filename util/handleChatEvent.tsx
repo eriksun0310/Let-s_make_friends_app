@@ -1,11 +1,11 @@
 import { supabase } from "./supabaseClient";
-import { getFriendDetail } from "./handleFriendsEvent";
 import { ChatRoom, Message, Result } from "../shared/types";
 import {
   transformChatRoom,
   transformMessage,
   transformMessageArray,
 } from "../shared/chat/chatUtils";
+import { getUserDetail } from "./handleUserEvent";
 
 /*
 處理 聊天室 db 操作
@@ -52,7 +52,9 @@ export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {
       const isUser1 = room.user1_id === userId;
       const friendId = isUser1 ? room.user2_id : room.user1_id;
 
-      const friend = await getFriendDetail(friendId);
+      const { data: friend } = await getUserDetail({
+        userId: friendId,
+      });
 
       const lastMessageData = await getLastMessage(room.id);
 
@@ -214,7 +216,9 @@ export const createNewChatRoomAndInsertMessage = async ({
     throw new Error("Failed to send message");
   }
 
-  const friend = await getFriendDetail(friendId);
+  const { data: friend } = await getUserDetail({
+    userId: friendId,
+  });
   const lastMessageData = await getLastMessage(room.id);
   console.log(" 建立新聊天室 lastMessageData", lastMessageData);
 

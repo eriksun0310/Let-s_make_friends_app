@@ -6,6 +6,7 @@ import {
 import { Result, User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
 import { initUserSettings } from "../shared/static";
+
 /*
 ✅: 已經整理好的
 處理 個人資料 db 操作
@@ -15,78 +16,139 @@ user_head_shot: 大頭貼
 user_settings: 用戶設定
 */
 
-type GetUserDataReturn = {
-  success: boolean;
-  errorMessage?: string;
+// ✅取得用戶資料
+// export const getUserDetail = async ({
+//   userId,
+// }: {
+//   userId: string;
+// }): Promise<GetUserDataReturn> => {
+//   try {
+//     // 查詢主資料表 users
+//     const { data: userData, error: userError } = await supabase
+//       .from("users")
+//       .select("*")
+//       .eq("id", userId); // 篩選條件：id 等於 userId
+
+//     if (userError) {
+//       console.error("取得用戶資料 失敗:", userError);
+//       return {
+//         success: false,
+//         errorMessage: userError.message,
+//         data: null,
+//       };
+//     }
+
+//     // 新用戶
+//     if (!userData || userData.length === 0) {
+//       return {
+//         success: true,
+//         data: null,
+//       };
+//     }
+
+//     // 查詢 user_selected_option
+//     const { data: selectedData, error: selectedError } = await supabase
+//       .from("user_selected_option")
+//       .select("interests, favorite_food, disliked_food", { count: "exact" })
+//       .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+//     if (selectedError) {
+//       console.error("取得用戶喜好 失敗:", selectedError);
+//       return {
+//         success: false,
+//         errorMessage: selectedError.message,
+//         data: null,
+//       };
+//     }
+
+//     // 查詢 user_head_shot
+//     const { data: headShotData, error: headShotError } = await supabase
+//       .from("user_head_shot")
+//       .select("image_url, image_type")
+//       .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+//     if (headShotError) {
+//       console.error("取得用戶大頭貼 失敗:", headShotError);
+//       return {
+//         success: false,
+//         errorMessage: headShotError.message,
+//         data: null,
+//       };
+//     }
+
+//     const transformedUser = transformUser({
+//       users: userData[0],
+//       userHeadShot: headShotData[0] || null,
+//       userSelectedOption: selectedData[0] || null,
+//     });
+
+//     return {
+//       success: true,
+//       data: transformedUser,
+//     };
+//   } catch (error) {
+//     console.log("取得用戶資料 失敗", error);
+//     return {
+//       success: false,
+//       errorMessage: (error as Error).message,
+//       data: null,
+//     };
+//   }
+// };
+
+type GetUserDataReturn = Result & {
   data: User | null;
 };
-
-// ✅取得用戶資料
-export const getUserData = async ({
+// ✅取得用戶詳細資料
+export const getUserDetail = async ({
   userId,
 }: {
   userId: string;
 }): Promise<GetUserDataReturn> => {
   try {
-    // 查詢主資料表 users
-    const { data: userData, error: userError } = await supabase
+    // 查詢 users, 並包含關聯的子表資料
+    const { data, error } = await supabase
       .from("users")
-      .select("*", {
-        count: "exact",
-      })
-      .eq("id", userId); // 篩選條件：id 等於 userId
+      .select(
+        `
+       id, 
+       name, 
+       gender, 
+       introduce, 
+       birthday, 
+       email, 
+       created_at, 
+       updated_at,
+       user_head_shot(image_url, image_type),
+       user_selected_option(interests, favorite_food, disliked_food)
+       `
+      )
+      .eq("id", userId)
+      .single(); // 確保只有一筆記錄
 
-    if (userError) {
-      console.error("取得用戶資料 失敗:", userError);
+    // 如果查詢發生錯誤，返回錯誤信息
+    if (error) {
+      // 如果查無資料，Supabase 通常返回錯誤訊息包含 "No rows"
+      if (error.message.includes("No rows")) {
+        return {
+          success: true,
+          data: null, // 新會員
+        };
+      }
+
+      // 如果是其他錯誤, 返回錯誤信息
+      console.error("取得用戶資料失敗:", error);
       return {
         success: false,
-        errorMessage: userError.message,
+        errorMessage: error.message,
         data: null,
       };
     }
-
-    // 新用戶
-    if (!userData || userData.length === 0) {
-      return {
-        success: true,
-        data: null,
-      };
-    }
-
-    // 查詢 user_selected_option
-    const { data: selectedData, error: selectedError } = await supabase
-      .from("user_selected_option")
-      .select("interests, favorite_food, disliked_food", { count: "exact" })
-      .eq("user_id", userId); // 篩選條件：id 等於 userId
-
-    if (selectedError) {
-      console.error("取得用戶喜好 失敗:", selectedError);
-      return {
-        success: false,
-        errorMessage: selectedError.message,
-        data: null,
-      };
-    }
-
-    // 查詢 user_head_shot
-    const { data: headShotData, error: headShotError } = await supabase
-      .from("user_head_shot")
-      .select("image_url, image_type", { count: "exact" })
-      .eq("user_id", userId); // 篩選條件：id 等於 userId
-
-    if (headShotError) {
-      console.error("取得用戶大頭貼 失敗:", headShotError);
-      return {
-        success: false,
-        errorMessage: headShotError.message,
-        data: null,
-      };
-    }
-
+    // 如果查有資料，進行資料轉換
     const transformedUser = transformUser({
-      users: userData[0],
-      userHeadShot: headShotData[0] || null,
-      userSelectedOption: selectedData[0] || null,
+      users: data,
+      userHeadShot: (data.user_head_shot as any) ?? null,
+      userSelectedOption: (data.user_selected_option as any) ?? null,
     });
 
     return {
@@ -275,9 +337,7 @@ export const saveUserSelectedOption = async ({
   }
 };
 
-type GetUserSettingsReturn = {
-  success: boolean;
-  errorMessage?: string;
+type GetUserSettingsReturn = Result & {
   data: UserSettings;
 };
 
@@ -332,9 +392,7 @@ export const getUserSettings = async ({
   }
 };
 
-type GetAllUsersSettingsReturn = {
-  success: boolean;
-  errorMessage?: string;
+type GetAllUsersSettingsReturn = Result & {
   data: UserSettings[];
 };
 
