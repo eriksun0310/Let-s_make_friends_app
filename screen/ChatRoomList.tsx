@@ -42,7 +42,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchChatData = async () => {
-      const rooms = await getAllChatRooms(personal.userId);
+      const { data: rooms } = await getAllChatRooms({
+        userId: personal.userId,
+      });
       // console.log("rooms is chatRoomList", rooms);
       dispatch(setChatRooms(rooms));
     };

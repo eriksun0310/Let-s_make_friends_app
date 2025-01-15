@@ -13,80 +13,103 @@ chat_rooms: 聊天室
 messages: 聊天室中的訊息
 */
 
+type GetAllChatRoomsReturn = Result & {
+  data: ChatRoom[];
+};
+
 // 取得所有聊天室
-export const getAllChatRooms = async (userId: string): Promise<ChatRoom[]> => {
-  const { data: chatRoomsData, error } = await supabase
-    .from("chat_rooms")
-    .select("*")
-    .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+export const getAllChatRooms = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<GetAllChatRoomsReturn> => {
+  try {
+    const { data: chatRoomsData, error } = await supabase
+      .from("chat_rooms")
+      .select("*")
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
 
-  if (error) {
-    console.error("Error fetching chat rooms:", error);
-    return [];
-  }
-
-  //過濾掉 user1_deleted 或 user2_deleted 為 true 的聊天室
-  const filteredRooms = chatRoomsData.filter((room) => {
-    // user1_deleted:true &&
-    // 如果 a 刪除聊天室，但 b 沒有刪除，則 b 可以看到聊天室
-    if (
-      room.user1_id === userId &&
-      room.user1_deleted &&
-      room.unread_count_user1 === 0
-    )
-      return false;
-    if (
-      room.user2_id === userId &&
-      room.user2_deleted &&
-      room.unread_count_user2 === 0
-    )
-      return false;
-
-    // 其他情況下顯示聊天室
-    return true;
-  });
-
-  // 取得每個聊天室的詳細資訊
-  const chatRoomsDetails = await Promise.all(
-    filteredRooms.map(async (room) => {
-      const isUser1 = room.user1_id === userId;
-      const friendId = isUser1 ? room.user2_id : room.user1_id;
-
-      const { data: friend } = await getUserDetail({
-        userId: friendId,
-      });
-
-      const lastMessageData = await getLastMessage(room.id);
-
+    if (error) {
+      console.error("取得聊天室 失敗", error);
       return {
-        id: room.id,
-        createdAt: room.created_at,
-        user1Id: room.user1_id,
-        user2Id: room.user2_id,
-        user1Deleted: room.user1_deleted,
-        user2Deleted: room.user2_deleted,
-        user1DeletedAt: room.user1_deleted_at,
-        user2DeletedAt: room.user2_deleted_at,
-        unreadCountUser1: room.unread_count_user1,
-        unreadCountUser2: room.unread_count_user2,
-        friend: friend,
-        lastTime: lastMessageData?.created_at!,
-        lastMessage: lastMessageData?.content!,
+        success: false,
+        errorMessage: error.message,
+        data: [],
       };
-    })
-  );
-
-  //console.log("chatRoomsDetails", chatRoomsDetails);
-
-  // 根據最後一條訊息的時間進行排序,將最新的聊天室排到最上面
-  const sortedChatRooms = chatRoomsDetails.sort((a, b) => {
-    if (a.lastTime && b.lastTime) {
-      return new Date(b.lastTime) - new Date(a.lastTime);
     }
-    return 0; // 若有空值則保持原順序
-  });
 
-  return sortedChatRooms;
+    //過濾掉 user1_deleted 或 user2_deleted 為 true 的聊天室
+    const filteredRooms = chatRoomsData.filter((room) => {
+      // user1_deleted:true &&
+      // 如果 a 刪除聊天室，但 b 沒有刪除，則 b 可以看到聊天室
+      if (
+        room.user1_id === userId &&
+        room.user1_deleted &&
+        room.unread_count_user1 === 0
+      )
+        return false;
+      if (
+        room.user2_id === userId &&
+        room.user2_deleted &&
+        room.unread_count_user2 === 0
+      )
+        return false;
+
+      // 其他情況下顯示聊天室
+      return true;
+    });
+
+    // 取得每個聊天室的詳細資訊
+    const chatRoomsDetails = await Promise.all(
+      filteredRooms.map(async (room) => {
+        const isUser1 = room.user1_id === userId;
+        const friendId = isUser1 ? room.user2_id : room.user1_id;
+
+        const { data: friend } = await getUserDetail({
+          userId: friendId,
+        });
+
+        const lastMessageData = await getLastMessage(room.id);
+
+        return {
+          id: room.id,
+          createdAt: room.created_at,
+          user1Id: room.user1_id,
+          user2Id: room.user2_id,
+          user1Deleted: room.user1_deleted,
+          user2Deleted: room.user2_deleted,
+          user1DeletedAt: room.user1_deleted_at,
+          user2DeletedAt: room.user2_deleted_at,
+          unreadCountUser1: room.unread_count_user1,
+          unreadCountUser2: room.unread_count_user2,
+          friend: friend,
+          lastTime: lastMessageData?.created_at!,
+          lastMessage: lastMessageData?.content!,
+        };
+      })
+    );
+
+    //console.log("chatRoomsDetails", chatRoomsDetails);
+
+    // 根據最後一條訊息的時間進行排序,將最新的聊天室排到最上面
+    const sortedChatRooms = chatRoomsDetails.sort((a, b) => {
+      if (a.lastTime && b.lastTime) {
+        return new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime();
+      }
+      return 0; // 若有空值則保持原順序
+    }) as ChatRoom[];
+
+    return {
+      success: true,
+      data: sortedChatRooms,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
 };
 
 // 取得聊天室的詳細資訊(根據 chatRoomId、 userId+ friendId 查詢)
