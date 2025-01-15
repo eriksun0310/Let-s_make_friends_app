@@ -50,7 +50,9 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
   // 取得好友列表
   const fetchFriendList = async () => {
-    const { data, success } = await getFriendList(personal.userId);
+    const { data, success } = await getFriendList({
+      currentUserId: personal.userId,
+    });
     if (!success) {
       console.log("取得好友列表 錯誤");
       setLoading(false);

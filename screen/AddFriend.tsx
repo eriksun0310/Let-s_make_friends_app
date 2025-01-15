@@ -7,7 +7,7 @@ import { NavigationProp } from "@react-navigation/native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
 import {
-  getAllUsers,
+  getBeFriendUsers,
   insertRejectedFriendRequest,
   sendFriendRequest,
 } from "../util/handleFriendsEvent";
@@ -47,9 +47,11 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
 
   // 可以成為好友的用戶資料
-  const fetchAllUsers = async () => {
+  const fetchBeFriendUsers = async () => {
     try {
-      const userData = (await getAllUsers(personal.userId)) as User[];
+      const { data: userData } = await getBeFriendUsers({
+        currentUserId: personal.userId,
+      });
       setAllUsers(userData);
     } catch (error) {
       console.log("取得 可以成為好友的用戶資料  錯誤", error);
@@ -86,7 +88,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       console.error("Error sending friend request:", error);
     }
 
-    await fetchAllUsers();
+    await fetchBeFriendUsers();
   };
 
   useEffect(() => {
@@ -130,7 +132,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       tabBarBadge: showBadge ? <Dot size="5" /> : null,
     });
 
-    fetchAllUsers(); // 調用 API 獲取資料
+    fetchBeFriendUsers(); // 調用 API 獲取資料
   }, [
     navigation,
     newFriendRequestNumber,

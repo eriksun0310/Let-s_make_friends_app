@@ -6,6 +6,7 @@ import {
 import { Result, User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
 import { initUserSettings } from "../shared/static";
+import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
 
 /*
 ✅: 已經整理好的
@@ -161,6 +162,76 @@ export const getUserDetail = async ({
       success: false,
       errorMessage: (error as Error).message,
       data: null,
+    };
+  }
+};
+
+type GetUsersDetailReturn = Result & {
+  data: User[];
+};
+
+// ✅批量查詢所有用戶的詳細資料
+export const getUsersDetail = async ({
+  userIds,
+}: {
+  userIds: string[];
+}): Promise<GetUsersDetailReturn> => {
+  try {
+    // 查詢 users
+    const { data, error } = await supabase
+      .from("users")
+      .select(
+        `
+        id, 
+        name, 
+        gender, 
+        introduce, 
+        birthday, 
+        email, 
+        created_at, 
+        updated_at,
+        user_head_shot(image_url, image_type),
+        user_selected_option(interests, favorite_food, disliked_food)
+        `
+      )
+      .in("id", userIds);
+
+    if (error) {
+      console.error("批量查詢所有用戶失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+        data: [],
+      };
+    }
+
+    if (!data || data.length === 0) {
+      console.log("批量查詢所有用戶為空");
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const transformedUsers = data.map((user) =>
+      transformUser({
+        users: user,
+        userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
+        userSelectedOption:
+          user.user_selected_option as unknown as UserSelectedOptionDBType,
+      })
+    );
+
+    return {
+      success: true,
+      data: transformedUsers,
+    };
+  } catch (error) {
+    console.log("批量查詢所有用戶錯誤", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
     };
   }
 };
@@ -396,7 +467,7 @@ type GetAllUsersSettingsReturn = Result & {
   data: UserSettings[];
 };
 
-// ✅批量查詢所有用戶設定的API
+// ✅批量查詢所有用戶設定
 export const getAllUsersSettings = async ({
   userIds,
 }: {

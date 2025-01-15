@@ -32,10 +32,11 @@ import {
   UserSettings,
 } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
-import { getFriendDetails, getFriendList } from "./handleFriendsEvent";
+import { getFriendList } from "./handleFriendsEvent";
 import {
   getAllUsersSettings,
   getUserDetail,
+  getUsersDetail,
   getUserSettings,
 } from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
@@ -257,7 +258,9 @@ export const getAllPosts = async ({
 }> => {
   try {
     // 取得好友資訊
-    const { data: friendList } = await getFriendList(userId);
+    const { data: friendList } = await getFriendList({
+      currentUserId: userId,
+    });
 
     // 提取好友 ID
     const friendIds = friendList.map((friend) => friend.userId);
@@ -288,7 +291,9 @@ export const getAllPosts = async ({
     const userIds = postsData.map((post) => post.user_id);
 
     // 批量查詢發文者資訊
-    const users = await getFriendDetails(userIds);
+    const { data: users } = await getUsersDetail({
+      userIds,
+    });
 
     // 取得所有用戶設定
     const { data: allUsersSettings } = await getAllUsersSettings({ userIds });
@@ -448,7 +453,7 @@ export const addPostDB = async ({
       tags: newPost.tags,
       postId: newPostId,
     });
-  
+
     // 轉換文章的資料格式
     const transformedPost = transformPost({
       posts: postData,

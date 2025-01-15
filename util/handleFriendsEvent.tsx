@@ -1,7 +1,7 @@
 import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
-import { Result, User } from "../shared/types";
+import { FriendState, Result, User } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
-import { getUserDetail } from "./handleUserEvent";
+import { getUserDetail, getUsersDetail } from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
 
 interface FriendProps {
@@ -31,13 +31,13 @@ friends: 好友列表
 //       .from("users")
 //       .select(
 //         `
-//         id, 
-//         name, 
-//         gender, 
-//         introduce, 
-//         birthday, 
-//         email, 
-//         created_at, 
+//         id,
+//         name,
+//         gender,
+//         introduce,
+//         birthday,
+//         email,
+//         created_at,
 //         updated_at,
 //         user_head_shot(image_url, image_type),
 //         user_selected_option(interests, favorite_food, disliked_food)
@@ -76,52 +76,52 @@ friends: 好友列表
 //   }
 // };
 
-export const getFriendDetails = async (
-  friendIds: string[]
-): Promise<User[]> => {
-  try {
-    // 查詢 users
-    const { data, error } = await supabase
-      .from("users")
-      .select(
-        `
-        id, 
-        name, 
-        gender, 
-        introduce, 
-        birthday, 
-        email, 
-        created_at, 
-        updated_at,
-        user_head_shot(image_url, image_type),
-        user_selected_option(interests, favorite_food, disliked_food)
-        `
-      )
-      .in("id", friendIds);
+// export const getFriendDetails = async (
+//   friendIds: string[]
+// ): Promise<User[]> => {
+//   try {
+//     // 查詢 users
+//     const { data, error } = await supabase
+//       .from("users")
+//       .select(
+//         `
+//         id,
+//         name,
+//         gender,
+//         introduce,
+//         birthday,
+//         email,
+//         created_at,
+//         updated_at,
+//         user_head_shot(image_url, image_type),
+//         user_selected_option(interests, favorite_food, disliked_food)
+//         `
+//       )
+//       .in("id", friendIds);
 
-    if (error) {
-      console.error("Error fetching users:", error);
-      return [];
-    }
+//     if (error) {
+//       console.error("Error fetching users:", error);
+//       return [];
+//     }
 
-    if (!data || data.length === 0) {
-      console.log("好友詳細資料為空");
-      return [];
-    }
+//     if (!data || data.length === 0) {
+//       console.log("好友詳細資料為空");
+//       return [];
+//     }
 
-    return data.map((user) =>
-      transformUser({
-        users: user,
-        userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
-        userSelectedOption:
-          user.user_selected_option as unknown as UserSelectedOptionDBType,
-      })
-    );
-  } catch (error) {
-    console.log("取得好友詳細資料錯誤", error);
-    return [];
-  }
-};
+//     return data.map((user) =>
+//       transformUser({
+//         users: user,
+//         userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
+//         userSelectedOption:
+//           user.user_selected_option as unknown as UserSelectedOptionDBType,
+//       })
+//     );
+//   } catch (error) {
+//     console.log("取得好友詳細資料錯誤", error);
+//     return [];
+//   }
+// };
 
 // 取得可以成為好友的用戶 - origin
 // export const getAllUsers = async (currentUserId: string) => {
@@ -212,7 +212,18 @@ export const getFriendDetails = async (
 //   }
 // };
 
-export const getAllUsers = async (currentUserId: string) => {
+type GetAllUsersReturn = {
+  success: boolean;
+  errorMessage?: string;
+  data: User[];
+};
+
+// ✅取得可以成為好友的用戶
+export const getBeFriendUsers = async ({
+  currentUserId,
+}: {
+  currentUserId: string;
+}): Promise<GetAllUsersReturn> => {
   try {
     // 查詢 friend_requests 獲取需要排除的 userId
     const { data: friendRequests, error: friendRequestsError } = await supabase
@@ -221,10 +232,15 @@ export const getAllUsers = async (currentUserId: string) => {
       .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`);
 
     if (friendRequestsError) {
-      console.error("Error fetching friend requests:", friendRequestsError);
-      return [];
+      console.error("取得 friend requests 失敗", friendRequestsError);
+      return {
+        success: false,
+        errorMessage: friendRequestsError.message,
+        data: [],
+      };
     }
 
+    // 整理需要排除的用戶 ID
     const excludeUserIds = [
       currentUserId,
       ...friendRequests.flatMap((req) => [req.sender_id, req.receiver_id]),
@@ -247,11 +263,15 @@ export const getAllUsers = async (currentUserId: string) => {
         user_selected_option(interests, favorite_food, disliked_food)
         `
       )
-      .not("id", "in", `(${excludeUserIds.join(",")})`);
+      .not("id", "in", `(${excludeUserIds.join(",")})`); // 排除自己、好友邀請中的用戶
 
     if (usersError) {
-      console.error("Error fetching users:", usersError);
-      return [] as User[];
+      console.error("查詢 users 失敗", usersError);
+      return {
+        success: false,
+        errorMessage: usersError.message,
+        data: [],
+      };
     }
 
     const allUsers = users.map((user) => {
@@ -264,10 +284,17 @@ export const getAllUsers = async (currentUserId: string) => {
       return transformedUser;
     });
 
-    return allUsers;
+    return {
+      success: true,
+      data: allUsers,
+    };
   } catch (error) {
     console.error("Error fetching all users:", error);
-    return [];
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
   }
 };
 
@@ -276,7 +303,7 @@ ex:111 寄給 222
 senderId: 111.user_id
 receiverId: 222.user_id
 */
-// 發送交友邀請
+// ✅發送交友邀請
 export const sendFriendRequest = async ({
   senderId,
   receiverId,
@@ -289,24 +316,24 @@ export const sendFriendRequest = async ({
       is_read: false, // 設置為未讀
     });
     if (error) {
-      console.error("Error sending friend request:", error);
+      console.error("發送交友邀請失敗", error);
       return {
         success: false,
-        errorMessage: "Failed to send friend request. Please try again later.",
+        errorMessage: error.message,
       };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.error("發送交友邀請失敗", error);
     return {
       success: false,
-      errorMessage: "An error occurred. Please try again later.",
+      errorMessage: (error as Error).message,
     };
   }
 };
 
-// 更新 friend_requests 狀態
+// ✅更新 friend_requests 狀態 (接受或拒絕)
 const updateFriendRequestStatus = async ({
   senderId,
   receiverId,
@@ -314,34 +341,46 @@ const updateFriendRequestStatus = async ({
 }: {
   senderId: string;
   receiverId: string;
-  status: "accepted" | "rejected";
+  status: Omit<FriendState, "add">;
 }): Promise<Result> => {
-  // 更新 friend_requests 狀態
-  const { error } = await supabase
-    .from("friend_requests")
-    .update({
-      status: status,
-      //updated_at: new Date().toISOString(),
-    })
-    .eq("sender_id", senderId)
-    .eq("receiver_id", receiverId);
-  if (error) {
-    console.error("Error updating friend request status:", error);
-    return { success: false, errorMessage: error?.message };
-  }
+  try {
+    // 更新 friend_requests 狀態
+    const { error } = await supabase
+      .from("friend_requests")
+      .update({
+        status: status,
+      })
+      .eq("sender_id", senderId)
+      .eq("receiver_id", receiverId);
+    if (error) {
+      console.log("更新 friend_requests 狀態 失敗", error);
+      return {
+        success: false,
+        errorMessage: error?.message,
+      };
+    }
 
-  return {
-    success: true,
-  };
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.log("更新 friend_requests 狀態 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
+  }
 };
-// 取得好友列表
-export const getFriendList = async (
-  currentUserId: string
-): Promise<{
-  success: boolean;
-  errorMessage?: string;
+
+type GetFriendListReturn = Result & {
   data: User[];
-}> => {
+};
+// ✅取得好友列表
+export const getFriendList = async ({
+  currentUserId,
+}: {
+  currentUserId: string;
+}): Promise<GetFriendListReturn> => {
   try {
     const { data: friendsData, error: friendsError } = await supabase
       .from("friends")
@@ -349,7 +388,7 @@ export const getFriendList = async (
       .eq("user_id", currentUserId);
 
     if (friendsError) {
-      console.error("Error fetching friends:", friendsError);
+      console.error("取得好友列表 失敗", friendsError);
 
       return {
         success: false,
@@ -359,23 +398,27 @@ export const getFriendList = async (
     }
 
     if (!friendsData || friendsData.length === 0) {
-      console.log("No friends found for the user.");
+      console.log("沒有好友");
       return {
         success: true,
-        errorMessage: "沒有好友",
         data: [],
       };
     }
 
+    // // 獲取每個好友的詳細資料
+    // const allFriendsDetails1 = await Promise.all(
+    //   friendsData.map(async (friend) => {
+    //     const { data: friendDetail } = await getUserDetail({
+    //       userId: friend.friend_id,
+    //     });
+    //     return friendDetail; // 返回每個好友的詳細資料
+    //   })
+    // );
+
     // 獲取每個好友的詳細資料
-    const allFriendsDetails = await Promise.all(
-      friendsData.map(async (friend) => {
-        const { data: friendDetail } = await getUserDetail({
-          userId: friend.friend_id,
-        });
-        return friendDetail; // 返回每個好友的詳細資料
-      })
-    );
+    const { data: allFriendsDetails } = await getUsersDetail({
+      userIds: friendsData.map((friend) => friend.friend_id),
+    });
 
     // 過濾掉返回為空的好友數據
     return {
@@ -383,7 +426,7 @@ export const getFriendList = async (
       data: allFriendsDetails.filter((friendDetail) => friendDetail !== null),
     };
   } catch (error) {
-    console.error("Error fetching friends:", error);
+    console.error("取得好友列表 失敗", error);
     return {
       success: false,
       errorMessage: (error as Error)?.message,
@@ -392,14 +435,14 @@ export const getFriendList = async (
   }
 };
 
-// 新增 好友資訊到 friends 表
+// ✅新增 好友資訊到 friends 表
 const insertFriend = async ({
   userId,
   friendId,
 }: {
   userId: string;
   friendId: string;
-}): Promise<void> => {
+}): Promise<Result> => {
   try {
     // 插入 user_id 和 friend_id 的關聯
     const { error: insertError1 } = await supabase.from("friends").insert({
@@ -408,8 +451,11 @@ const insertFriend = async ({
       notified: false,
     });
     if (insertError1) {
-      console.error("Error inserting friend record 1:", insertError1);
-      throw insertError1; // 拋出錯誤
+      console.log("新增好友資訊 失敗", insertError1);
+      return {
+        success: false,
+        errorMessage: insertError1?.message,
+      };
     }
 
     // 插入反向關聯 friend_id 和 user_id 的關聯
@@ -420,15 +466,25 @@ const insertFriend = async ({
     });
 
     if (insertError2) {
-      console.error("Error inserting friend record 2:", insertError2);
-      throw insertError2; // 拋出錯誤
+      console.log("新增好友資訊 失敗", insertError2);
+      return {
+        success: false,
+        errorMessage: insertError2?.message,
+      };
     }
+
+    return {
+      success: true,
+    };
   } catch (error) {
-    console.error("Error inserting friend:", error);
+    return {
+      success: false,
+      errorMessage: (error as Error)?.message,
+    };
   }
 };
 
-// 確認交友邀請
+// ✅接受交友邀請
 export const acceptedFriendRequest = async ({
   senderId,
   receiverId,
@@ -441,9 +497,10 @@ export const acceptedFriendRequest = async ({
     });
 
     if (!success) {
+      console.log("接受交友邀請 失敗", errorMessage);
       return {
         success: false,
-        errorMessage: errorMessage || "Failed to accept friend request.",
+        errorMessage: errorMessage,
       };
     }
 
@@ -455,15 +512,15 @@ export const acceptedFriendRequest = async ({
 
     return { success: true };
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.log("接受交友邀請 失敗", error);
     return {
       success: false,
-      errorMessage: "An error occurred. Please try again later.",
+      errorMessage: (error as Error)?.message,
     };
   }
 };
 
-// 這是給 加好友想刪除好友用的(因為friend_requests 沒有資料要用insert)
+// ✅這是給 加好友想刪除好友用的(因為friend_requests 沒有資料要用insert)
 export const insertRejectedFriendRequest = async ({
   senderId,
   receiverId,
@@ -476,29 +533,28 @@ export const insertRejectedFriendRequest = async ({
       is_read: true, // 設置為已讀
     });
     if (error) {
-      console.error("Error sending friend request:", error);
+      console.log("加好友UI 刪除好友 失敗", error);
       return {
         success: false,
-        errorMessage: "Failed to send friend request. Please try again later.",
+        errorMessage: error.message,
       };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.error("加好友UI 刪除好友 失敗", error);
     return {
       success: false,
-      errorMessage: "An error occurred. Please try again later.",
+      errorMessage: (error as Error).message,
     };
   }
 };
 
-// 拒絕交友邀請(給對方有寄送交友邀請用的)
+// ✅拒絕交友邀請(給對方有寄送交友邀請用的)
 export const updateRejectedFriendRequest = async ({
   senderId,
   receiverId,
 }: FriendProps): Promise<Result> => {
-  console.log("senderId:", senderId, "receiverId:", receiverId);
   try {
     const { success, errorMessage } = await updateFriendRequestStatus({
       senderId,
@@ -507,23 +563,24 @@ export const updateRejectedFriendRequest = async ({
     });
 
     if (!success) {
+      console.log("拒絕交友邀請 失敗", errorMessage);
       return {
         success: false,
-        errorMessage: errorMessage || "Failed to reject the friend request.",
+        errorMessage: errorMessage,
       };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.log("拒絕交友邀請 失敗", error);
     return {
       success: false,
-      errorMessage: "An error occurred. Please try again later.",
+      errorMessage: (error as Error)?.message,
     };
   }
 };
 
-//刪除(單一)好友
+//✅刪除(單一)好友
 export const deleteFriend = async ({
   userId,
   friendId,
@@ -542,13 +599,13 @@ export const deleteFriend = async ({
       );
 
     if (error) {
-      console.error("Error deleting friend:", error);
-      return { success: false, errorMessage: "Failed to delete friend." };
+      console.log("刪除好友 失敗", error);
+      return { success: false, errorMessage: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("deleteFriend error:", error);
-    return { success: false, errorMessage: "An error occurred." };
+    console.log("刪除好友 失敗", error);
+    return { success: false, errorMessage: (error as Error).message };
   }
 };

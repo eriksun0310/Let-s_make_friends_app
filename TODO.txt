@@ -24,7 +24,7 @@
     ✅1. handleUserEvent
     ✅2.刪除user_online_status 相關的邏輯、資料表
 2. 加好友
-    1.handleFriendsEvent
+    ✅1.handleFriendsEvent
 3. 首頁
     1.handlePostEvent
 4. 聊天室

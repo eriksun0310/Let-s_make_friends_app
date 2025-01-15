@@ -76,9 +76,9 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
 
     // 取得好友列表
     const fetchFriendList = async () => {
-      const { data: friendList, success } = await getFriendList(
-        personal.userId
-      );
+      const { data: friendList, success } = await getFriendList({
+        currentUserId: personal.userId,
+      });
       if (!success) {
         console.log("取得好友列表 錯誤");
         return;
