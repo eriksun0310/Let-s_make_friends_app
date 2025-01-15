@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import RegisterForm from "./RegisterForm";
 import type { Form, RegisterIsValid } from "../../../shared/types";
-import { logout } from "../../../store/userSlice";
-
 import FlatButton from "../../ui/button/FlatButton";
 import { useAppDispatch } from "../../../store/hooks";
 

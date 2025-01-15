@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { selectUser, setUser } from "../store/userSlice";
 import { NavigationProp } from "@react-navigation/native";
 import SaveButton from "../components/ui/button/SaveButton";
-import { updateUser } from "../util/handleUserEvent";
+import { updateUserField } from "../util/handleUserEvent";
 import { updateUserTitle } from "../shared/static";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
@@ -41,7 +41,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ route, navigation }) => {
       // 更新回redux
       dispatch(setUser({ ...personal, [mode]: value }));
       // 更新supabase
-      await updateUser({
+      await updateUserField({
         userId: personal.userId,
         fieldName: mode,
         fieldValue: value,

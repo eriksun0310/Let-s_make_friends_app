@@ -6,11 +6,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Text } from "react-native";
 import type { LoginForm, LoginIsValid } from "../shared/types";
 import { setUser, setUserSettings } from "../store/userSlice";
-import {
-  getUserData,
-  getUserSettings,
-  updateUserOnlineStatus,
-} from "../util/handleUserEvent";
+import { getUserData, getUserSettings } from "../util/handleUserEvent";
 import { useAppDispatch } from "../store/hooks";
 
 interface LoginEmailProps {
@@ -76,27 +72,22 @@ const Login: React.FC<LoginEmailProps> = ({ navigation }) => {
       const { userId, email } = await login(form.email, form.password);
 
       // 取得用戶資料
-      const userData = await getUserData({
+      const { data: userData } = await getUserData({
         userId,
       });
 
       // 舊用戶
       if (userData) {
-        // 更新用戶在線狀態
-        await updateUserOnlineStatus({
-          userId: userId,
-          isOnline: true,
-        });
-
         // 取得用戶設定資料
-        const { success: userSettingsSuccess, data } = await getUserSettings({
+        const { data } = await getUserSettings({
           userId,
         });
 
+        // 用戶個人資料
         dispatch(setUser(userData));
-        if (userSettingsSuccess) {
-          dispatch(setUserSettings(data));
-        }
+
+        // 用戶設定
+        dispatch(setUserSettings(data));
 
         navigation.navigate("main", { screen: "home" }); // 如果用戶資料完整，跳轉聊天頁面
 

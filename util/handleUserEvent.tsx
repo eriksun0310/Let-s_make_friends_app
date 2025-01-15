@@ -3,80 +3,107 @@ import {
   transformUser,
   transformUserSettings,
 } from "../shared/user/userUtils";
-import { User, UserSettings } from "../shared/types";
+import { Result, User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
 import { initUserSettings } from "../shared/static";
-import { UserSettingsDBType } from "../shared/dbType";
-
 /*
+✅: 已經整理好的
 處理 個人資料 db 操作
 users:個人資料
 user_selected_option:興趣選項
 user_head_shot: 大頭貼
-user_online_status: 用戶在線狀態
 user_settings: 用戶設定
 */
 
-// 取得用戶資料
+type GetUserDataReturn = {
+  success: boolean;
+  errorMessage?: string;
+  data: User | null;
+};
+
+// ✅取得用戶資料
 export const getUserData = async ({
   userId,
 }: {
   userId: string;
-}): Promise<User | null> => {
-  // 查詢主資料表 users
-  const {
-    data: userData,
-    error: userError,
-    count: userCount,
-  } = await supabase
-    .from("users")
-    .select("*", {
-      count: "exact",
-    })
-    .eq("id", userId); // 篩選條件：id 等於 userId
+}): Promise<GetUserDataReturn> => {
+  try {
+    // 查詢主資料表 users
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("*", {
+        count: "exact",
+      })
+      .eq("id", userId); // 篩選條件：id 等於 userId
 
-  if (userError) {
-    console.error("Error fetching user data:", userError);
-    return null;
+    if (userError) {
+      console.error("取得用戶資料 失敗:", userError);
+      return {
+        success: false,
+        errorMessage: userError.message,
+        data: null,
+      };
+    }
+
+    // 新用戶
+    if (!userData || userData.length === 0) {
+      return {
+        success: true,
+        data: null,
+      };
+    }
+
+    // 查詢 user_selected_option
+    const { data: selectedData, error: selectedError } = await supabase
+      .from("user_selected_option")
+      .select("interests, favorite_food, disliked_food", { count: "exact" })
+      .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+    if (selectedError) {
+      console.error("取得用戶喜好 失敗:", selectedError);
+      return {
+        success: false,
+        errorMessage: selectedError.message,
+        data: null,
+      };
+    }
+
+    // 查詢 user_head_shot
+    const { data: headShotData, error: headShotError } = await supabase
+      .from("user_head_shot")
+      .select("image_url, image_type", { count: "exact" })
+      .eq("user_id", userId); // 篩選條件：id 等於 userId
+
+    if (headShotError) {
+      console.error("取得用戶大頭貼 失敗:", headShotError);
+      return {
+        success: false,
+        errorMessage: headShotError.message,
+        data: null,
+      };
+    }
+
+    const transformedUser = transformUser({
+      users: userData[0],
+      userHeadShot: headShotData[0] || null,
+      userSelectedOption: selectedData[0] || null,
+    });
+
+    return {
+      success: true,
+      data: transformedUser,
+    };
+  } catch (error) {
+    console.log("取得用戶資料 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: null,
+    };
   }
-
-  // 新用戶
-  if (userCount === 0 || !userData || userData.length === 0) {
-    return null; // 新用戶或無效的 userId
-  }
-
-  // 查詢 user_selected_option
-  const { data: selectedData, error: selectedError } = await supabase
-    .from("user_selected_option")
-    .select("interests, favorite_food, disliked_food", { count: "exact" })
-    .eq("user_id", userId); // 篩選條件：id 等於 userId
-
-  if (selectedError) {
-    console.error("Error fetching selected data:", selectedError);
-    return null;
-  }
-
-  // 查詢 user_head_shot
-  const { data: headShotData, error: headShotError } = await supabase
-    .from("user_head_shot")
-    .select("image_url, image_type", { count: "exact" })
-    .eq("user_id", userId); // 篩選條件：id 等於 userId
-
-  if (headShotError) {
-    console.error("Error fetching headShot data:", headShotError);
-    return null;
-  }
-
-  const transformedUser = transformUser({
-    users: userData[0]!,
-    userHeadShot: headShotData[0]! || null,
-    userSelectedOption: selectedData[0]! || null,
-  });
-
-  return transformedUser;
 };
 
-// 點擊 關於我的儲存
+//✅ 點擊 關於我的儲存
 export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
   try {
     // 儲存自己的基本資料
@@ -88,9 +115,6 @@ export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
     // 儲存自己的選項
     await saveUserSelectedOption({ user });
 
-    // 儲存自己的在線狀態
-    await updateUserOnlineStatus({ userId: user.userId, isOnline: true });
-
     // 儲存自己的設定
     await saveUserSettings({ ...initUserSettings, userId: user.userId });
   } catch (error) {
@@ -98,8 +122,8 @@ export const saveAboutMe = async ({ user }: { user: User }): Promise<void> => {
   }
 };
 
-// 更新 個人資料的單一欄位(name、introduce)
-export const updateUser = async ({
+// ✅更新 個人資料的單一欄位(name、introduce)
+export const updateUserField = async ({
   userId,
   fieldName,
   fieldValue,
@@ -107,11 +131,14 @@ export const updateUser = async ({
   userId: string;
   fieldName: "name" | "introduce";
   fieldValue: any;
-}): Promise<void> => {
+}): Promise<Result> => {
   try {
     // 驗證 fieldName 是否為允許的欄位
     if (!["name", "introduce"].includes(fieldName)) {
-      throw new Error(`Invalid field name: ${fieldName}`);
+      return {
+        success: false,
+        errorMessage: `更新不允許的欄位: ${fieldName}`,
+      };
     }
 
     const { error } = await supabase
@@ -122,15 +149,26 @@ export const updateUser = async ({
       .eq("id", userId);
 
     if (error) {
-      throw new Error(`Error updating user ${fieldName}: ${error.message}`);
+      console.log(`更新 users 的${fieldName} 失敗`, error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
     }
+
+    return {
+      success: true,
+    };
   } catch (error) {
-    console.error("updateUser:", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };
 
-// 儲存自己的基本資料(for aboutMe 的儲存)
-export const saveUser = async ({ user }: { user: User }): Promise<void> => {
+// ✅儲存自己的基本資料(for aboutMe 的儲存)
+export const saveUser = async ({ user }: { user: User }): Promise<Result> => {
   try {
     const { error } = await supabase.from("users").upsert(
       {
@@ -145,19 +183,31 @@ export const saveUser = async ({ user }: { user: User }): Promise<void> => {
     );
 
     if (error) {
-      throw new Error(`Error saving user: ${error.message}`);
+      console.log("更新 users 失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
     }
+
+    return {
+      success: true,
+    };
   } catch (error) {
-    console.error("Error saving user:", error);
+    console.log("更新 users 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };
 
-// 儲存自己的大頭貼
+// ✅儲存自己的大頭貼
 export const saveUserHeadShot = async ({
   user,
 }: {
   user: User;
-}): Promise<void> => {
+}): Promise<Result> => {
   try {
     const { error } = await supabase.from("user_head_shot").upsert(
       {
@@ -169,19 +219,31 @@ export const saveUserHeadShot = async ({
     );
 
     if (error) {
-      throw new Error(`Error saving headshot: ${error.message}`);
+      console.log("更新 user_head_shot 失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
     }
+
+    return {
+      success: true,
+    };
   } catch (error) {
-    console.error("Error saving user headshot:", error);
+    console.log("更新 user_head_shot 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };
 
-// 儲存用戶興趣選項
+// ✅儲存用戶興趣選項
 export const saveUserSelectedOption = async ({
   user,
 }: {
   user: User;
-}): Promise<void> => {
+}): Promise<Result> => {
   try {
     const { error } = await supabase.from("user_selected_option").upsert(
       {
@@ -194,71 +256,37 @@ export const saveUserSelectedOption = async ({
     );
 
     if (error) {
-      throw new Error(`Error saving user options: ${error.message}`);
+      console.log("更新 user_selected_option 失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
     }
+
+    return {
+      success: true,
+    };
   } catch (error) {
-    console.error("Error saving user options:", error);
+    console.log("更新 user_selected_option 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };
 
-//檢查用戶是否在線上(2024/12/29 目前用不到, 因為改成 supabase presence)
-export const isUserOnline = async (userId: string): Promise<boolean> => {
-  const { data, error } = await supabase
-    .from("user_online_status")
-    .select("is_online") // 仅选择所需字段
-    .eq("user_id", userId)
-    .maybeSingle(); // 避免抛出异常
-
-  if (error) {
-    console.error("Error checking user online status:", error);
-    return false; // 默认返回不在线
-  }
-
-  if (!data) {
-    console.warn("No record found for user:", userId);
-    return false; // 无记录则返回不在线
-  }
-
-  return data.is_online; // 返回用户在线状态
+type GetUserSettingsReturn = {
+  success: boolean;
+  errorMessage?: string;
+  data: UserSettings;
 };
 
-// 更新用戶在線狀態
-export const updateUserOnlineStatus = async ({
-  userId,
-  isOnline,
-}: {
-  userId: string;
-  isOnline: boolean;
-}): Promise<void> => {
-  try {
-    const { error } = await supabase.from("user_online_status").upsert(
-      {
-        user_id: userId,
-        is_online: isOnline,
-        last_seen: new Date().toISOString(),
-      },
-      {
-        onConflict: "user_id",
-      }
-    );
-
-    if (error) {
-      console.error("Error updating user_online_status:", error);
-    }
-  } catch (error) {
-    console.error("Unexpected error updating user online status:", error);
-  }
-};
-
-// 取得個別用戶設定
+// ✅取得個別用戶設定
 export const getUserSettings = async ({
   userId,
 }: {
   userId: string;
-}): Promise<{
-  success: boolean;
-  data: UserSettings;
-}> => {
+}): Promise<GetUserSettingsReturn> => {
   try {
     const { data, error } = await supabase
       .from("user_settings")
@@ -267,9 +295,10 @@ export const getUserSettings = async ({
       .maybeSingle();
 
     if (error) {
-      console.log("取得用戶設定失敗", error);
+      console.log("取得 user_settings 失敗", error);
       return {
         success: false,
+        errorMessage: error.message,
         data: {
           ...initUserSettings,
         },
@@ -291,10 +320,11 @@ export const getUserSettings = async ({
       };
     }
   } catch (error) {
-    console.log("取得用戶設定失敗", error);
+    console.log("取得 user_settings 失敗", error);
 
     return {
       success: false,
+      errorMessage: (error as Error).message,
       data: {
         ...initUserSettings,
       },
@@ -302,30 +332,32 @@ export const getUserSettings = async ({
   }
 };
 
-// 批量查詢所有用戶設定的API
+type GetAllUsersSettingsReturn = {
+  success: boolean;
+  errorMessage?: string;
+  data: UserSettings[];
+};
+
+// ✅批量查詢所有用戶設定的API
 export const getAllUsersSettings = async ({
   userIds,
 }: {
   userIds: string[];
-}): Promise<{
-  success: boolean;
-  data: UserSettings[];
-}> => {
+}): Promise<GetAllUsersSettingsReturn> => {
   try {
-    console.log("userIds", userIds);
     const { data, error } = await supabase
       .from("user_settings")
       .select("user_id, hide_likes, hide_comments, mark_as_read")
       .in("user_id", userIds);
 
     if (error) {
+      console.log("取得 所有 user_settings", error);
       return {
         success: false,
+        errorMessage: error.message,
         data: [],
       };
     }
-
-    console.log("取得所有用戶設定", data);
     const transformedUserSettings = transformAllUserSettings(data);
 
     return {
@@ -333,15 +365,16 @@ export const getAllUsersSettings = async ({
       data: transformedUserSettings,
     };
   } catch (error) {
-    console.log("取得用戶設定失敗", error);
+    console.log("取得 所有 user_settings", error);
     return {
       success: false,
+      errorMessage: (error as Error).message,
       data: [],
     };
   }
 };
 
-// 儲存用戶設定
+// ✅儲存用戶設定
 export const saveUserSettings = async ({
   userId,
   hideLikes,
@@ -352,10 +385,7 @@ export const saveUserSettings = async ({
   hideLikes: boolean;
   hideComments: boolean;
   markAsRead: boolean;
-}): Promise<{
-  success: boolean;
-  errorMessage?: string;
-}> => {
+}): Promise<Result> => {
   try {
     const { error } = await supabase.from("user_settings").upsert(
       {

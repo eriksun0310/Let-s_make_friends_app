@@ -14,6 +14,22 @@
 ➖➖➖➖➖➖➖➖➖
 
 
+ [寫 取supabase 、或更新等等的函式統一規格]
+ 1. try catch
+ 2. 有回傳資料 {success: boolean, errorMessage?:string, data: }
+ 3. 無回傳資料 type Result  
+
+🚀[整理code]
+1. 個人資料
+    ✅1. handleUserEvent
+    ✅2.刪除user_online_status 相關的邏輯、資料表
+2. 加好友
+    1.handleFriendsEvent
+3. 首頁
+    1.handlePostEvent
+4. 聊天室
+    1.handleChatEvent
+
 🚀[要先做]
 ✅1.編輯貼文 有問題 
 目前看來自己編輯貼文 內容跟tags 會取正確的

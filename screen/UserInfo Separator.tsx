@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
-import { RootState } from "../store/store";
-
-import { useSelector } from "react-redux";
 import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
 import PostPermissionsSettings from "../components/post/PostPermissionsSettings";
@@ -23,10 +20,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
-import {
-  getProcessedChatData,
-  processMessageWithSeparators,
-} from "../shared/chat/chatFuncs";
 
 interface UserInfoProps {
   route: {
@@ -61,7 +54,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   //登出
   const handleLogout = () => {
-    dispatch(logout(personal.userId)).then(() => {
+    dispatch(logout).then(() => {
       navigation.navigate("login");
     });
   };
