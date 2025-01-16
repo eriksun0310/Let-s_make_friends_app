@@ -14,7 +14,6 @@ export const transformChatRoom = ({
     lastMessage?: LastMessage | null;
   };
 }): ChatRoom => {
-  console.log("333 dataaa", data);
   const {
     id,
     user1_id,

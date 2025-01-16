@@ -236,10 +236,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   // 標記單條訊息已讀
   useEffect(() => {
-    console.log("readMessages 1111111", readMessages);
     if (readMessages) {
       setMessages((prevMessages) => {
-        console.log("prevMessages", prevMessages);
         return prevMessages.map((msg) => {
           console.log("msg", msg);
           return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
@@ -307,12 +305,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     );
 
     // 更新資料庫的未讀數量歸0
-    const result = await resetUnreadCount({
+    const { success, errorMessage } = await resetUnreadCount({
       chatRoomId: currentChatRoomId!,
       userId: personal.userId,
     });
-    if (!result.success) {
-      console.error("更新未讀數量失敗", result.error);
+    if (!success) {
+      console.error("更新未讀數量失敗", errorMessage);
     }
 
     dispatch(setCurrentChatRoomId(null));

@@ -170,15 +170,15 @@ export const getChatRoomDetail = async ({
 
 // 取得最後一則訊息
 export const getLastMessage = async (
-  chatRoomId: string
+  chatRoomIds: string
 ): Promise<{
   content: string;
   created_at: Date;
-} | null> => {
+}[] | null> => {
   const { data, error } = await supabase
     .from("messages")
     .select("content, created_at")
-    .eq("chat_room_id", chatRoomId)
+    .in("chat_room_id", [chatRoomIds])
     .order("created_at", { ascending: false }) // 按照時間降序排列
     .limit(1); //只取最後一條訊息
 
@@ -193,7 +193,7 @@ export const getLastMessage = async (
   }
 
   // 返回第一條訊息
-  return data[0];
+  return data;
 };
 
 // 建立新聊天室&插入訊息

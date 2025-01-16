@@ -206,7 +206,6 @@ export const getUsersDetail = async ({
     }
 
     if (!data || data.length === 0) {
-      console.log("批量查詢所有用戶為空");
       return {
         success: true,
         data: [],

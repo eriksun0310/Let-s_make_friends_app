@@ -229,9 +229,19 @@ export const getLastMessage = async ({
   chatRoomIds: string[];
 }): Promise<GetLastMessageReturn> => {
   try {
-    const { data, error } = await supabase.rpc("get_last_messages", {
-      chat_room_ids: chatRoomIds,
-    });
+    if (chatRoomIds.length === 0) {
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const { data, error } = await supabase
+      .from("messages")
+      .select("chat_room_id, content, created_at")
+      .in("chat_room_id", chatRoomIds) // 限制範圍為 chatRoomIds
+      .order("chat_room_id", { ascending: true }) // 必須首先根據 chat_room_id 排序
+      .order("created_at", { ascending: false }); // 根據時間降序，取最新
 
     if (error) {
       console.log("取得聊天室最後一則訊息 失敗", error);
@@ -244,17 +254,26 @@ export const getLastMessage = async ({
 
     //如果data 是空數組, 返回null
     if (!data || data.length === 0) {
-      console.log("聊天室沒有最後一則訊息");
       return {
         success: true,
         data: [],
       };
     }
 
+    // 去除每個聊天室的多餘訊息, 僅保留最新的一條
+    const lastMessages = Object.values(
+      data.reduce((acc, message) => {
+        if (!acc[message.chat_room_id]) {
+          acc[message.chat_room_id] = message;
+        }
+        return acc;
+      }, {} as LastMessage[])
+    );
+
     // 返回第一條訊息
     return {
       success: true,
-      data: data,
+      data: lastMessages,
     };
   } catch (error) {
     console.log("批量查詢最後一則訊息 失敗", error);
@@ -545,16 +564,26 @@ export const resetUnreadCount = async ({
 
         if (!unreadColumn) return null;
 
-        return {
-          [unreadColumn]: 0,
-        };
+        if (room[unreadColumn] > 0) {
+          return {
+            [unreadColumn]: 0,
+          };
+        }
+
+        return {}; // 如果不需要更新未讀數量,則返回空物件
       })
       .eq("id", chatRoomId)
       .select("user1_id, user2_id, unread_count_user1, unread_count_user2")
       .single();
 
     if (error || !updatedRoom) {
-      console.log("更新聊天室未讀數量 失敗", error);
+      if (error?.message === "Empty or invalid json") {
+        console.log("未讀數量已經是0 不需要更新");
+        return {
+          success: true,
+        };
+      }
+      console.log("resetUnreadCount 更新聊天室未讀數量 失敗", error);
       return {
         success: false,
         errorMessage: error?.message,
@@ -610,30 +639,11 @@ export const markChatRoomMessagesAsRead = async ({
   userId: string;
 }): Promise<Result> => {
   try {
-    // 確定當前用戶是 user1 或 user2
-    const { data: updatedChatRoom, error: updatedChatRoomError } =
-      await supabase
-        .from("chat_rooms")
-        .update((room: ChatRoomsDBType) => {
-          const unreadColumn =
-            room.user1_id === userId
-              ? "unread_count_user1"
-              : "unread_count_user2";
-          return {
-            [unreadColumn]: 0,
-          };
-        })
-        .eq("id", chatRoomId)
-        .select("*")
-        .single(); // 返回更新後的聊天室
-
-    if (updatedChatRoomError || !updatedChatRoom) {
-      console.log("更新聊天室未讀數量 失敗", updatedChatRoomError);
-      return {
-        success: false,
-        errorMessage: updatedChatRoomError?.message,
-      };
-    }
+    // 更新聊天室未讀數量
+    await resetUnreadCount({
+      chatRoomId,
+      userId,
+    });
 
     // 將該聊天室中屬於當前用戶的訊息標記為已讀
     const { error: updateMessageError } = await supabase
