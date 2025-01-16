@@ -40,42 +40,19 @@ interface AllHeadShotProps {
 const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
   const [index, setIndex] = useState(0);
 
-  // 切換tab
-  const handleTabChange = (newIndex: number) => {
-    setIndex(newIndex);
-    // 根據 index 找到對應的 imageType
-    const newImageType = Object.keys(imageUrls)[newIndex] as ImageType;
+  console.log("headShot", headShot);
 
-    // 更新 headShot.imageType
-    setHeadShot((prev) => ({
-      ...prev,
-      imageType: newImageType,
-    }));
-  };
 
-  // 當前選的大頭貼
-  // useEffect(() => {
-  //   const index = Object.keys(imageUrls).indexOf(headShot.imageType);
-
-  //   if (index !== -1) {
-  //     setIndex(index);
-  //   }
-  // }, [headShot]);
-
-  // 初始化時設置 index
-  useEffect(() => {
-    const initialIndex = Object.keys(imageUrls).indexOf("animal");
-    if (initialIndex !== -1) {
-      setIndex(initialIndex);
-    }
-  }, [headShot.imageType]);
+  useEffect(()=>{
+    
+  })
   return (
     <>
       {/* tab */}
       <View style={styles.tab}>
         <Tab
           value={index}
-          onChange={handleTabChange}
+          onChange={setIndex}
           dense
           indicatorStyle={{
             backgroundColor: Colors.textBlue,
@@ -99,36 +76,36 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
             </Tab.Item>
           ))}
         </Tab>
+        <TabView value={index} onChange={setIndex} animationType="timing">
+          <View style={styles.optionsContainer}>
+            {imageUrls[headShot.imageType].map((item) => {
+              console.log("item", item);
+              return (
+                <TouchableOpacity
+                  key={item.imageUrl}
+                  style={styles.option}
+                  onPress={() => {
+                    setHeadShot((prev) => ({
+                      ...prev,
+                      imageUrl: item.imageUrl,
+                    }));
+                  }}
+                >
+                  <Avatar
+                    source={item.imageUrl}
+                    containerStyle={[
+                      styles.optionImage,
+                      item.imageUrl === parseInt(headShot.imageUrl as string)
+                        ? styles.selected
+                        : null,
+                    ]}
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </TabView>
       </View>
-      <TabView value={index} onChange={setIndex} animationType="timing">
-        <View style={styles.optionsContainer}>
-          {imageUrls[headShot.imageType].map((item) => {
-            console.log("item", item);
-            return (
-              <TouchableOpacity
-                key={item.imageUrl}
-                style={styles.option}
-                onPress={() => {
-                  setHeadShot((prev) => ({
-                    ...prev,
-                    imageUrl: item.imageUrl,
-                  }));
-                }}
-              >
-                <Avatar
-                  source={item.imageUrl}
-                  containerStyle={[
-                    styles.optionImage,
-                    item.imageUrl === parseInt(headShot.imageUrl as string)
-                      ? styles.selected
-                      : null,
-                  ]}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </TabView>
     </>
   );
 };

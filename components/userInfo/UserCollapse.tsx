@@ -6,7 +6,7 @@ import { Colors } from "../../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import { calculateAge, getZodiacSign } from "../../shared/user/userFuncs";
 import { Snackbar } from "react-native-paper";
-import { User, UserState } from "../../shared/types";
+import { Tab, User, UserState } from "../../shared/types";
 
 interface UserCollapseProps {
   userState: UserState;
@@ -133,14 +133,14 @@ const UserCollapse: React.FC<UserCollapseProps> = ({
                   }
                 >
                   <View>
-                    <Text>{tabs[key]}:</Text>
+                    <Text>{tabs[key as Tab]}:</Text>
                   </View>
                   <View style={styles.optionContainer}>
                     {user.selectedOption[key]?.length > 0 ? (
                       user.selectedOption[key]?.map((item, index) => {
                         const isLastItem =
                           index === user.selectedOption[key]?.length - 1;
-                        const option = optionList?.[key]?.[item];
+                        const option = optionList?.[key as Tab]?.[item];
 
                         return (
                           <Text key={index}>

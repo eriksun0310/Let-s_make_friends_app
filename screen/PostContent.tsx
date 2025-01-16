@@ -28,6 +28,7 @@ import {
 } from "../store";
 import { addPostDB, updatePostDB } from "../util/handlePostEvent";
 import { EditPost, PostDetail, PostVisibility } from "../shared/types";
+import { Avatar } from "@rneui/themed";
 
 const title = {
   edit: "編輯",
@@ -211,9 +212,9 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.postContainer}>
             <View style={styles.header}>
-              <Image
+              <Avatar
+                containerStyle={styles.avatar}
                 source={personal.headShot.imageUrl as ImageSourcePropType}
-                style={styles.avatar}
               />
               <Text style={styles.username}>{personal.name}</Text>
             </View>

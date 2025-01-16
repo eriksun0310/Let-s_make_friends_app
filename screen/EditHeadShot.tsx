@@ -8,14 +8,14 @@ import { Colors } from "../constants/style";
 import BackButton from "../components/ui/button/BackButton";
 import SaveButton from "../components/ui/button/SaveButton";
 import { saveUserHeadShot } from "../util/handleUserEvent";
-import { Screen } from "../shared/types";
+import { UserScreen } from "../shared/types";
 import { selectUser, setUser, useAppDispatch, useAppSelector } from "../store";
 
 interface AvatarCreatorProps {
   navigation: NavigationProp<any>;
   route: {
     params: {
-      screen: Screen;
+      screen: UserScreen;
     };
   };
 }
@@ -40,7 +40,7 @@ const EditHeadShot: React.FC<AvatarCreatorProps> = ({ route, navigation }) => {
     // 更新回redux
     dispatch(setUser({ ...personal, headShot }));
 
-    // 判斷哪個畫面需要打api
+    // 判斷哪個畫面需要更新大頭貼
     if (screen === "userInfo") {
       await saveUserHeadShot({
         user: {

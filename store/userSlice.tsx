@@ -118,7 +118,7 @@ const userSlice = createSlice({
 });
 
 // 將 logout 定義為一個 thunk，用來登出用戶(因為非同步操作，所以用 thunk)
-export const logout = (): AppThunk => async (dispatch) => {
+export const logout = () => async (dispatch: any) => {
   try {
     await supabase.auth.signOut();
     dispatch(userSlice.actions.setUser(initialState.user)); // 清除用戶信息

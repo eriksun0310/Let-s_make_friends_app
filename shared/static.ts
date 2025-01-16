@@ -1,4 +1,5 @@
 import {
+  ImageType,
   OptionList,
   SegmentedButtons,
   Tabs,
@@ -78,4 +79,9 @@ export const initUserSettings: UserSettings = {
   hideComments: false,
   hideLikes: false,
   markAsRead: true,
+};
+
+export const headShotTabsTitle: Record<ImageType, string> = {
+  people: "頭像",
+  animal: "動物",
 };

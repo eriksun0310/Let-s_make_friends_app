@@ -102,7 +102,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   };
 
   // 檢查文章是否為自己發的
-  const hasMyPost = postData?.some((post) => post.user.userId === user.userId);
+  const hasMyPost = postData?.some(
+    (post) => post?.user?.userId === user.userId
+  );
 
   // 過濾掉不符合的文章權限
   const filteredPost = postData?.filter((post) => {
@@ -136,10 +138,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    // console.log("好友資料 当前导航堆栈:", navigation.getState());
     navigation.setOptions({
       title: userState === "personal" ? "個人資料" : "好友資料",
-      headerTitleAlign: "center",
+      // headerTitleAlign: "center",
       headerLeft: () => {
         if (userState === "friend") {
           return <BackButton onPress={() => navigation.goBack()} />;
@@ -186,11 +187,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             navigation={navigation}
             user={user}
           />
-          <View
-            style={{
-              marginTop: 10,
-            }}
-          />
+          <View style={{ marginTop: 10 }} />
 
           {hasMyPost && userState === "personal" && (
             <PostPermissionsSettings
@@ -202,7 +199,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           <View style={{ marginTop: 10 }} />
 
           {filteredPost?.map((post) => {
-            if (post.user.userId === user.userId) {
+            if (post?.user?.userId === user.userId) {
               return (
                 <TouchableOpacity
                   onPress={() =>
@@ -211,16 +208,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
                     })
                   }
                 >
-                  <Post
-                    screen="home"
-                    // userState={
-                    //   post.user.userId === personal.userId
-                    //     ? "personal"
-                    //     : "friend"
-                    // } // 這個到時候 要看說是訪客還是朋友
-                    userState={userState}
-                    postDetail={post}
-                  />
+                  <Post screen="home" userState={userState} postDetail={post} />
                 </TouchableOpacity>
               );
             }
@@ -229,9 +217,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           {userState === "personal" && (
             <View style={styles.formContainer}>
               <Button
-                style={{
-                  width: "50%",
-                }}
+                style={{width: "50%"}}
                 text="登出"
                 onPress={handleLogout}
               />

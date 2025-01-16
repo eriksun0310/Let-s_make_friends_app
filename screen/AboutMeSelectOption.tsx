@@ -12,13 +12,12 @@ import SaveButton from "../components/ui/button/SaveButton";
 import BackButton from "../components/ui/button/BackButton";
 import { saveUserSelectedOption } from "../util/handleUserEvent";
 import { tabs } from "../shared/static";
-import { Screen } from "../shared/types";
+import { UserScreen } from "../shared/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 type RootStackParamList = {
   aboutMe: undefined;
-  AboutMeSelectOption: { currentTab: string; screen: Screen };
-  // 其他 screen 的定義...
+  AboutMeSelectOption: { currentTab: string; screen: UserScreen };
 };
 
 type AboutMeSelectOptionRouteProp = RouteProp<
@@ -79,6 +78,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
   // 當前選的tab
   useEffect(() => {
     const index = Object.keys(tabs).indexOf(currentTab);
+    console.log('index 11111', index);
     if (index !== -1) {
       setIndex(index);
     }
@@ -147,7 +147,7 @@ const AboutMeSelectOption: React.FC<AboutMeSelectOptionProps> = ({
         ))}
       </Tab>
 
-      <TabView value={index} onChange={setIndex} animationType="spring">
+      <TabView value={index} onChange={setIndex} animationType="timing">
         {Object.keys(tabs)?.map((key) => (
           <TabView.Item key={key}>
             <RenderOption

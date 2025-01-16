@@ -13,7 +13,6 @@ interface EditUserInfoProps {
     params: {
       mode: "introduce" | "name";
       defaultValue: string;
-      // name: string;
     };
   };
   navigation: NavigationProp<any>;

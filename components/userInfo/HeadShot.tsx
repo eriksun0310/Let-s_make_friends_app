@@ -1,14 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import React from "react";
 import ShowHeadShot from "../editHeadShot/ShowHeadShot";
 import { HeadShot as HeadShotType, UserState } from "../../shared/types";
-import { Screen } from "../../shared/types";
-import { MessageCircle, MessageCircleMore } from "lucide-react-native";
+import { UserScreen } from "../../shared/types";
 
 interface HeadShotProps {
   userState: UserState;
-  screen: Screen; // 判斷是哪個頁面的大頭貼
+  screen: UserScreen; // 判斷是哪個頁面的大頭貼
   nameValue?: string;
   navigation: NavigationProp<any>;
   headShot: HeadShotType;
@@ -32,7 +31,7 @@ const HeadShot: React.FC<HeadShotProps> = ({
           isPersonal && navigation.navigate("editHeadShot", { screen })
         }
       >
-        <ShowHeadShot imageUrl={headShot?.imageUrl} />
+        <ShowHeadShot imageUrl={headShot?.imageUrl as ImageSourcePropType} />
       </TouchableOpacity>
 
       {/* 名字 */}

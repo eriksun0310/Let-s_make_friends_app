@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, ImageSourcePropType } from "react-native";
 import { HeadShot } from "../../shared/types";
 import ShowHeadShot from "./ShowHeadShot";
 
@@ -12,7 +12,7 @@ const SelectedHeadShot: React.FC<SelectedHeadShotProps> = ({ headShot }) => {
   return (
     <View style={styles.avatarContainer}>
       <View style={[styles.avatar]}>
-        <ShowHeadShot imageUrl={headShot?.imageUrl} />
+        <ShowHeadShot imageUrl={headShot?.imageUrl as ImageSourcePropType} />
       </View>
     </View>
   );

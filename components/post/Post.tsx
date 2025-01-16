@@ -27,59 +27,14 @@ const Post: React.FC<PostProps> = ({
   showTags = false,
 }) => {
   const personal = useAppSelector(selectUser);
-  const { post, user, tags, postLikes, postComments, userSettings } =
-    postDetail;
-
-  // const [like, setLike] = useState(false);
-
-  // const [isProcessing, setIsProcessing] = useState(false);
-
-  // 處理 按讚、收回讚
-  // const handleLikeChange = useCallback(async () => {
-  //   setIsProcessing(true); // 開始處理
-  //   setLike(!like); // 樂觀更新
-  //   try {
-  //     const { success } = await updatePostLikeDB({
-  //       postId: post?.id,
-  //       userId: personal.userId,
-  //       like: !like,
-  //     });
-
-  //     if (!success) {
-  //       console.log("更新按讚失敗");
-  //       setLike(!like);
-  //     }
-  //   } catch (error) {
-  //     console.log(" 按讚失敗", error);
-  //   } finally {
-  //     setIsProcessing(false); // 恢復按鈕可點擊狀態
-  //   }
-  // }, [like, post?.id, personal.userId]);
-
-  // useEffect(() => {
-  //   const updateLike = async () => {
-  //     const { success } = await updatePostLikeDB({
-  //       postId: post?.id,
-  //       userId: personal.userId,
-  //       like: like,
-  //     });
-  //     if (success) {
-  //       // 更新redux
-  //     }
-  //   };
-
-  //   updateLike();
-  // }, [like]);
-
-  // console.log("userSettings", userSettings);
+  const { post, user, tags } = postDetail;
 
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>
         <Avatar
-          rounded
           source={user?.headShot?.imageUrl as ImageSourcePropType}
-          size="medium"
+          containerStyle={styles.avatar}
         />
         <View style={styles.headerText}>
           <Text style={styles.username}>{user?.name}</Text>
@@ -130,7 +85,6 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    marginLeft: 10,
   },
   username: {
     fontWeight: "bold",
@@ -160,6 +114,12 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 14,
     color: Colors.icon,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
   },
 });
 

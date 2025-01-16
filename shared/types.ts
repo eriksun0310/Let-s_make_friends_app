@@ -1,3 +1,5 @@
+import { ImageSourcePropType } from "react-native";
+
 export type IsValidItem = {
   value: boolean;
   errorText: string;
@@ -25,7 +27,7 @@ export type ImageType = "people" | "animal";
 
 export type HeadShot = {
   imageType: ImageType;
-  imageUrl: string;
+  imageUrl: ImageSourcePropType | string;
 };
 
 export type Tab = "interests" | "favoriteFood" | "dislikedFood";
@@ -93,7 +95,7 @@ export type EditUserFieldName =
   | "headShot"
   | "selectedOption";
 
-export type Screen = "userInfo" | "aboutMe";
+export type UserScreen = "userInfo" | "aboutMe";
 
 export type Message = {
   id: string;
