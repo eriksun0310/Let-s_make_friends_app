@@ -118,18 +118,19 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     setInputText("");
 
     let chatRoomId = currentChatRoomId; // redux 的
-    let messageResult;  // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
+    let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
 
     // 新聊天室
     if (!chatRoomId) {
-      const newChatRoomData = await createNewChatRoomAndInsertMessage({
-        userId: personal.userId,
-        friendId: friend.userId,
-        message: inputText,
-      });
+      const { data: newChatRoomData, success } =
+        await createNewChatRoomAndInsertMessage({
+          userId: personal.userId,
+          friendId: friend.userId,
+          message: inputText,
+        });
 
       // 如果沒有新的聊天室資料,則代表發送訊息失敗
-      if (!newChatRoomData) {
+      if (!success) {
         console.error("Failed to create chat room and insert message");
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -140,7 +141,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         );
       }
 
-      chatRoomId = newChatRoomData.chatRoom.id;
+      chatRoomId = newChatRoomData?.chatRoom?.id;
       messageResult = newChatRoomData.messageResult!;
 
       if (newChatRoomData.chatRoom) {
@@ -148,7 +149,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
       }
     } else {
-      const result = await sendMessage({
+      const { data: result, success } = await sendMessage({
         userId: personal.userId,
         friendId: friend.userId,
         message: inputText,
@@ -156,8 +157,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       });
 
       // 如果發送訊息失敗
-      if (result.error) {
-        console.error("Failed to send message:", result.error);
+      if (!success) {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === tempMessage.id
@@ -168,7 +168,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         return;
       }
 
-      messageResult = result.data!;
+      messageResult = result;
     }
 
     setMessages((prevMessages) =>
@@ -205,17 +205,17 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
     try {
       setLoading(true);
-      const messageData = await getMessages({
-        chatRoomId: currentChatRoomId,
+      const { data: messageData, success } = await getMessages({
+        chatRoomId: currentChatRoomId || "",
         userId: personal.userId,
       });
 
-      if (messageData.success) {
+      if (success) {
         // 處理訊息資料，加入分隔符標記
         //const processedData = processMessageWithSeparators(messageData.data);
 
         // console.log("processedData", processedData);
-        setMessages(messageData.data as MessageType[]); // 設置處理後的訊息
+        setMessages(messageData as MessageType[]); // 設置處理後的訊息
       } else {
         setError("取得訊息失敗，請稍後再試");
       }
@@ -273,7 +273,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     const markAllMessagesRead = async () => {
       if (currentChatRoomId && personal.userId) {
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
-        const success = await markChatRoomMessagesAsRead({
+        const { success } = await markChatRoomMessagesAsRead({
           chatRoomId: currentChatRoomId,
           userId: personal.userId,
         });

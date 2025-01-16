@@ -17,7 +17,6 @@ import BackButton from "../components/ui/button/BackButton";
 import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
 import {
-  createNewChatRoom,
   getMessages,
   markChatRoomMessagesAllAsRead,
   markChatRoomMessagesAsRead,
@@ -131,7 +130,7 @@ const ChatDetail = ({ route, navigation }) => {
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
     setInputText("");
 
-    const result = await sendMessage({
+    const { data: result } = await sendMessage({
       userId: personal.userId,
       friendId: friend.userId,
       message: inputText,
@@ -253,7 +252,7 @@ const ChatDetail = ({ route, navigation }) => {
     const markAllMessagesRead = async () => {
       if (currentChatRoomId && personal.userId) {
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
-        const success = await markChatRoomMessagesAsRead({
+        const { success } = await markChatRoomMessagesAsRead({
           chatRoomId: currentChatRoomId,
           userId: personal.userId,
         });

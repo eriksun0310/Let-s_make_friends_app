@@ -48,25 +48,23 @@ export const getProcessedChatData = ({ chatRoom, userId, messagesData }) => {
   }
 };
 
-type DeletedColumn = "user1Deleted" | "user2Deleted";
+
 // 重製聊天室
 export const resetDeleteChatRoomState = async ({
   chatRoom,
   userId,
 }: {
-  chatRoom: ChatRoom;
+  chatRoom: ChatRoom | null;
   userId: string;
 }) => {
-  const isUser1 = chatRoom.user1Id === userId;
-  let deletedColumn = (
-    isUser1 ? "user1Deleted" : "user2Deleted"
-  ) as DeletedColumn;
+  const deletedColumn =
+    chatRoom?.user1Id === userId ? "user1Deleted" : "user2Deleted";
 
   // 如果有刪除聊天室的話, 再次點進那個聊天室 要重置聊天室的刪除狀態
-  if (chatRoom[deletedColumn]) {
+  if (chatRoom?.[deletedColumn]) {
     await resetDeleteChatRoomDB({
+      deletedColumn: deletedColumn,
       chatRoomId: chatRoom.id,
-      userId: userId,
     });
   }
 };

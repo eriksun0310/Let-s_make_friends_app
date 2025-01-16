@@ -40,24 +40,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     }
 
     if (mode === "delete") {
-      try {
-        const result = await deleteChatRoomDB({
-          chatRoomId: chatRoom.id,
-          userId: personal.userId,
-        });
+      const {
+        data: roomId,
+        success,
+        errorMessage,
+      } = await deleteChatRoomDB({
+        chatRoomId: chatRoom.id,
+        userId: personal.userId,
+      });
 
-        if (result.success && result.roomId) {
-          // 成功資料庫刪除, 更新redux狀態
-          dispatch(deleteChatRoom(result.roomId));
-        } else {
-          console.error(
-            "Failed to delete chat room:",
-            result.error || "Unknown error"
-          );
-          alert("刪除聊天室失敗, 請再試一次");
-        }
-      } catch (error) {
-        console.error("Unexpected error while deleting chat room:", error);
+      if (success && roomId) {
+        // 成功資料庫刪除, 更新redux狀態
+        dispatch(deleteChatRoom(roomId));
+      } else {
+        console.log(errorMessage);
         alert("刪除聊天室失敗, 請再試一次");
       }
     }
@@ -66,19 +62,18 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
     // 開始加載聊天紀錄
-    const messages = await getMessages({
+    const { data: messages } = await getMessages({
       chatRoomId: chatRoom.id,
       userId: personal.userId,
     });
 
-    console.log("messages", messages);
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
-      messages: messages?.data, // 預加載的聊天記錄
+      messages: messages, // 預加載的聊天記錄
     });
 
     // 清零未讀訊息

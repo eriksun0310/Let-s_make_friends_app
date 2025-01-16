@@ -141,7 +141,7 @@ export const updateOrCreateChatRoom =
     const chatRoom = state.chat.chatRooms.find((room) => room.id === id);
 
     // 取得聊天室詳細資料
-    const chatRoomDetail = await getChatRoomDetail({
+    const { data: chatRoomDetail } = await getChatRoomDetail({
       chatRoomId: id,
     });
 
@@ -156,23 +156,23 @@ export const updateOrCreateChatRoom =
           lastTime,
           incrementUser1,
           incrementUser2,
-          user1Deleted: chatRoomDetail.user1Deleted,
-          user1DeletedAt: chatRoomDetail.user1DeletedAt,
-          user2Deleted: chatRoomDetail.user2Deleted,
-          user2DeletedAt: chatRoomDetail.user2DeletedAt,
+          user1Deleted: chatRoomDetail?.user1Deleted,
+          user1DeletedAt: chatRoomDetail?.user1DeletedAt,
+          user2Deleted: chatRoomDetail?.user2Deleted,
+          user2DeletedAt: chatRoomDetail?.user2DeletedAt,
         })
       );
     } else {
       const personal = state.user.user;
 
       const friendId =
-        personal.userId === chatRoomDetail.user1Id
-          ? chatRoomDetail.user2Id
-          : chatRoomDetail.user1Id;
+        personal.userId === chatRoomDetail?.user1Id
+          ? chatRoomDetail?.user2Id
+          : chatRoomDetail?.user1Id;
 
       // 取得聊天室好友詳細資料
       const { data: friend } = await getUserDetail({
-        userId: friendId,
+        userId: friendId || "",
       });
 
       dispatch(
@@ -185,10 +185,10 @@ export const updateOrCreateChatRoom =
           unreadCountUser1: incrementUser1 || 0,
           unreadCountUser2: incrementUser2 || 0,
           friend,
-          user1Deleted: chatRoomDetail.user1Deleted,
-          user1DeletedAt: chatRoomDetail.user1DeletedAt,
-          user2Deleted: chatRoomDetail.user2Deleted,
-          user2DeletedAt: chatRoomDetail.user2DeletedAt,
+          user1Deleted: chatRoomDetail?.user1Deleted,
+          user1DeletedAt: chatRoomDetail?.user1DeletedAt,
+          user2Deleted: chatRoomDetail?.user2Deleted,
+          user2DeletedAt: chatRoomDetail?.user2DeletedAt,
         })
       );
     }

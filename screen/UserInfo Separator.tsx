@@ -61,17 +61,17 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   // 進入1對1聊天室
   const handleChatRoomPress = async () => {
-    const chatRoom = await getChatRoomDetail({
+    const { data: chatRoom } = await getChatRoomDetail({
       userId: personal.userId,
       friendId: friend.userId,
     });
 
     // 開始加載聊天紀錄
-    const messages = await getMessages({
-      chatRoomId: chatRoom.id,
+    const { data: messages } = await getMessages({
+      chatRoomId: chatRoom?.id || "",
       userId: personal.userId,
     });
-    dispatch(setCurrentChatRoomId(chatRoom.id));
+    dispatch(setCurrentChatRoomId(chatRoom?.id));
 
     // let processedData = [];
     // 舊聊天室
@@ -86,12 +86,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     // }
 
     navigation.navigate("chatDetail", {
-      chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室
+      chatRoomState: chatRoom?.id ? "old" : "new", //  區分新舊聊天室
       chatRoom: {
         id: chatRoom?.id,
         friend: friend,
       },
-      messages: messages?.data,
+      messages: messages,
       // hasUnreadSeparator: hasUnreadSeparator, // 傳遞分隔符狀態
       // setHasUnreadSeparator: setHasUnreadSeparator,
     });

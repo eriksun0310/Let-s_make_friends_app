@@ -15,10 +15,7 @@ import {
 import { PaperProvider } from "react-native-paper";
 import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
-import {
-  MessageCircleMore,
-  Settings2,
-} from "lucide-react-native";
+import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
@@ -71,25 +68,25 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   // 進入1對1聊天室
   const handleChatRoomPress = async () => {
-    const chatRoom = await getChatRoomDetail({
+    const { data: chatRoom } = await getChatRoomDetail({
       userId: personal.userId,
       friendId: friend.userId,
     });
 
     // 開始加載聊天紀錄
-    const messages = await getMessages({
-      chatRoomId: chatRoom.id,
+    const { data: messages } = await getMessages({
+      chatRoomId: chatRoom?.id || "",
       userId: personal.userId,
     });
-    dispatch(setCurrentChatRoomId(chatRoom.id));
+    dispatch(setCurrentChatRoomId(chatRoom?.id));
 
     navigation.navigate("chatDetail", {
-      chatRoomState: chatRoom.id ? "old" : "new", //  區分新舊聊天室
+      chatRoomState: chatRoom?.id ? "old" : "new", //  區分新舊聊天室
       chatRoom: {
         id: chatRoom?.id,
         friend: friend,
       },
-      messages: messages?.data,
+      messages: messages,
     });
 
     // 重製聊天室狀態
@@ -135,7 +132,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           <Settings2 color={Colors.icon} />
         </CustomIcon>
       );
-    }else return null;
+    } else return null;
   };
 
   useEffect(() => {

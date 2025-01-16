@@ -1,5 +1,5 @@
 import { ChatRoomsDBType, MessagesDBType } from "../dbType";
-import { ChatRoom, Message, User } from "../types";
+import { ChatRoom, LastMessage, Message, User } from "../types";
 
 /* chatUtils.ts 專注於工具函數 */
 
@@ -11,7 +11,7 @@ export const transformChatRoom = ({
   data: ChatRoomsDBType;
   options?: {
     friend: User | null;
-    lastMessageData?: { created_at: Date; content: string };
+    lastMessage?: LastMessage | null;
   };
 }): ChatRoom => {
   console.log("333 dataaa", data);
@@ -35,8 +35,8 @@ export const transformChatRoom = ({
     user2Deleted: user2_deleted,
     user1DeletedAt: user1_deleted_at,
     user2DeletedAt: user2_deleted_at,
-    lastTime: options?.lastMessageData?.created_at || new Date(),
-    lastMessage: options?.lastMessageData?.content || "",
+    lastTime: options?.lastMessage?.created_at || new Date(),
+    lastMessage: options?.lastMessage?.content || "",
     unreadCountUser1: unread_count_user1,
     unreadCountUser2: unread_count_user2,
     friend: options?.friend || ({} as User),
@@ -65,7 +65,7 @@ export const transformMessage = (data: MessagesDBType): Message => {
   };
 };
 
-export const transformMessageArray = (data: MessagesDBType[]): Message[] => {
+export const transformMessages = (data: MessagesDBType[]): Message[] => {
   return (data || []).map(
     ({
       id,
