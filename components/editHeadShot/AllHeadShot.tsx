@@ -99,36 +99,43 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
             </Tab.Item>
           ))}
         </Tab>
+
+        <TabView
+          value={index}
+          onChange={handleTabChange}
+          animationType="timing"
+        >
+          {Object.keys(imageUrls).map((key) => (
+            <TabView.Item key={key}>
+              <View style={styles.optionsContainer}>
+                {imageUrls[key as ImageType].map((item) => (
+                  <TouchableOpacity
+                    key={item.imageUrl}
+                    style={styles.option}
+                    onPress={() => {
+                      setHeadShot((prev) => ({
+                        ...prev,
+                        imageType: key as ImageType, // 更新為當前的類型
+                        imageUrl: item.imageUrl, // 更新為選中的圖片
+                      }));
+                    }}
+                  >
+                    <Avatar
+                      source={item.imageUrl}
+                      containerStyle={[
+                        styles.optionImage,
+                        item.imageUrl === parseInt(headShot.imageUrl as string)
+                          ? styles.selected
+                          : null,
+                      ]}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TabView.Item>
+          ))}
+        </TabView>
       </View>
-      <TabView value={index} onChange={setIndex} animationType="timing">
-        <View style={styles.optionsContainer}>
-          {imageUrls[headShot.imageType].map((item) => {
-            console.log("item", item);
-            return (
-              <TouchableOpacity
-                key={item.imageUrl}
-                style={styles.option}
-                onPress={() => {
-                  setHeadShot((prev) => ({
-                    ...prev,
-                    imageUrl: item.imageUrl,
-                  }));
-                }}
-              >
-                <Avatar
-                  source={item.imageUrl}
-                  containerStyle={[
-                    styles.optionImage,
-                    item.imageUrl === parseInt(headShot.imageUrl as string)
-                      ? styles.selected
-                      : null,
-                  ]}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </TabView>
     </>
   );
 };
