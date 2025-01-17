@@ -9,7 +9,7 @@ import Post from "../components/post/Post";
 import {
   SegmentedButtonType,
   User,
-  UserInfoScreen,
+  FriendScreen,
   UserState,
 } from "../shared/types";
 import { PaperProvider } from "react-native-paper";
@@ -17,7 +17,6 @@ import BackButton from "../components/ui/button/BackButton";
 import Button from "../components/ui/button/Button";
 import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
-import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
   logout,
   selectPosts,
@@ -27,23 +26,24 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
-import { resetDeleteChatRoomState } from "../shared/chat/chatFuncs";
 import { getUserSettings } from "../util/handleUserEvent";
+import { getChatRoomDetail, getMessages } from "util/handleChatEvent";
+import { resetDeleteChatRoomState } from "shared/chat/chatFuncs";
 
 interface UserInfoProps {
   route: {
     params: {
       userState: UserState;
       friend: User;
-      screen: UserInfoScreen;
+      screen: FriendScreen;
     };
   };
   navigation: NavigationProp<any>;
 }
 
-export const postList = Array(14).fill({
-  date: "2024/08/02",
-});
+export const postList = Array.from({ length: 335 }, (_, index) => ({
+  date: `${index + 1} `,
+}));
 
 const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   const { userState, friend, screen } = route.params || {
@@ -117,10 +117,9 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   const handleHeaderRight = ({
     userState,
-    screen,
   }: {
     userState: UserState;
-    screen: UserInfoScreen;
+    screen: FriendScreen;
   }) => {
     if (userState === "friend") {
       return (
@@ -139,10 +138,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: userState === "personal" ? "個人資料" : "好友資料",
+      title: userState === "personal" ? "個人資料" : `${user.name}個人資料`,
       headerTitleAlign: "center",
       headerLeft: () => {
-        if (userState === "friend") {
+        if (userState !== "personal") {
           return <BackButton onPress={() => navigation.goBack()} />;
         } else return null;
       },
@@ -152,7 +151,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           screen,
         }),
     });
-  }, [navigation, userState, screen]);
+  }, [navigation, userState]);
 
   useEffect(() => {
     // 取得用戶設定資料
@@ -181,6 +180,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
             navigation={navigation}
             headShot={user.headShot}
           />
+
+          {/* TODO：😵‍💫 想一下需不需要 */}
+          {/* {userState !== "personal" && (
+            <ActionButton
+              friend={friend}
+              userState={userState}
+              screen={screen}
+            />
+          )} */}
 
           <UserCollapse
             userState={userState}
@@ -217,7 +225,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           {userState === "personal" && (
             <View style={styles.formContainer}>
               <Button
-                style={{width: "50%"}}
+                style={{ width: "50%" }}
                 text="登出"
                 onPress={handleLogout}
               />
@@ -241,6 +249,22 @@ const styles = StyleSheet.create({
     display: "flex",
     marginVertical: 30,
     alignItems: "center",
+  },
+  buttonView: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  actionButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    width: "20%",
+    marginHorizontal: 32,
   },
 });
 

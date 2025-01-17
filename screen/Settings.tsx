@@ -43,7 +43,6 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
     }
 
 
-    console.log('有改變');
     // 如果有改變，更新到資料庫
     const success = await saveUserSettings({
       ...currentUserSettings,
@@ -72,7 +71,7 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: "隱私設定",
+      headerTitle: "用戶設定",
       headerTitleAlign: "center",
       gestureEnabled: false, // 禁用手勢返回
       headerLeft: () => (

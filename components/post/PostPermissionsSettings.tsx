@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import SegmentedButtons from "../ui/button/SegmentedButtons";
 import { segmentedButtons } from "../../shared/static";

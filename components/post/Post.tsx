@@ -16,9 +16,9 @@ interface PostProps {
   showTags?: boolean;
   screen?: PostScreen;
 }
-export const tagList = Array(5).fill({
-  text: "大家好",
-});
+// export const tagList = Array(5).fill({
+//   text: "大家好",
+// });
 
 const Post: React.FC<PostProps> = ({
   screen = "home",

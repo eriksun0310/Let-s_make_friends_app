@@ -238,7 +238,7 @@ export type UserSettings = {
 
 export type PostScreen = "home" | "postDetail";
 
-export type UserInfoScreen = "addFriend" | "friendInvitation";
+export type FriendScreen = "addFriend" | "friendInvitation";
 
 export type LastMessage = {
   chat_room_id: string;
