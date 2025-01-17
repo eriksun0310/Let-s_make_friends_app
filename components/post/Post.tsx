@@ -28,7 +28,6 @@ const Post: React.FC<PostProps> = ({
 }) => {
   const personal = useAppSelector(selectUser);
   const { post, user, tags } = postDetail;
-
   return (
     <Card containerStyle={styles.cardContainer}>
       <View style={styles.header}>

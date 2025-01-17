@@ -1,37 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  StyleSheet,
-  ImageSourcePropType,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Colors } from "../../constants/style";
 import { HeadShot, ImageType } from "../../shared/types";
-import man from "../../assets/people/man/man.png";
-import man1 from "../../assets/people/man/man (1).png";
-import man2 from "../../assets/people/man/man (2).png";
-import woman from "../../assets/people/woman/girl.png";
-import woman1 from "../../assets/people/woman/woman (1).png";
-import woman2 from "../../assets/people/woman/woman (2).png";
-import woman3 from "../../assets/people/woman/woman (3).png";
-import ostrich from "../../assets/animal/ostrich.png";
 import { Avatar, Tab, TabView } from "@rneui/themed";
 import { headShotTabsTitle } from "../../shared/static";
-export const imageUrls: Record<ImageType, Array<ImageSourcePropType | any>> = {
-  people: [
-    { imageUrl: man },
-    { imageUrl: man1 },
-    { imageUrl: man2 },
-    { imageUrl: woman },
-    { imageUrl: woman1 },
-    { imageUrl: woman2 },
-    { imageUrl: woman3 },
-  ],
-  animal: [{ imageUrl: ostrich }],
-};
+import { imageUrls } from "../../shared/images";
 
 interface AllHeadShotProps {
   headShot: HeadShot;
@@ -40,31 +13,9 @@ interface AllHeadShotProps {
 const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
   const [index, setIndex] = useState(0);
 
-  // 切換tab
-  const handleTabChange = (newIndex: number) => {
-    setIndex(newIndex);
-    // 根據 index 找到對應的 imageType
-    const newImageType = Object.keys(imageUrls)[newIndex] as ImageType;
-
-    // 更新 headShot.imageType
-    setHeadShot((prev) => ({
-      ...prev,
-      imageType: newImageType,
-    }));
-  };
-
-  // 當前選的大頭貼
-  // useEffect(() => {
-  //   const index = Object.keys(imageUrls).indexOf(headShot.imageType);
-
-  //   if (index !== -1) {
-  //     setIndex(index);
-  //   }
-  // }, [headShot]);
-
   // 初始化時設置 index
   useEffect(() => {
-    const initialIndex = Object.keys(imageUrls).indexOf("animal");
+    const initialIndex = Object.keys(imageUrls).indexOf(headShot.imageType);
     if (initialIndex !== -1) {
       setIndex(initialIndex);
     }
@@ -75,7 +26,7 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
       <View style={styles.tab}>
         <Tab
           value={index}
-          onChange={handleTabChange}
+          onChange={setIndex}
           dense
           indicatorStyle={{
             backgroundColor: Colors.textBlue,
@@ -101,37 +52,43 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
         </Tab>
 
         <TabView
+          containerStyle={{
+            marginTop: 16,
+          }}
           value={index}
-          onChange={handleTabChange}
+          onChange={setIndex}
           animationType="timing"
         >
           {Object.keys(imageUrls).map((key) => (
             <TabView.Item key={key}>
-              <View style={styles.optionsContainer}>
-                {imageUrls[key as ImageType].map((item) => (
-                  <TouchableOpacity
-                    key={item.imageUrl}
-                    style={styles.option}
-                    onPress={() => {
-                      setHeadShot((prev) => ({
-                        ...prev,
-                        imageType: key as ImageType, // 更新為當前的類型
-                        imageUrl: item.imageUrl, // 更新為選中的圖片
-                      }));
-                    }}
-                  >
-                    <Avatar
-                      source={item.imageUrl}
-                      containerStyle={[
-                        styles.optionImage,
-                        item.imageUrl === parseInt(headShot.imageUrl as string)
-                          ? styles.selected
-                          : null,
-                      ]}
-                    />
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <ScrollView>
+                <View style={styles.optionsContainer}>
+                  {imageUrls[key as ImageType].map((item) => (
+                    <TouchableOpacity
+                      key={item.imageUrl}
+                      style={styles.option}
+                      onPress={() => {
+                        setHeadShot((prev) => ({
+                          ...prev,
+                          imageType: key as ImageType, // 更新為當前的類型
+                          imageUrl: item.imageUrl, // 更新為選中的圖片
+                        }));
+                      }}
+                    >
+                      <Avatar
+                        source={item.imageUrl}
+                        containerStyle={[
+                          styles.optionImage,
+                          item.imageUrl ===
+                          parseInt(headShot.imageUrl as string)
+                            ? styles.selected
+                            : null,
+                        ]}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
             </TabView.Item>
           ))}
         </TabView>
@@ -142,11 +99,6 @@ const AllHeadShot: React.FC<AllHeadShotProps> = ({ headShot, setHeadShot }) => {
 
 const styles = StyleSheet.create({
   tab: {
-    // flexDirection: "row",
-    // justifyContent: "center",
-    // padding: 16,
-    // borderTopWidth: 1,
-    // borderTopColor: "#E5E5E5",
     flex: 1,
     backgroundColor: "#fff",
   },

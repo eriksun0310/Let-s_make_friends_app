@@ -82,6 +82,7 @@ export const initUserSettings: UserSettings = {
 };
 
 export const headShotTabsTitle: Record<ImageType, string> = {
-  people: "頭像",
+  people: "人像",
   animal: "動物",
 };
+
