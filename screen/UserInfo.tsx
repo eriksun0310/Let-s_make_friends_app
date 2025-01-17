@@ -140,7 +140,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       title: userState === "personal" ? "個人資料" : "好友資料",
-      // headerTitleAlign: "center",
+      headerTitleAlign: "center",
       headerLeft: () => {
         if (userState === "friend") {
           return <BackButton onPress={() => navigation.goBack()} />;
