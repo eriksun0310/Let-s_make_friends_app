@@ -105,15 +105,7 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
                 })
               }
             >
-              {/* 
-              TODO:userState 是用來判斷要不要出現  menu的 所以到時候可以rename
-              showMenu
-              首頁還是不要出現 可以編輯或刪除, 要點進去內文才可以 */}
-              <Post
-                screen="home"
-                userState={"friend"} // 這個到時候 要看說是訪客還是朋友
-                postDetail={post}
-              />
+              <Post screen="home" userState={"friend"} postDetail={post} />
             </TouchableOpacity>
           ))}
         </ScrollView>

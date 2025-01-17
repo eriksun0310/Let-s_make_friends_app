@@ -1,11 +1,5 @@
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
+import React, { useEffect } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import Comments from "../components/post/Comments";
 import EnterComments from "../components/post/EnterComments";
@@ -15,7 +9,6 @@ import BackButton from "../components/ui/button/BackButton";
 import { selectPosts, selectUser, useAppSelector } from "../store";
 import { PostDetail as PostDetailType } from "../shared/types";
 import LikeDrawer from "../components/post/like/LikeDrawer";
-import { Colors } from "../constants/style";
 
 interface PostDetailProps {
   route: {
@@ -37,11 +30,6 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
   ) as PostDetailType;
 
   const personal = useAppSelector(selectUser);
-
-  const modalizeRef = useRef<{
-    open: () => void;
-    close: () => void;
-  }>(null);
 
   useEffect(() => {
     navigation.setOptions({
