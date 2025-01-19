@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { FriendRequest, User } from "shared/types";
 import { RootState } from "./store";
+import { transformFriendRequests } from "shared/friend/friendUtils";
 
 interface InitialStateProps {
   friendList: User[]; // 好友列表
@@ -39,17 +40,23 @@ const friendSlice = createSlice({
     },
 
     setFriendRequests(state, action) {
+      state.friendRequests = action.payload;
       // state.friendRequests = action.payload;
     },
 
     addFriendRequest(state, action) {
+      const newFriendRequest = action.payload;
+      const transformedNew = transformFriendRequests([newFriendRequest]);
+
+      state.friendRequests = [...state.friendRequests, ...transformedNew];
       // state.friendRequests.push(action.payload);
     },
 
     setFriendRequestUnRead(state, action) {
       // state.friendRequestUnRead = action.payload;
     },
-    updateFriendRequestUnRead(state, action) {
+    updateFriendRequestUnRead(state) {
+      state.friendRequestUnRead += 1;
       // state.friendRequestUnRead = action.payload;
     },
 

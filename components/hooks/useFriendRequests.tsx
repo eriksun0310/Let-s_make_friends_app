@@ -3,10 +3,13 @@ import { supabase } from "../../util/supabaseClient";
 import { transformFriendRequests } from "../../shared/friend/friendUtils";
 import { FriendRequest } from "../../shared/types";
 import { FriendRequestsDBType } from "../../shared/dbType";
+import { useAppDispatch } from "store";
+import { addFriendRequest, setFriendRequests, setFriendRequestUnRead, updateFriendRequestUnRead } from "store/friendSlice";
 
 // 取得狀態為 pending 的好友邀請
 export const useFriendRequests = (userId: string) => {
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const dispatch = useAppDispatch();
+  const [friendRequests, setFriendRequests1] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFriendRequestNumber, setNewFriendRequestNumber] = useState(0); // 新好友数量
 
@@ -29,7 +32,17 @@ export const useFriendRequests = (userId: string) => {
       const transformedData = transformFriendRequests(data) || [];
 
       // 更新本地的好友邀请数据，包括未读和已读的
-      setFriendRequests(transformedData);
+      setFriendRequests1(transformedData);
+
+      // 更新 好友邀請 redux
+      dispatch(setFriendRequests(transformedData));
+      // 更新未讀的好友邀請數量
+      dispatch(
+        setFriendRequestUnRead(
+          transformedData.filter((req) => req.isRead === false).length
+        )
+      );
+
       setNewFriendRequestNumber(
         transformedData.filter((req) => req.isRead === false).length
       );
@@ -55,19 +68,21 @@ export const useFriendRequests = (userId: string) => {
 
             const newFriendRequest = payload.new as FriendRequestsDBType;
 
-            setFriendRequests((prev) => {
+            setFriendRequests1((prev) => {
               const transformedNew = transformFriendRequests([
                 newFriendRequest,
               ]);
               return [...prev, ...transformedNew];
             });
+            dispatch(addFriendRequest(newFriendRequest));
+            dispatch(updateFriendRequestUnRead())// dispatch(updateFriendRequestUnRead())
             setNewFriendRequestNumber((prev) => prev + 1); // 更新交友邀請數量
           } else if (
             payload.eventType === "DELETE" ||
             (payload.eventType === "UPDATE" && payload.new.status !== "pending")
           ) {
             // 刪除好友邀請或狀態改變（非 pending）
-            setFriendRequests((prev) =>
+            setFriendRequests1((prev) =>
               prev.filter((req) => req.id !== payload.old?.id)
             );
           }
