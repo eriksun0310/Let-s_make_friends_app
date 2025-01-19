@@ -15,7 +15,12 @@ import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import { FriendState, User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
-import { selectUser, useAppSelector } from "../store";
+import {
+  selectFriendRequests,
+  selectFriendRequestUnRead,
+  selectUser,
+  useAppSelector,
+} from "../store";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -30,18 +35,16 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
 
+  const friendRequests = useAppSelector(selectFriendRequests);
+  const friendRequestUnRead = useAppSelector(selectFriendRequestUnRead);
+
   // 取得新的好友
   const { newFriend, newFriendsNumber, markAllAsNotified } = useNewFriend(
     personal.userId
   );
 
   //取得交友邀請
-  const {
-    friendRequests,
-    loading,
-    newFriendRequestNumber,
-    markInvitationsAsRead,
-  } = useFriendRequests(personal.userId);
+  const { loading, markInvitationsAsRead } = useFriendRequests();
 
   // 所有的用戶資料
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -93,7 +96,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
 
   useEffect(() => {
     // 判斷是否顯示紅點
-    const showBadge = newFriendRequestNumber > 0 || newFriendsNumber > 0;
+    const showBadge = friendRequestUnRead > 0 || newFriendsNumber > 0;
 
     //  TODO: 點了好友列表後 newFriend 的length 歸0
     // 設置導航選項
@@ -121,8 +124,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
           }}
         >
           <View style={styles.bellRingContainer}>
-            {newFriendRequestNumber > 0 && (
-              <Badge style={styles.badge}>{newFriendRequestNumber}</Badge>
+            {friendRequestUnRead > 0 && (
+              <Badge style={styles.badge}>{friendRequestUnRead}</Badge>
             )}
             <BellRing color={Colors.icon} size={25} />
           </View>
@@ -135,12 +138,13 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     fetchBeFriendUsers(); // 調用 API 獲取資料
   }, [
     navigation,
-    newFriendRequestNumber,
+    friendRequestUnRead,
     newFriendsNumber,
     friendRequests,
     newFriend,
   ]);
 
+  // 不確定要不要
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;
   return (
     <View style={styles.screen}>

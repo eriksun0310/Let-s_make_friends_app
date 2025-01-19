@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text } from "react-native";
+import { useEffect, useState } from "react";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import FriendItem from "../components/ui/FriendItem";
-import { NavigationProp, useFocusEffect } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { getFriendList } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";

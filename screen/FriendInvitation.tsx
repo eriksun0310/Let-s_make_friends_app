@@ -6,7 +6,7 @@ import BackButton from "../components/ui/button/BackButton";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { selectUser, useAppSelector } from "../store";
+import { selectFriendRequests, selectUser, useAppSelector } from "../store";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -14,10 +14,10 @@ interface FriendInvitationProps {
 
 //交友邀請
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
-  const personal = useAppSelector(selectUser);
+  const { loading } = useFriendRequests();
 
-  const { friendRequests, loading } = useFriendRequests(personal.userId);
-
+  const friendRequests = useAppSelector(selectFriendRequests);
+  
   useEffect(() => {
     navigation.setOptions({
       title: "交友邀請",

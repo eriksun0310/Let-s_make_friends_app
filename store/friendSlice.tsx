@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { FriendRequest, User } from "shared/types";
 import { RootState } from "./store";
-import { transformFriendRequests } from "shared/friend/friendUtils";
-
 interface InitialStateProps {
   friendList: User[]; // 好友列表
   friendRequests: FriendRequest[]; // 交友邀請列表
@@ -33,31 +31,40 @@ const friendSlice = createSlice({
 
       // 如果好友不存在的話 新增
       if (index === -1) {
-        state.friendList.push(action.payload);
+        state.friendList = [...state.friendList, action.payload];
       } else {
-        state.friendList[index] = action.payload;
+        state.friendList = state.friendList.map((friend, idx) =>
+          idx === index ? action.payload : friend
+        );
       }
     },
 
     setFriendRequests(state, action) {
       state.friendRequests = action.payload;
-      // state.friendRequests = action.payload;
     },
 
     addFriendRequest(state, action) {
       const newFriendRequest = action.payload;
-      const transformedNew = transformFriendRequests([newFriendRequest]);
+      const isExist = state.friendRequests.some(
+        (req) => req.id === newFriendRequest.id
+      );
 
-      state.friendRequests = [...state.friendRequests, ...transformedNew];
-      // state.friendRequests.push(action.payload);
+      if (!isExist) {
+        state.friendRequests = [...state.friendRequests, ...newFriendRequest];
+      }
+    },
+
+    deleteFriendRequest(state, action) {
+      state.friendRequests = state.friendRequests.filter(
+        (req) => req.id !== action.payload
+      );
     },
 
     setFriendRequestUnRead(state, action) {
-      // state.friendRequestUnRead = action.payload;
+      state.friendRequestUnRead = action.payload;
     },
     updateFriendRequestUnRead(state) {
       state.friendRequestUnRead += 1;
-      // state.friendRequestUnRead = action.payload;
     },
 
     setNewFriendUnRead(state, action) {
@@ -74,6 +81,7 @@ export const {
   addFriend,
   setFriendRequests,
   addFriendRequest,
+  deleteFriendRequest,
   setFriendRequestUnRead,
   updateFriendRequestUnRead,
   setNewFriendUnRead,
@@ -82,7 +90,7 @@ export const {
 
 export const selectFriendList = (state: RootState) => state.friend.friendList;
 
-export const selectFriendRequest = (state: RootState) =>
+export const selectFriendRequests = (state: RootState) =>
   state.friend.friendRequests;
 
 export const selectFriendRequestUnRead = (state: RootState) =>

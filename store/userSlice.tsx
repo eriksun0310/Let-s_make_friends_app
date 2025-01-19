@@ -92,25 +92,6 @@ const userSlice = createSlice({
     setIsNewUser(state, action) {
       state.isNewUser = action.payload;
     },
-
-    setFriendList(state, action) {
-      state.friendList = action.payload;
-    },
-
-    addFriend(state, action) {
-      // 如果好友存在的話 更新
-      const index = state.friendList.findIndex(
-        (friend) => friend.userId === action.payload.userId
-      );
-
-      // 如果好友不存在的話 新增
-      if (index === -1) {
-        state.friendList.push(action.payload);
-      } else {
-        state.friendList[index] = action.payload;
-      }
-    },
-
     setUserSettings(state, action) {
       state.userSettings = action.payload;
     },
@@ -177,8 +158,6 @@ export const {
   setUser,
   setSelectedOption,
   setIsAuthenticated,
-  setFriendList,
-  addFriend,
   setUserSettings,
 } = userSlice.actions;
 
@@ -190,8 +169,6 @@ export const selectIsAuthenticated = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectInitialized = (state: RootState) => state.user.initialized;
-
-export const selectFriendList = (state: RootState) => state.user.friendList;
 
 export const selectUserSettings = (state: RootState) => state.user.userSettings;
 

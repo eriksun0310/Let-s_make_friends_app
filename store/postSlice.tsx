@@ -29,7 +29,7 @@ const postSlice = createSlice({
     },
 
     addTag(state, action) {
-      state.tags.push(action.payload);
+      state.tags = [...state.tags, action.payload];
     },
 
     setPosts(state, action) {
@@ -47,7 +47,7 @@ const postSlice = createSlice({
 
       state.postMap[postId] = action.payload;
 
-      state.posts.push(action.payload);
+      state.posts = [...state.posts, action.payload];
       // 排序 貼文
       state.posts.sort(
         (a, b) =>
@@ -94,7 +94,7 @@ const postSlice = createSlice({
     },
 
     addPostComment(state, action) {
-      state.postComments.push(action.payload);
+      state.postComments = [...state.postComments, action.payload];
     },
 
     updatePostComment(state, action) {},

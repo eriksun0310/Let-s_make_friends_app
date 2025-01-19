@@ -42,6 +42,10 @@
     ☑️1.handleChatEvent
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
+🚀[要統一改的]
+✅1. redux 有用 .push() 都改用 state.array =[ ... ]
+
+
 
 [加好友 BUG]
 1. 要多開 friendSlice.tsx
@@ -49,6 +53,7 @@
 3. useFriendRequests() 的hook 在兩個地方同時使用會造成friend_requests 沒有監聽(被卸載了)
 4. friend 的redux 設定好之後, 在 useFriendRequests、useNewFriend 去更新對應的狀態
 5. 有些要render 畫面的部分, 就可以從 redux 拿 , 例如 FriendInvitation render 的時候, 就不會每次都要fetch 資料庫一次
+✅6. userSlice 的  setFriendList 、addFriend 改到用friendSlice
 
 
 ❓[問題]

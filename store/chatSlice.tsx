@@ -32,18 +32,22 @@ const chatSlice = createSlice({
       const incomingRoom = action.payload;
       const index = state.chatRooms.findIndex(
         (room) => room.id === incomingRoom.id
-      );
+    );
 
       // 如果聊天室不存在,添加
       if (index === -1) {
-        state.chatRooms.push(incomingRoom);
-
+        state.chatRooms = [...state.chatRooms, incomingRoom];
         //聊天室已存在,更新數據
       } else {
-        state.chatRooms[index] = {
-          ...state.chatRooms[index],
-          ...incomingRoom,
-        };
+        // TODO: 新增聊天室 要看說是不是部分更新
+        // state.chatRooms = state.chatRooms.map((room, idx) =>
+        //   idx === index ? { ...room, ...incomingRoom } : room
+        // );
+
+        //  還是 說incomingRoom 有帶完整資訊就可以用這個方法
+        state.chatRooms = state.chatRooms.map((room, idx) =>
+          idx === index ? incomingRoom : room
+        );
       }
 
       // 排序聊天室, 按照最後一則訊息的時間排序
