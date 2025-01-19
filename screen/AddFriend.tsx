@@ -8,6 +8,7 @@ import CustomIcon from "../components/ui/button/CustomIcon";
 import { Badge } from "react-native-paper";
 import {
   getBeFriendUsers,
+  getFriendRequests,
   insertRejectedFriendRequest,
   sendFriendRequest,
 } from "../util/handleFriendsEvent";
@@ -16,9 +17,15 @@ import { FriendState, User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
 import {
+  deleteBeAddFriend,
+  selectBeAddFriends,
   selectFriendRequests,
   selectFriendRequestUnRead,
   selectUser,
+  setBeAddFriends,
+  setFriendRequests,
+  setFriendRequestUnRead,
+  useAppDispatch,
   useAppSelector,
 } from "../store";
 
@@ -33,7 +40,11 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
+  const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
+
+  // 可以成為好友的用戶資料
+  const beAddFriends = useAppSelector(selectBeAddFriends);
 
   const friendRequests = useAppSelector(selectFriendRequests);
   const friendRequestUnRead = useAppSelector(selectFriendRequestUnRead);
@@ -44,21 +55,30 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   );
 
   //取得交友邀請
-  const { loading, markInvitationsAsRead } = useFriendRequests();
+  const { loading } = useFriendRequests();
 
   // 所有的用戶資料
-  const [allUsers, setAllUsers] = useState<User[]>([]);
+  //const [allUsers, setAllUsers] = useState<User[]>([]);
 
   // 可以成為好友的用戶資料
   const fetchBeFriendUsers = async () => {
-    try {
-      const { data: userData } = await getBeFriendUsers({
-        currentUserId: personal.userId,
-      });
-      setAllUsers(userData);
-    } catch (error) {
-      console.log("取得 可以成為好友的用戶資料  錯誤", error);
-    }
+    // loading
+    const { data: userData } = await getBeFriendUsers({
+      currentUserId: personal.userId,
+    });
+
+    dispatch(setBeAddFriends(userData));
+    //setAllUsers(userData);
+  };
+
+  // 取得其他用戶寄送的交友邀請
+  const fetchFriendRequests = async () => {
+    const { data } = await getFriendRequests({ userId: personal.userId });
+    dispatch(setFriendRequests(data));
+    // 更新未讀的好友邀請數量
+    dispatch(
+      setFriendRequestUnRead(data.filter((req) => req.isRead === false).length)
+    );
   };
 
   //點擊 加好友、拒絕好友
@@ -87,11 +107,14 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       if (!result.success) {
         console.error(`Failed to add friend`);
       }
+      // 更新redux 的 beAddFriends
+      dispatch(deleteBeAddFriend(receiverId));
     } catch (error) {
       console.error("Error sending friend request:", error);
     }
 
-    await fetchBeFriendUsers();
+    // 應該是不用
+    //await fetchBeFriendUsers();
   };
 
   useEffect(() => {
@@ -120,7 +143,6 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
         <CustomIcon
           onPress={async () => {
             navigation.navigate("friendInvitation");
-            await markInvitationsAsRead(); // 標記所有交友邀請為已讀
           }}
         >
           <View style={styles.bellRingContainer}>
@@ -135,7 +157,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       tabBarBadge: showBadge ? <Dot size="5" /> : null,
     });
 
-    fetchBeFriendUsers(); // 調用 API 獲取資料
+    // fetchBeFriendUsers(); // 調用 API 獲取資料
   }, [
     navigation,
     friendRequestUnRead,
@@ -144,12 +166,19 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     newFriend,
   ]);
 
+  useEffect(() => {
+    // 取得可以成為好友的用戶
+    fetchBeFriendUsers();
+    // 取得其他用戶寄送的交友邀請
+    fetchFriendRequests();
+  }, [personal.userId]);
+
   // 不確定要不要
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {allUsers?.map((user) => {
+        {beAddFriends?.map((user) => {
           return (
             <FriendCard
               screen="addFriend"

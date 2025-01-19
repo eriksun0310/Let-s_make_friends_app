@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { FriendRequest, User } from "shared/types";
 import { RootState } from "./store";
 interface InitialStateProps {
+  beAddFriends: User[]; // 可以加好友的用戶列表
   friendList: User[]; // 好友列表
   friendRequests: FriendRequest[]; // 交友邀請列表
   friendRequestUnRead: number; // 交友邀請未讀數量
@@ -9,6 +10,7 @@ interface InitialStateProps {
 }
 
 const initialState: InitialStateProps = {
+  beAddFriends: [],
   friendList: [],
   friendRequests: [],
   friendRequestUnRead: 0,
@@ -19,6 +21,29 @@ const friendSlice = createSlice({
   name: "friend",
   initialState,
   reducers: {
+    setBeAddFriends(state, action) {
+      state.beAddFriends = action.payload;
+    },
+    // ex: for 有新用戶的加入
+    addBeAddFriend(state, action) {
+      state.beAddFriends = [...state.beAddFriends, action.payload];
+    },
+
+    // ex: 用戶換了大頭貼
+    updateBeAddFriend(state, action) {
+      const updateUser = action.payload;
+      state.beAddFriends = state.beAddFriends.map((friend) =>
+        friend.userId === updateUser.userId ? updateUser : friend
+      );
+    },
+
+    // ex: 有任一用戶 在 加好友頁面 刪除好友
+    deleteBeAddFriend(state, action) {
+      state.beAddFriends = state.beAddFriends.filter(
+        (friend) => friend.userId !== action.payload
+      );
+    },
+
     setFriendList(state, action) {
       state.friendList = action.payload;
     },
@@ -86,7 +111,14 @@ export const {
   updateFriendRequestUnRead,
   setNewFriendUnRead,
   updateNewFriendUnRead,
+  setBeAddFriends,
+  addBeAddFriend,
+  updateBeAddFriend,
+  deleteBeAddFriend,
 } = friendSlice.actions;
+
+export const selectBeAddFriends = (state: RootState) =>
+  state.friend.beAddFriends;
 
 export const selectFriendList = (state: RootState) => state.friend.friendList;
 

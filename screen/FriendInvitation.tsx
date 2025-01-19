@@ -6,7 +6,14 @@ import BackButton from "../components/ui/button/BackButton";
 import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { selectFriendRequests, selectUser, useAppSelector } from "../store";
+import {
+  selectFriendRequests,
+  selectUser,
+  setFriendRequestUnRead,
+  useAppDispatch,
+  useAppSelector,
+} from "../store";
+import { markInvitationsAsRead } from "util/handleFriendsEvent";
 
 interface FriendInvitationProps {
   navigation: NavigationProp<any>;
@@ -14,17 +21,31 @@ interface FriendInvitationProps {
 
 //交友邀請
 const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
+  const dispatch = useAppDispatch();
+  const personal = useAppSelector(selectUser);
+
   const { loading } = useFriendRequests();
 
   const friendRequests = useAppSelector(selectFriendRequests);
-  
+
+  const fetchMarkInvitationsAsRead = async () => {
+    const { success } = await markInvitationsAsRead({
+      userId: personal.userId,
+    });
+    if (success) {
+      dispatch(setFriendRequestUnRead(0));
+    }
+  };
+
+  // 點開交友邀請後,將未讀的邀請設為已讀
   useEffect(() => {
     navigation.setOptions({
       title: "交友邀請",
       headerTitleAlign: "center",
       headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
-  }, [navigation]);
+    fetchMarkInvitationsAsRead();
+  }, [navigation, personal.userId]);
 
   if (loading) {
     return <LoadingOverlay message="交友邀請 loading ..." />;

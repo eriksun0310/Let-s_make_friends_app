@@ -1,5 +1,9 @@
+import {
+  transformFriendRequest,
+  transformFriendRequests,
+} from "shared/friend/friendUtils";
 import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
-import { FriendState, Result, User } from "../shared/types";
+import { FriendRequest, FriendState, Result, User } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
 import { getUserDetail, getUsersDetail } from "./handleUserEvent";
 import { supabase } from "./supabaseClient";
@@ -298,6 +302,46 @@ export const getBeFriendUsers = async ({
   }
 };
 
+type GetFriendRequestsProps = Result & {
+  data: FriendRequest[];
+};
+// 取得其他用戶寄送的交友邀請
+export const getFriendRequests = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<GetFriendRequestsProps> => {
+  try {
+    const { data, error } = await supabase
+      .from("friend_requests")
+      .select("*")
+      .eq("receiver_id", userId)
+      .eq("status", "pending");
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+        data: [],
+      };
+    }
+
+    const transformedFriendRequests = transformFriendRequests(data);
+
+    return {
+      success: true,
+      data: transformedFriendRequests,
+    };
+  } catch (error) {
+    console.error("取得交友邀請失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
+};
+
 /*
 ex:111 寄給 222  
 senderId: 111.user_id
@@ -333,6 +377,10 @@ export const sendFriendRequest = async ({
   }
 };
 
+type UpdateFriendRequestStatusProps = Result & {
+  data: FriendRequest | null;
+};
+
 // ☑️更新 friend_requests 狀態 (接受或拒絕)
 const updateFriendRequestStatus = async ({
   senderId,
@@ -342,32 +390,39 @@ const updateFriendRequestStatus = async ({
   senderId: string;
   receiverId: string;
   status: Omit<FriendState, "add">;
-}): Promise<Result> => {
+}): Promise<UpdateFriendRequestStatusProps> => {
   try {
     // 更新 friend_requests 狀態
-    const { error } = await supabase
+    const { data: updateFriendRequest, error } = await supabase
       .from("friend_requests")
       .update({
         status: status,
       })
       .eq("sender_id", senderId)
-      .eq("receiver_id", receiverId);
+      .eq("receiver_id", receiverId)
+      .select("*")
+      .maybeSingle();
     if (error) {
       console.log("更新 friend_requests 狀態 失敗", error);
       return {
         success: false,
         errorMessage: error?.message,
+        data: null,
       };
     }
 
+    const transformedFriendRequest =
+      transformFriendRequest(updateFriendRequest);
     return {
       success: true,
+      data: transformedFriendRequest,
     };
   } catch (error) {
     console.log("更新 friend_requests 狀態 失敗", error);
     return {
       success: false,
       errorMessage: (error as Error).message,
+      data: null,
     };
   }
 };
@@ -484,13 +539,21 @@ const insertFriend = async ({
   }
 };
 
+type AcceptedFriendRequestProps = Result & {
+  data: FriendRequest | null;
+};
+
 // ☑️接受交友邀請
 export const acceptedFriendRequest = async ({
   senderId,
   receiverId,
-}: FriendProps): Promise<Result> => {
+}: FriendProps): Promise<AcceptedFriendRequestProps> => {
   try {
-    const { success, errorMessage } = await updateFriendRequestStatus({
+    const {
+      success,
+      data: updateFriendRequest,
+      errorMessage,
+    } = await updateFriendRequestStatus({
       senderId: senderId,
       receiverId: receiverId,
       status: "accepted",
@@ -501,6 +564,7 @@ export const acceptedFriendRequest = async ({
       return {
         success: false,
         errorMessage: errorMessage,
+        data: null,
       };
     }
 
@@ -510,12 +574,13 @@ export const acceptedFriendRequest = async ({
       friendId: receiverId,
     });
 
-    return { success: true };
+    return { success: true, data: updateFriendRequest };
   } catch (error) {
     console.log("接受交友邀請 失敗", error);
     return {
       success: false,
       errorMessage: (error as Error)?.message,
+      data: null,
     };
   }
 };
@@ -550,13 +615,21 @@ export const insertRejectedFriendRequest = async ({
   }
 };
 
+type UpdateRejectedFriendRequestProps = Result & {
+  data: FriendRequest | null;
+};
+
 // ☑️拒絕交友邀請(給對方有寄送交友邀請用的)
 export const updateRejectedFriendRequest = async ({
   senderId,
   receiverId,
-}: FriendProps): Promise<Result> => {
+}: FriendProps): Promise<UpdateRejectedFriendRequestProps> => {
   try {
-    const { success, errorMessage } = await updateFriendRequestStatus({
+    const {
+      success,
+      data: updateFriendRequest,
+      errorMessage,
+    } = await updateFriendRequestStatus({
       senderId,
       receiverId,
       status: "rejected",
@@ -567,15 +640,17 @@ export const updateRejectedFriendRequest = async ({
       return {
         success: false,
         errorMessage: errorMessage,
+        data: null,
       };
     }
 
-    return { success: true };
+    return { success: true, data: updateFriendRequest };
   } catch (error) {
     console.log("拒絕交友邀請 失敗", error);
     return {
       success: false,
       errorMessage: (error as Error)?.message,
+      data: null,
     };
   }
 };
@@ -607,5 +682,35 @@ export const deleteFriend = async ({
   } catch (error) {
     console.log("刪除好友 失敗", error);
     return { success: false, errorMessage: (error as Error).message };
+  }
+};
+
+// 標記所有交友邀請為已讀
+export const markInvitationsAsRead = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<Result> => {
+  try {
+    const { error } = await supabase
+      .from("friend_requests")
+      .update({ is_read: true })
+      .eq("receiver_id", userId)
+      .eq("is_read", false); // 只更新尚未讀取的邀請
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
   }
 };

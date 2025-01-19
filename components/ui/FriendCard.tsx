@@ -16,7 +16,12 @@ import {
   acceptedFriendRequest,
   updateRejectedFriendRequest,
 } from "../../util/handleFriendsEvent";
-import { selectUser, useAppSelector } from "../../store";
+import {
+  deleteFriendRequest,
+  selectUser,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 
 const translateBtnLoading = {
   addFriend: "add",
@@ -43,12 +48,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
   navigation,
   onHandleAddFriendFunc,
 }) => {
+  const dispatch = useAppDispatch();
+  const personal = useAppSelector(selectUser);
   const [buttonLoading, setButtonLoading] = useState({
     add: false,
     accepted: false,
     rejected: false,
   });
-  const personal = useAppSelector(selectUser);
 
   // 點擊 好友資訊
   const clickSearch = () => {
@@ -137,9 +143,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
           throw new Error("Invalid action type");
       }
 
-      if (!result.success) {
-        console.error(`Failed to ${friendState} friend`);
+      const { success, data } = result;
+      if (success) {
+        dispatch(deleteFriendRequest(data?.id));
       }
+      // if (!result.success) {
+      //   console.error(`Failed to ${friendState} friend`);
+      // }
     } catch (error) {
       console.error(`Error while performing ${friendState} action:`, error);
     } finally {

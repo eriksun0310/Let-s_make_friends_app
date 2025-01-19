@@ -86,22 +86,22 @@ export const useFriendRequests = () => {
   }, [personal.userId]);
 
   // 標記所有交友邀請為已讀
-  const markInvitationsAsRead = async () => {
-    const { error } = await supabase
-      .from("friend_requests")
-      .update({ is_read: true })
-      .eq("receiver_id", personal.userId)
-      .eq("is_read", false); // 只更新尚未讀取的邀請
+  // const markInvitationsAsRead = async () => {
+  //   const { error } = await supabase
+  //     .from("friend_requests")
+  //     .update({ is_read: true })
+  //     .eq("receiver_id", personal.userId)
+  //     .eq("is_read", false); // 只更新尚未讀取的邀請
 
-    if (error) {
-      console.error("Error updating invitation read status:", error);
-    } else {
-      dispatch(setFriendRequestUnRead);
-    }
-  };
+  //   if (error) {
+  //     console.error("Error updating invitation read status:", error);
+  //   } else {
+  //     dispatch(setFriendRequestUnRead);
+  //   }
+  // };
 
   return {
     loading,
-    markInvitationsAsRead,
+    // markInvitationsAsRead,
   };
 };
