@@ -12,8 +12,7 @@ import {
   insertRejectedFriendRequest,
   sendFriendRequest,
 } from "../util/handleFriendsEvent";
-import { useFriendRequests } from "../components/hooks/useFriendRequests";
-import { FriendState, User } from "../shared/types";
+import { FriendState } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useNewFriend } from "../components/hooks/useNewFriend";
 import {
@@ -28,6 +27,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
+import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -40,6 +40,8 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
+  useAddFriendListeners();
+  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
@@ -55,19 +57,21 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   );
 
   //取得交友邀請
-  const { loading } = useFriendRequests();
+  //const { loading } = useFriendRequests();
 
   // 所有的用戶資料
   //const [allUsers, setAllUsers] = useState<User[]>([]);
 
   // 可以成為好友的用戶資料
   const fetchBeFriendUsers = async () => {
+    setLoading(true);
     // loading
     const { data: userData } = await getBeFriendUsers({
       currentUserId: personal.userId,
     });
 
     dispatch(setBeAddFriends(userData));
+    setLoading(false);
     //setAllUsers(userData);
   };
 
@@ -89,28 +93,23 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     friendState: Omit<FriendState, "accepted">;
     receiverId: string;
   }) => {
-    try {
-      let result = {} as {
-        success: boolean;
-      };
-      if (friendState === "add") {
-        result = await sendFriendRequest({
-          senderId: personal.userId,
-          receiverId: receiverId,
-        });
-      } else if (friendState === "rejected") {
-        result = await insertRejectedFriendRequest({
-          senderId: personal.userId,
-          receiverId: receiverId,
-        });
-      }
-      if (!result.success) {
-        console.error(`Failed to add friend`);
-      }
+    let result = {} as {
+      success: boolean;
+    };
+    if (friendState === "add") {
+      result = await sendFriendRequest({
+        senderId: personal.userId,
+        receiverId: receiverId,
+      });
+    } else if (friendState === "rejected") {
+      result = await insertRejectedFriendRequest({
+        senderId: personal.userId,
+        receiverId: receiverId,
+      });
+    }
+    if (result.success) {
       // 更新redux 的 beAddFriends
       dispatch(deleteBeAddFriend(receiverId));
-    } catch (error) {
-      console.error("Error sending friend request:", error);
     }
 
     // 應該是不用
@@ -172,6 +171,10 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     // 取得其他用戶寄送的交友邀請
     fetchFriendRequests();
   }, [personal.userId]);
+
+  // console.log("beAddFriends 11111", beAddFriends);
+  // console.log("friendRequests 1111", friendRequests);
+  // console.log("friendRequestUnRead 1111", friendRequestUnRead);
 
   // 不確定要不要
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;

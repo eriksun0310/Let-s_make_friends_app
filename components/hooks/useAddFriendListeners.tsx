@@ -30,6 +30,7 @@ export const useAddFriendListeners = () => {
           if (insertFriendRequest.sender_id === personal.userId) {
             return;
           }
+          dispatch(deleteBeAddFriend(insertFriendRequest.sender_id));
           // 收到使用者寄給我的好友邀請
           if (insertFriendRequest.status === "pending") {
             const transformedFriendRequests = transformFriendRequests([
@@ -37,9 +38,7 @@ export const useAddFriendListeners = () => {
             ]);
             dispatch(addFriendRequest(transformedFriendRequests));
             dispatch(updateFriendRequestUnRead());
-          } else if (insertFriendRequest.status === "rejected") {
-            dispatch(deleteBeAddFriend(insertFriendRequest.sender_id));
-          }
+          } 
         }
       )
       .subscribe();
