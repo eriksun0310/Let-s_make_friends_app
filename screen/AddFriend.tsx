@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { BellRing, Dot, Users } from "lucide-react-native";
+import { BellRing, Users } from "lucide-react-native";
 import FriendCard from "../components/ui/FriendCard";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
@@ -40,7 +40,7 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
-  useAddFriendListeners();
+  // useAddFriendListeners();
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
@@ -65,19 +65,19 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   // 可以成為好友的用戶資料
   const fetchBeFriendUsers = async () => {
     setLoading(true);
-    // loading
+
     const { data: userData } = await getBeFriendUsers({
       currentUserId: personal.userId,
     });
 
     dispatch(setBeAddFriends(userData));
     setLoading(false);
-    //setAllUsers(userData);
   };
 
   // 取得其他用戶寄送的交友邀請
   const fetchFriendRequests = async () => {
     const { data } = await getFriendRequests({ userId: personal.userId });
+    console.log('getFriendRequests data', data);
     dispatch(setFriendRequests(data));
     // 更新未讀的好友邀請數量
     dispatch(
@@ -153,7 +153,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
         </CustomIcon>
       ),
       // 動態設置底部導航的 tabBarBadge
-      tabBarBadge: showBadge ? <Dot size="5" /> : null,
+      // tabBarB/adge: showBadge ? <Dot size="5" /> : null,
     });
 
     // fetchBeFriendUsers(); // 調用 API 獲取資料

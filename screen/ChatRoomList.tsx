@@ -3,9 +3,7 @@ import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useEffect, useState } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
-
 import { NavigationProp } from "@react-navigation/native";
-import { Dot } from "lucide-react-native";
 import {
   selectUser,
   useAppDispatch,
@@ -52,22 +50,22 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  useEffect(() => {
-    // 判斷是否有未讀訊息
-    const hasUnreadMessages = chatRoomsData?.some((room) => {
-      const unreadCount =
-        room.user1Id === personal.userId
-          ? room.unreadCountUser1
-          : room.unreadCountUser2;
-      return unreadCount > 0;
-    });
+  // useEffect(() => {
+  //   // 判斷是否有未讀訊息
+  //   const hasUnreadMessages = chatRoomsData?.some((room) => {
+  //     const unreadCount =
+  //       room.user1Id === personal.userId
+  //         ? room.unreadCountUser1
+  //         : room.unreadCountUser2;
+  //     return unreadCount > 0;
+  //   });
 
-    // console.log('hasUnreadMessages', hasUnreadMessages)
-    navigation.setOptions({
-      // 動態設置底部導航的 tabBarBadge
-      tabBarBadge: hasUnreadMessages ? <Dot size={10}></Dot> : null,
-    });
-  }, [navigation, chatRoomsData, personal.userId]);
+  //   console.log('hasUnreadMessages', hasUnreadMessages)
+  //   // navigation.setOptions({
+  //   //   // 動態設置底部導航的 tabBarBadge
+  //   //   tabBarBadge: hasUnreadMessages ? <View style={styles.dot} /> : null,
+  //   // });
+  // }, [navigation, chatRoomsData, personal.userId]);
 
   return (
     // <ChatContextProvider>
@@ -117,6 +115,12 @@ const styles = StyleSheet.create({
   },
   chatMessage: {
     color: "#7e7e7e",
+  },
+  dot: {
+    backgroundColor: "red",
+    borderRadius: 100,
+    width: 5,
+    height: 5,
   },
 });
 export default ChatRoomList;

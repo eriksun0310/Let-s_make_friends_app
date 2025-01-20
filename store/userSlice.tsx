@@ -10,7 +10,6 @@ interface InitialStateProps {
   isAuthenticated: boolean; // 是否已經登入
   initialized: boolean; // 應用程序這個初始化步驟已完成
   isNewUser: boolean; // 是否是新用戶
-  friendList: User[]; // 好友列表
   userSettings: UserSettings;
 }
 
@@ -35,7 +34,6 @@ const initialState: InitialStateProps = {
   isAuthenticated: false, // 是否已經登入
   initialized: false, // 應用程序這個初始化步驟已完成,
   isNewUser: false,
-  friendList: [],
   userSettings: initUserSettings,
 };
 

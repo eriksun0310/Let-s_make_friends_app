@@ -225,7 +225,7 @@ export const useChatListeners = () => {
     const handleAppStateChange = async (state: string) => {
       // console.log("handleAppStateChange", state);
       // console.log("handleAppStateChange userId", userId);
-
+      console.log("state", state);
       if (state === "background") {
         console.log("App moved to background");
 
@@ -280,6 +280,8 @@ export const useChatListeners = () => {
       subscription.remove();
     };
   }, [currentChatRoomId, userId, presenceChannel]);
+
+ 
 
   // useEffect(() => {
   //   const handleAppStateChange = (state: string) => {

@@ -35,10 +35,18 @@ import {
   selectIsAuthenticated,
   selectIsNewUser,
   AppReduxProvider,
+  selectFriendRequestUnRead,
+  selectUser,
+  selectChatRooms,
+  setFriendRequests,
+  setFriendRequestUnRead,
 } from "./store";
 import { ChatContextProvider } from "./shared/chat/ChatContext";
 import PostContent from "./screen/PostContent";
 import Settings from "./screen/Settings";
+import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
+import { View, StyleSheet } from "react-native";
+import { getFriendRequests } from "util/handleFriendsEvent";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -47,15 +55,43 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainTabNavigator = () => {
+  const personal = useAppSelector(selectUser);
+
+  const chatRoomsData = useAppSelector(selectChatRooms);
+
+  const friendRequestUnRead = useAppSelector(selectFriendRequestUnRead);
+
+  const hasUnreadMessages = chatRoomsData?.some((room) => {
+    const unreadCount =
+      room.user1Id === personal.userId
+        ? room.unreadCountUser1
+        : room.unreadCountUser2;
+    return unreadCount > 0;
+  });
+
+  // 判斷加好友是否顯示紅點
+  const addFriendDot = friendRequestUnRead > 0;
+
   return (
     <Tab.Navigator
       initialRouteName="home"
       screenOptions={({ route }) => ({
+        tabBarShowLabel: false,
         tabBarIcon: ({ color, size }) => {
           if (route.name === "chatRoomList") {
-            return <MessageCircle color={color} size={size} />;
+            return (
+              <>
+                <MessageCircle color={color} size={size} />
+                {hasUnreadMessages && <View style={styles.dot} />}
+              </>
+            );
           } else if (route.name === "addFriend") {
-            return <UserRoundPlus color={color} size={size} />;
+            return (
+              <>
+                <UserRoundPlus color={color} size={size} />
+                {addFriendDot && <View style={styles.dot} />}
+              </>
+            );
           } else if (route.name === "userInfoPersonal") {
             return <UserRound color={color} size={size} />;
           } else if (route.name === "home") {
@@ -70,19 +106,25 @@ const MainTabNavigator = () => {
         name="chatRoomList"
         options={{
           title: "聊天室",
+          // headerShown: false,
           headerTitleAlign: "center",
         }}
         component={ChatRoomList}
       />
       <Tab.Screen
         name="home"
-        options={{ title: "首頁", headerTitleAlign: "center" }}
+        options={{
+          title: "首頁",
+          // headerShown: false,
+          headerTitleAlign: "center",
+        }}
         component={Home}
       />
       <Tab.Screen
         name="addFriend"
         options={{
           title: "加好友",
+
           headerTitleAlign: "center",
         }}
         component={AddFriend}
@@ -91,7 +133,7 @@ const MainTabNavigator = () => {
       <Tab.Screen
         name="userInfoPersonal"
         options={({ route }) => ({
-          title: "個人資料",
+          // title: "個人資料",
           userState: "personal",
         })}
         component={UserInfo}
@@ -127,11 +169,29 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
+  const dispatch = useAppDispatch();
+  const personal = useAppSelector(selectUser);
   const isNewUser = useAppSelector(selectIsNewUser);
 
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
+  useAddFriendListeners();
+
+  // 取得其他用戶寄送的交友邀請
+  const fetchFriendRequests = async () => {
+    const { data } = await getFriendRequests({ userId: personal.userId });
+    console.log("getFriendRequests data =====>", data);
+    dispatch(setFriendRequests(data));
+    // 更新未讀的好友邀請數量
+    dispatch(
+      setFriendRequestUnRead(data.filter((req) => req.isRead === false).length)
+    );
+  };
+  useEffect(() => {
+    // 取得其他用戶寄送的交友邀請
+    fetchFriendRequests();
+  }, [personal.userId]);
   return (
     <Stack.Navigator
       initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}
@@ -156,7 +216,6 @@ const AuthenticatedStack = () => {
         name="aboutMe"
         options={{
           title: "關於我",
-
           headerLeft: () => null, // 隱藏返回按鈕
         }}
         component={AboutMe}
@@ -255,3 +314,12 @@ export default function App() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  dot: {
+    backgroundColor: "red",
+    borderRadius: 100,
+    width: 5,
+    height: 5,
+  },
+});

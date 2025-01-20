@@ -48,11 +48,11 @@
 
 
 [加好友 BUG]
-1. 要多開 friendSlice.tsx
-2. friendRequests[] 、friendRequestUnRead、friendList[] 、newFriendUnRead
-3. useFriendRequests() 的hook 在兩個地方同時使用會造成friend_requests 沒有監聽(被卸載了)
-4. friend 的redux 設定好之後, 在 useFriendRequests、useNewFriend 去更新對應的狀態
-5. 有些要render 畫面的部分, 就可以從 redux 拿 , 例如 FriendInvitation render 的時候, 就不會每次都要fetch 資料庫一次
+✅1. 要多開 friendSlice.tsx
+✅2. friendRequests[] 、friendRequestUnRead、friendList[] 、newFriendUnRead
+✅3. useFriendRequests() 的hook 在兩個地方同時使用會造成friend_requests 沒有監聽(被卸載了)
+✅4. friend 的redux 設定好之後, 在 useFriendRequests、useNewFriend 去更新對應的狀態
+✅5. 有些要render 畫面的部分, 就可以從 redux 拿 , 例如 FriendInvitation render 的時候, 就不會每次都要fetch 資料庫一次
 ✅6. userSlice 的  setFriendList 、addFriend 改到用friendSlice
 
 
@@ -60,6 +60,20 @@
 1. 關於有時候畫面剛載入完 , 會去getFriendList (取資料庫的資料), 然後更新回friendList 的redux ,不過要在哪個時間點,
 再去重新fetch 一次資料庫, 假設每次都要更新 friend redux, 什麼時候 friendList redux 資料會遺失?
 
+在什么情况下重新从数据库获取数据？
+你可以根据以下情景来决定何时重新获取数据：
+
+应用启动：当用户第一次打开应用时，从数据库加载初始数据。
+应用切回前台：当用户从后台切回前台时，可能需要重新获取数据以保证数据的实时性。
+特定事件触发：当用户执行某些操作（如刷新页面、特定交互）时，可以手动触发数据刷新。
+
+
+狀態	持久化（Redux Persist）	即時更新	實現方式
+個人資料	✅ 是	❌ 否	儲存在 Redux Persist 或本地存儲
+好友資料	✅ 是	❌ 否	啟動時從伺服器加載，持久化即可
+好友邀請	❌ 否	✅ 是	切回前台或有事件通知時拉取更新
+聊天室	❌ 否	✅ 是	使用 WebSocket 或 AppState 更新
+貼文	❌ 否	✅ 是	每次進入頁面或下拉刷新時拉取更新
 
 
 
