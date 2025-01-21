@@ -47,6 +47,7 @@ import Settings from "./screen/Settings";
 import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
 import { View, StyleSheet } from "react-native";
 import { getFriendRequests } from "util/handleFriendsEvent";
+import useAppStateFetcher from "components/hooks/useAppStateFetcher";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -172,26 +173,24 @@ const AuthenticatedStack = () => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
   const isNewUser = useAppSelector(selectIsNewUser);
-
+  useAppStateFetcher();
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
-  useAddFriendListeners();
-
   // 取得其他用戶寄送的交友邀請
-  const fetchFriendRequests = async () => {
-    const { data } = await getFriendRequests({ userId: personal.userId });
-    console.log("getFriendRequests data =====>", data);
-    dispatch(setFriendRequests(data));
-    // 更新未讀的好友邀請數量
-    dispatch(
-      setFriendRequestUnRead(data.filter((req) => req.isRead === false).length)
-    );
-  };
-  useEffect(() => {
-    // 取得其他用戶寄送的交友邀請
-    fetchFriendRequests();
-  }, [personal.userId]);
+  // const fetchFriendRequests = async () => {
+  //   const { data } = await getFriendRequests({ userId: personal.userId });
+  //   console.log("getFriendRequests data =====>", data);
+  //   dispatch(setFriendRequests(data));
+  //   // 更新未讀的好友邀請數量
+  //   dispatch(
+  //     setFriendRequestUnRead(data.filter((req) => req.isRead === false).length)
+  //   );
+  // };
+  // useEffect(() => {
+  //   // 取得其他用戶寄送的交友邀請
+  //   fetchFriendRequests();
+  // }, [personal.userId]);
   return (
     <Stack.Navigator
       initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}
@@ -276,6 +275,7 @@ const AuthenticatedStack = () => {
 
 const Navigation = () => {
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
   }, [dispatch]);
@@ -284,6 +284,7 @@ const Navigation = () => {
   const initialized = useAppSelector(selectInitialized);
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  console.log("isAuthenticated", isAuthenticated);
 
   if (!initialized) {
     return <LoadingOverlay message="loading ..." />; // 顯示載入頁面直到初始化完成

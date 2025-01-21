@@ -113,9 +113,15 @@ export const logout = () => async (dispatch: any) => {
 // 定義 initializeAuth 為一個 thunk，用來在每次應用程式啟動時檢查 Supabase 認證狀態
 export const initializeAuth = (): AppThunk => async (dispatch) => {
   try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    console.log("current session 1111111111", session);
+
+    // const session = supabase.auth.session();
     // 使用 onAuthStateChange 來監聽認證狀態變化
     supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log("session", session);
+      console.log("session", session);
       // 不管是註冊還是登入都會有 session
       if (session) {
         const user = session.user;

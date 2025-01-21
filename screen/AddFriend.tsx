@@ -77,7 +77,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
   // 取得其他用戶寄送的交友邀請
   const fetchFriendRequests = async () => {
     const { data } = await getFriendRequests({ userId: personal.userId });
-    console.log('getFriendRequests data', data);
+    // console.log('getFriendRequests data', data);
     dispatch(setFriendRequests(data));
     // 更新未讀的好友邀請數量
     dispatch(

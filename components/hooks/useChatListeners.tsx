@@ -221,65 +221,67 @@ export const useChatListeners = () => {
   //   return () => subscription.remove();
   // }, [currentChatRoomId, userId, presenceChannel]);
 
-  useEffect(() => {
-    const handleAppStateChange = async (state: string) => {
-      // console.log("handleAppStateChange", state);
-      // console.log("handleAppStateChange userId", userId);
-      console.log("state", state);
-      if (state === "background") {
-        console.log("App moved to background");
 
-        // 應用切到背景時，清理 Presence 狀態
-        if (presenceChannel) {
-          await presenceChannel.untrack();
-          console.log("Untracked presence");
-        }
+  //  TODO: 不確定要不要
+  // useEffect(() => {
+  //   const handleAppStateChange = async (state: string) => {
+  //     // console.log("handleAppStateChange", state);
+  //     // console.log("handleAppStateChange userId", userId);
+  //     console.log("state", state);
+  //     if (state === "background") {
+  //       console.log(" 1111 App moved to background");
 
-        // 更新未讀數量
-        // if (currentChatRoomId) {
-        //   try {
-        //     const result = await updateUnreadCount({
-        //       chatRoomId: currentChatRoomId,
-        //       userId,
-        //     });
-        //     console.log("result", result);
-        //     if (result.success) {
-        //       console.log("Updated unread count successfully");
-        //     } else {
-        //       console.error("Failed to update unread count:", result.error);
-        //     }
-        //   } catch (error) {
-        //     console.error("Error updating unread count:", error);
-        //   }
-        // }
-      } else if (state === "active") {
-        console.log("App moved to foreground");
+  //       // 應用切到背景時，清理 Presence 狀態
+  //       if (presenceChannel) {
+  //         await presenceChannel.untrack();
+  //         console.log("Untracked presence");
+  //       }
 
-        // 應用切回前台時，重新跟蹤 Presence 狀態
-        if (presenceChannel) {
-          try {
-            await presenceChannel.track({
-              user_id: userId,
-              chat_room_id: currentChatRoomId || null,
-              status: "online",
-            });
-            console.log("Tracked presence");
-          } catch (error) {
-            console.error("Error tracking presence:", error);
-          }
-        }
-      }
-    };
+  //       // 更新未讀數量
+  //       // if (currentChatRoomId) {
+  //       //   try {
+  //       //     const result = await updateUnreadCount({
+  //       //       chatRoomId: currentChatRoomId,
+  //       //       userId,
+  //       //     });
+  //       //     console.log("result", result);
+  //       //     if (result.success) {
+  //       //       console.log("Updated unread count successfully");
+  //       //     } else {
+  //       //       console.error("Failed to update unread count:", result.error);
+  //       //     }
+  //       //   } catch (error) {
+  //       //     console.error("Error updating unread count:", error);
+  //       //   }
+  //       // }
+  //     } else if (state === "active") {
+  //       console.log("2222 App moved to foreground");
 
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
+  //       // 應用切回前台時，重新跟蹤 Presence 狀態
+  //       if (presenceChannel) {
+  //         try {
+  //           await presenceChannel.track({
+  //             user_id: userId,
+  //             chat_room_id: currentChatRoomId || null,
+  //             status: "online",
+  //           });
+  //           console.log("Tracked presence");
+  //         } catch (error) {
+  //           console.error("Error tracking presence:", error);
+  //         }
+  //       }
+  //     }
+  //   };
 
-    return () => {
-      subscription.remove();
-    };
-  }, [currentChatRoomId, userId, presenceChannel]);
+  //   const subscription = AppState.addEventListener(
+  //     "change",
+  //     handleAppStateChange
+  //   );
+
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
 
  
 

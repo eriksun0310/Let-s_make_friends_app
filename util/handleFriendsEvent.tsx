@@ -453,7 +453,7 @@ export const getFriendList = async ({
     }
 
     if (!friendsData || friendsData.length === 0) {
-      console.log("沒有好友");
+      // console.log("沒有好友");
       return {
         success: true,
         data: [],
