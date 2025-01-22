@@ -18,7 +18,7 @@ import Button from "../components/ui/button/Button";
 import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import {
-  logout,
+
   selectPosts,
   selectUser,
   setCurrentChatRoomId,
@@ -29,6 +29,7 @@ import {
 import { getUserSettings } from "../util/handleUserEvent";
 import { getChatRoomDetail, getMessages } from "util/handleChatEvent";
 import { resetDeleteChatRoomState } from "shared/chat/chatFuncs";
+import { logout } from "components/hooks/useAppLifecycle";
 
 interface UserInfoProps {
   route: {

@@ -1,9 +1,6 @@
 import { createContext, useContext, useMemo } from "react";
-
 import { useChatListeners } from "../../components/hooks/useChatListeners";
 import { Message } from "../types";
-import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
-import useAppStateFetcher from "components/hooks/useAppStateFetcher";
 
 // 定義 Context 類型
 interface Value {
@@ -23,12 +20,6 @@ export const ChatContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const { newMessage, readMessages } = useChatListeners();
-  // useAppStateFetcher()
-
-  // const value = {
-  //   newMessage: newMessage || null,
-  //   readMessages,
-  // };
 
   const value = useMemo(
     () => ({

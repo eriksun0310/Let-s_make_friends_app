@@ -14,12 +14,12 @@ import { MessageCircleMore } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import { getChatRoomDetail, getMessages } from "../util/handleChatEvent";
 import {
-  logout,
   selectUser,
   setCurrentChatRoomId,
   useAppDispatch,
   useAppSelector,
 } from "../store";
+import { logout } from "components/hooks/useAppLifecycle";
 
 interface UserInfoProps {
   route: {

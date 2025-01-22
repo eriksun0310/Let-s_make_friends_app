@@ -30,7 +30,6 @@ import "react-native-gesture-handler";
 import {
   useAppDispatch,
   useAppSelector,
-  initializeAuth,
   selectInitialized,
   selectIsAuthenticated,
   selectIsNewUser,
@@ -38,16 +37,12 @@ import {
   selectFriendRequestUnRead,
   selectUser,
   selectChatRooms,
-  setFriendRequests,
-  setFriendRequestUnRead,
 } from "./store";
 import { ChatContextProvider } from "./shared/chat/ChatContext";
 import PostContent from "./screen/PostContent";
 import Settings from "./screen/Settings";
-import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
 import { View, StyleSheet } from "react-native";
-import { getFriendRequests } from "util/handleFriendsEvent";
-import useAppStateFetcher from "components/hooks/useAppStateFetcher";
+import { useAppLifecycle } from "components/hooks/useAppLifecycle";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -170,27 +165,9 @@ const AuthStack = () => {
 
 // 已登入後的頁面(有驗證)
 const AuthenticatedStack = () => {
-  const dispatch = useAppDispatch();
-  const personal = useAppSelector(selectUser);
   const isNewUser = useAppSelector(selectIsNewUser);
-  useAppStateFetcher();
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-
-  // 取得其他用戶寄送的交友邀請
-  // const fetchFriendRequests = async () => {
-  //   const { data } = await getFriendRequests({ userId: personal.userId });
-  //   console.log("getFriendRequests data =====>", data);
-  //   dispatch(setFriendRequests(data));
-  //   // 更新未讀的好友邀請數量
-  //   dispatch(
-  //     setFriendRequestUnRead(data.filter((req) => req.isRead === false).length)
-  //   );
-  // };
-  // useEffect(() => {
-  //   // 取得其他用戶寄送的交友邀請
-  //   fetchFriendRequests();
-  // }, [personal.userId]);
   return (
     <Stack.Navigator
       initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}
@@ -238,15 +215,7 @@ const AuthenticatedStack = () => {
       <Stack.Screen name="editHeadShot" component={EditHeadShot} />
 
       {/* 好友列表*/}
-      <Stack.Screen
-        name="friendList"
-        component={FriendList}
-        // options={{
-        //   title: "好友列表",
-        //   headerTitleAlign: "center",
-        //   headerLeft: () => <BackButton />,
-        // }}
-      />
+      <Stack.Screen name="friendList" component={FriendList} />
       {/* 交友邀請*/}
       <Stack.Screen name="friendInvitation" component={FriendInvitation} />
       {/* 用戶資訊 */}
@@ -274,12 +243,13 @@ const AuthenticatedStack = () => {
 };
 
 const Navigation = () => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
+  // }, [dispatch]);
 
+  useAppLifecycle();
   // 應用程式初始化
   const initialized = useAppSelector(selectInitialized);
   // 是否已經登入
