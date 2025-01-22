@@ -43,7 +43,7 @@ import PostContent from "./screen/PostContent";
 import Settings from "./screen/Settings";
 import { View, StyleSheet } from "react-native";
 import { useAppLifecycle } from "components/hooks/useAppLifecycle";
-import { useNewFriend } from "components/hooks/useNewFriend";
+import { useFriends } from "components/hooks/useFriends";
 import { useFriendRequests } from "components/hooks/useFriendRequests";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
@@ -176,14 +176,11 @@ const AuthenticatedStack = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   // TODO：到時候需要把 所有監聽事件都放在這裡
   //(ex: 交友邀請 、新好友、聊天室、貼文按讚、貼文回覆等等)
-  
-  // 監聽交友邀請
+
+  // 監聽好友邀請
   useFriendRequests();
   // 監聽新好友
-  useNewFriend();
-
-
-
+  useFriends();
 
   return (
     <Stack.Navigator

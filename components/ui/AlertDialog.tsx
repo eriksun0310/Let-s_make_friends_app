@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, StyleProp, TextStyle } from "react-native";
 import { Dialog, Button } from "@rneui/themed";
 
 interface AlertDialogProps {
@@ -10,6 +10,8 @@ interface AlertDialogProps {
   leftBtnOnPress: () => void; // 左側按鈕點擊事件
   rightBtnOnPress: () => void; // 右側按鈕點擊事件
   onBackdropPress: () => void; // 背景點擊事件
+  rightButtonStyle?: StyleProp<TextStyle>; // 右側按鈕樣式
+  rightTitleStyle?: StyleProp<TextStyle>; // 右側按鈕文字樣式
 }
 const AlertDialog: React.FC<AlertDialogProps> = ({
   isVisible,
@@ -19,6 +21,8 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
   leftBtnOnPress,
   rightBtnOnPress,
   onBackdropPress,
+  rightButtonStyle,
+  rightTitleStyle,
 }) => {
   return (
     <>
@@ -31,15 +35,15 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
             title={leftBtnText}
             onPress={leftBtnOnPress}
             buttonStyle={[styles.leftButton, { backgroundColor: "#e6e6e6" }]}
-            titleStyle={{ color: "#999999" }}
+            titleStyle={{ color: "#474747" }}
             // buttonStyle={[styles.leftButton, { backgroundColor: "#ffcccc" }]}
             // titleStyle={{ color: "#d9534f" }}
           />
           <Button
             title={rightBtnText}
             onPress={rightBtnOnPress}
-            buttonStyle={[styles.leftButton, { backgroundColor: "#e1f5fe" }]}
-            titleStyle={{ color: "#0277bd" }}
+            buttonStyle={[styles.rightButton, rightButtonStyle]}
+            titleStyle={[styles.rightText, rightTitleStyle]}
           />
         </View>
       </Dialog>
@@ -58,6 +62,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffcccc",
     borderRadius: 5,
     paddingVertical: 10,
+  },
+
+  rightButton: {
+    backgroundColor: "#e1f5fe",
+    borderRadius: 5,
+    paddingVertical: 10,
+  },
+  rightText: {
+    color: "#0277bd",
   },
 });
 

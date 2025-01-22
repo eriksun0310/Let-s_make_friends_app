@@ -43,10 +43,15 @@
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
 
-✅[加好友 整理code]
+[加好友 整理code]
 ✅1. 將 useAddFriendListeners 統整進 useFriendRequests
 ✅2. friends 資料表 的  notified -> is_read rename
 ✅3. 整理 新好友的通知 改記在 redux
+
+[刪除好友的邏輯]
+✅1. useNewFriend() -> useFriends() : 監聽 friends 這張表的事件(insert、 delete)
+✅2. INSERT dispatch(addFriend()) 
+✅3. DELETE dispatch(deleteFriend())
 
 
 ❓[問題]

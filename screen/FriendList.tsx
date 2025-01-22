@@ -5,7 +5,6 @@ import FriendItem from "../components/ui/FriendItem";
 import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
 import {
-  getFriendList,
   markNewFriendsAsRead,
 } from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
@@ -13,8 +12,6 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectFriendList,
   selectUser,
-  setFriendList,
-  setFriendRequestUnRead,
   setNewFriendUnRead,
   useAppDispatch,
   useAppSelector,

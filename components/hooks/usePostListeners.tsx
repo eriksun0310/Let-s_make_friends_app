@@ -78,13 +78,15 @@ export const usePostListeners = () => {
         },
         async (payload) => {
           const event = payload.eventType;
-          const post = payload.new as PostsDBType;
+   
           //監聽文章刪除事件
           if (event === "DELETE") {
+            const deletePostId = payload.old.id;
             // 刪除 redux 文章
-            dispatch(deletePost(post.id));
+            dispatch(deletePost(deletePostId));
             //監聽文章(新增、更新事件)
           } else if (event === "INSERT" || event === "UPDATE") {
+            const post = payload.new as PostsDBType;
             await handlePostChange({
               event: event,
               post: post,

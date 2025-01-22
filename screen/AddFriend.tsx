@@ -14,7 +14,6 @@ import {
 } from "../util/handleFriendsEvent";
 import { FriendState } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { useNewFriend } from "../components/hooks/useNewFriend";
 import {
   deleteBeAddFriend,
   selectBeAddFriends,

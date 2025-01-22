@@ -43,6 +43,7 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
       });
 
       if (success) {
+        console.log("刪除好友 friend.userId", friend.userId);
         dispatch(deleteFriend(friend.userId));
       }
     }
@@ -62,17 +63,26 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
     <>
       <AlertDialog
         alertTitle={`確認刪除 ${friend.name} 好友，聊天紀錄將永久刪除，是否繼續?`}
-        leftBtnText="刪除"
-        rightBtnText="取消"
+        leftBtnText="取消"
+        rightBtnText="刪除"
         isVisible={isAlertVisible}
         // 刪除好友
-        leftBtnOnPress={() => handleDeleteFriend("delete")} //確認刪除
-        rightBtnOnPress={() => handleDeleteFriend("cancel")} //取消
+        // leftBtnOnPress={() => handleDeleteFriend("delete")} //確認刪除
+        // rightBtnOnPress={() => handleDeleteFriend("cancel")} //取消
+        leftBtnOnPress={() => handleDeleteFriend("cancel")} //確認刪除
+        rightBtnOnPress={() => handleDeleteFriend("delete")} //取消
         onBackdropPress={() => handleDeleteFriend("cancel")}
+        rightButtonStyle={{
+          backgroundColor: "#ffcccc",
+        }}
+        rightTitleStyle={{
+          color: "#d9534f",
+        }}
       />
 
       <ListItem.Swipeable
         style={styles.container}
+        leftContent={null}
         rightContent={(reset) => (
           <Button
             title="刪除好友"
