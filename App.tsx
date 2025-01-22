@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -28,7 +28,6 @@ import PostDetail from "./screen/PostDetail";
 import Search from "./screen/Search";
 import "react-native-gesture-handler";
 import {
-  useAppDispatch,
   useAppSelector,
   selectInitialized,
   selectIsAuthenticated,
@@ -37,12 +36,15 @@ import {
   selectFriendRequestUnRead,
   selectUser,
   selectChatRooms,
+  selectNewFriendUnRead,
 } from "./store";
 import { ChatContextProvider } from "./shared/chat/ChatContext";
 import PostContent from "./screen/PostContent";
 import Settings from "./screen/Settings";
 import { View, StyleSheet } from "react-native";
 import { useAppLifecycle } from "components/hooks/useAppLifecycle";
+import { useNewFriend } from "components/hooks/useNewFriend";
+import { useFriendRequests } from "components/hooks/useFriendRequests";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -55,7 +57,11 @@ const MainTabNavigator = () => {
 
   const chatRoomsData = useAppSelector(selectChatRooms);
 
+  // 交友邀請未讀通知
   const friendRequestUnRead = useAppSelector(selectFriendRequestUnRead);
+
+  // 新好友未讀通知
+  const newFriendUnRead = useAppSelector(selectNewFriendUnRead);
 
   const hasUnreadMessages = chatRoomsData?.some((room) => {
     const unreadCount =
@@ -66,7 +72,7 @@ const MainTabNavigator = () => {
   });
 
   // 判斷加好友是否顯示紅點
-  const addFriendDot = friendRequestUnRead > 0;
+  const addFriendDot = friendRequestUnRead > 0 || newFriendUnRead > 0;
 
   return (
     <Tab.Navigator
@@ -168,6 +174,17 @@ const AuthenticatedStack = () => {
   const isNewUser = useAppSelector(selectIsNewUser);
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  // TODO：到時候需要把 所有監聽事件都放在這裡
+  //(ex: 交友邀請 、新好友、聊天室、貼文按讚、貼文回覆等等)
+  
+  // 監聽交友邀請
+  useFriendRequests();
+  // 監聽新好友
+  useNewFriend();
+
+
+
+
   return (
     <Stack.Navigator
       initialRouteName={isAuthenticated && isNewUser ? "aboutMe" : "main"}

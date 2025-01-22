@@ -72,77 +72,24 @@ export const usePostListeners = () => {
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "posts",
         },
         async (payload) => {
-          //console.log('測試 11111')
-          const newPost = payload.new as PostsDBType;
-
-          await handlePostChange({
-            event: "INSERT",
-            post: newPost,
-          });
-
-          // 公開
-          // if (newPost.visibility === "public") {
-          //   const postDetail = await getPostDetail({
-          //     post: newPost,
-          //   });
-
-          //   dispatch(addPost(postDetail));
-          //   // 好友
-          // } else if (newPost.visibility === "friends") {
-          //   // 判斷發文者是否為好友
-          //   const hasFriendPost = friendList.some(
-          //     (friend) => friend.userId === newPost.user_id
-          //   );
-
-          //   // 不是好友發的文
-          //   if (!hasFriendPost) {
-          //     return;
-          //   }
-
-          //   const postDetail = await getPostDetail({
-          //     post: newPost,
-          //   });
-
-          //   dispatch(addPost(postDetail));
-          // }
-        }
-      )
-
-      //監聽文章更新事件
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "posts",
-        },
-        async (payload) => {
-          //console.log('測試 22222')
-          console.log("payload", payload);
-          const updatedPost = payload.new as PostsDBType;
-          await handlePostChange({
-            event: "UPDATE",
-            post: updatedPost,
-          });
-        }
-      )
-      //監聽文章刪除事件
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          schema: "public",
-          table: "posts",
-        },
-        async (payload) => {
-          const deletedPost = payload.old as PostsDBType;
-          // 刪除 redux 文章
-          dispatch(deletePost(deletedPost.id));
+          const event = payload.eventType;
+          const post = payload.new as PostsDBType;
+          //監聽文章刪除事件
+          if (event === "DELETE") {
+            // 刪除 redux 文章
+            dispatch(deletePost(post.id));
+            //監聽文章(新增、更新事件)
+          } else if (event === "INSERT" || event === "UPDATE") {
+            await handlePostChange({
+              event: event,
+              post: post,
+            });
+          }
         }
       )
       .subscribe();

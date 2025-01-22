@@ -2,30 +2,31 @@ import React, { useRef, useState } from "react";
 import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { Colors } from "../../constants/style";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import { User } from "../../shared/types";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "./AlertDialog";
-import { deleteFriend } from "../../util/handleFriendsEvent";
-import { selectUser, useAppSelector } from "../../store";
+import { deleteFriendDB } from "../../util/handleFriendsEvent";
+import {
+  deleteFriend,
+  selectUser,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 
 interface FriendItemProps {
   friend: User;
   navigation: NavigationProp<any>;
-  onDeleteSuccess: () => Promise<void>;
 }
-const FriendItem: React.FC<FriendItemProps> = ({
-  friend,
-  navigation,
-  onDeleteSuccess,
-}) => {
+const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
+  const dispatch = useAppDispatch();
   // 取得個人資料
   const personal = useAppSelector(selectUser);
 
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
-  const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
+  const resetRef = useRef(() => {}); // 用於存儲 `reset` 函數
 
   // 刪除好友 事件
   const handleDeleteFriend = async (mode: "delete" | "cancel") => {
@@ -36,16 +37,13 @@ const FriendItem: React.FC<FriendItemProps> = ({
 
     if (mode === "delete") {
       console.log("delete");
-      const { success } = await deleteFriend({
+      const { success } = await deleteFriendDB({
         userId: personal.userId,
         friendId: friend.userId,
       });
 
       if (success) {
-        await onDeleteSuccess();
-        console.log("delete success");
-      } else {
-        console.log("delete error");
+        dispatch(deleteFriend(friend.userId));
       }
     }
   };
@@ -75,20 +73,6 @@ const FriendItem: React.FC<FriendItemProps> = ({
 
       <ListItem.Swipeable
         style={styles.container}
-        // leftContent={(reset) => (
-        //   <Button
-        //     title="查看好友"
-        //     icon={{ name: "search", color: "white" }}
-        //     buttonStyle={{ height: 100 }}
-        //     onPress={() => {
-        //       navigation.navigate("userInfoFriend", {
-        //         mode: "friend",
-        //         friend: friend,
-        //       });
-        //       reset();
-        //     }}
-        //   />
-        // )}
         rightContent={(reset) => (
           <Button
             title="刪除好友"

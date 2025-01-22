@@ -3,9 +3,7 @@ import { useEffect } from "react";
 import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
-import { useFriendRequests } from "../components/hooks/useFriendRequests";
 import FriendInvitationItem from "../components/friendInvitation/FriendInvitationItem";
-import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectFriendRequests,
   selectUser,
@@ -24,10 +22,10 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
-  const { loading } = useFriendRequests();
-
+ 
   const friendRequests = useAppSelector(selectFriendRequests);
 
+  // 將未讀的邀請設為已讀
   const fetchMarkInvitationsAsRead = async () => {
     const { success } = await markInvitationsAsRead({
       userId: personal.userId,
@@ -47,9 +45,6 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
     fetchMarkInvitationsAsRead();
   }, [navigation, personal.userId]);
 
-  if (loading) {
-    return <LoadingOverlay message="交友邀請 loading ..." />;
-  }
 
   return (
     <View style={styles.screen}>

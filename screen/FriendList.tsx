@@ -4,13 +4,18 @@ import { Colors } from "../constants/style";
 import FriendItem from "../components/ui/FriendItem";
 import { NavigationProp } from "@react-navigation/native";
 import BackButton from "../components/ui/button/BackButton";
-import { getFriendList } from "../util/handleFriendsEvent";
+import {
+  getFriendList,
+  markNewFriendsAsRead,
+} from "../util/handleFriendsEvent";
 import { User } from "../shared/types";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   selectFriendList,
   selectUser,
   setFriendList,
+  setFriendRequestUnRead,
+  setNewFriendUnRead,
   useAppDispatch,
   useAppSelector,
 } from "../store";
@@ -41,32 +46,27 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
 
   //const [friendList, setFriendList] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
 
   // 取得好友列表
-  const fetchFriendList = async () => {
-    const { data, success } = await getFriendList({
-      currentUserId: personal.userId,
-    });
-    if (!success) {
-      console.log("取得好友列表 錯誤");
-      setLoading(false);
-      return;
-    }
-    dispatch(setFriendList(data));
-    setLoading(false);
-  };
+  // const fetchFriendList = async () => {
+  //   const { data, success } = await getFriendList({
+  //     currentUserId: personal.userId,
+  //   });
+  //   if (!success) {
+  //     console.log("取得好友列表 錯誤");
+  //     setLoading(false);
+  //     return;
+  //   }
+  //   dispatch(setFriendList(data));
+  //   setLoading(false);
+  // };
 
   const renderFriendItem = ({ item }: { item: User }) => (
-    <FriendItem
-      key={item.userId}
-      friend={item}
-      navigation={navigation}
-      onDeleteSuccess={fetchFriendList}
-    />
+    <FriendItem key={item.userId} friend={item} navigation={navigation} />
   );
 
   // useFocusEffect(
@@ -89,21 +89,32 @@ const FriendList: React.FC<FriendListProps> = ({ navigation }) => {
   //   }, [navigation])
   // );
 
+  //  將未讀的新好友設為已讀
+  const fetchMarkNewFriendsAsRead = async () => {
+    const { success } = await markNewFriendsAsRead({
+      userId: personal.userId,
+    });
+    if (success) {
+      dispatch(setNewFriendUnRead(0));
+    }
+  };
+
   // 過濾符合條件的好友列表
   const filteredFriendList = friendList.filter((friend) =>
     friend.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   useEffect(() => {
-    fetchFriendList();
+    // fetchFriendList();
     navigation.setOptions({
       title: "好友列表",
       headerTitleAlign: "center",
       headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
+    fetchMarkNewFriendsAsRead();
   }, [navigation]);
 
-  if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
+  // if (loading) return <LoadingOverlay message="好友列表 loading ..." />;
 
   return (
     <View style={styles.screen}>

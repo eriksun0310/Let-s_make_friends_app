@@ -20,6 +20,7 @@ import {
   selectBeAddFriends,
   selectFriendRequests,
   selectFriendRequestUnRead,
+  selectNewFriendUnRead,
   selectUser,
   setBeAddFriends,
   setFriendRequests,
@@ -27,7 +28,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../store";
-import { useAddFriendListeners } from "components/hooks/useAddFriendListeners";
 
 export const friendCards = Array(14).fill({
   name: "海鴨",
@@ -40,27 +40,18 @@ interface AddFriendProps {
 }
 //加好友
 const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
-  // useAddFriendListeners();
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
   // 可以成為好友的用戶資料
   const beAddFriends = useAppSelector(selectBeAddFriends);
-
+  // 交友邀請
   const friendRequests = useAppSelector(selectFriendRequests);
+  // 交友邀請未讀通知
   const friendRequestUnRead = useAppSelector(selectFriendRequestUnRead);
-
-  // 取得新的好友
-  const { newFriend, newFriendsNumber, markAllAsNotified } = useNewFriend(
-    personal.userId
-  );
-
-  //取得交友邀請
-  //const { loading } = useFriendRequests();
-
-  // 所有的用戶資料
-  //const [allUsers, setAllUsers] = useState<User[]>([]);
+  // 新好友未讀通知
+  const newFriendUnRead = useAppSelector(selectNewFriendUnRead);
 
   // 可以成為好友的用戶資料
   const fetchBeFriendUsers = async () => {
@@ -108,31 +99,21 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
       });
     }
     if (result.success) {
-      // 更新redux 的 beAddFriends
       dispatch(deleteBeAddFriend(receiverId));
     }
-
-    // 應該是不用
-    //await fetchBeFriendUsers();
   };
 
   useEffect(() => {
-    // 判斷是否顯示紅點
-    const showBadge = friendRequestUnRead > 0 || newFriendsNumber > 0;
-
-    //  TODO: 點了好友列表後 newFriend 的length 歸0
-    // 設置導航選項
     navigation.setOptions({
       headerLeft: () => (
         <CustomIcon
           onPress={async () => {
             navigation.navigate("friendList");
-            await markAllAsNotified(); // 標記所有新好友為已通知
           }}
         >
           <View style={styles.bellRingContainer}>
-            {newFriendsNumber > 0 && (
-              <Badge style={styles.badge}>{newFriendsNumber}</Badge>
+            {newFriendUnRead > 0 && (
+              <Badge style={styles.badge}>{newFriendUnRead}</Badge>
             )}
             <Users color={Colors.icon} size={25} />
           </View>
@@ -152,18 +133,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
           </View>
         </CustomIcon>
       ),
-      // 動態設置底部導航的 tabBarBadge
-      // tabBarB/adge: showBadge ? <Dot size="5" /> : null,
     });
-
-    // fetchBeFriendUsers(); // 調用 API 獲取資料
-  }, [
-    navigation,
-    friendRequestUnRead,
-    newFriendsNumber,
-    friendRequests,
-    newFriend,
-  ]);
+  }, [navigation, friendRequestUnRead, friendRequests, newFriendUnRead]);
 
   useEffect(() => {
     // 取得可以成為好友的用戶

@@ -64,6 +64,12 @@ const friendSlice = createSlice({
       }
     },
 
+    deleteFriend(state, action) {
+      state.friendList = state.friendList.filter(
+        (friend) => friend.userId !== action.payload
+      );
+    },
+
     setFriendRequests(state, action) {
       state.friendRequests = action.payload;
     },
@@ -93,10 +99,10 @@ const friendSlice = createSlice({
     },
 
     setNewFriendUnRead(state, action) {
-      // state.newFriendUnRead = action.payload;
+      state.newFriendUnRead = action.payload;
     },
-    updateNewFriendUnRead(state, action) {
-      // state.newFriendUnRead = action.payload;
+    updateNewFriendUnRead(state) {
+      state.newFriendUnRead += 1;
     },
   },
 });
@@ -104,6 +110,7 @@ const friendSlice = createSlice({
 export const {
   setFriendList,
   addFriend,
+  deleteFriend,
   setFriendRequests,
   addFriendRequest,
   deleteFriendRequest,

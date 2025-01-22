@@ -38,7 +38,7 @@ export type FriendDBType = {
   user_id: string;
   friend_id: string;
   created_at: string;
-  notified: string;
+  is_read: string;
 };
 
 // 交友請求

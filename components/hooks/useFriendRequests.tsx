@@ -1,18 +1,40 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
 import { transformFriendRequests } from "../../shared/friend/friendUtils";
-import { FriendRequest } from "../../shared/types";
 import { FriendRequestsDBType } from "../../shared/dbType";
 import { selectUser, useAppDispatch, useAppSelector } from "store";
 import {
   addFriendRequest,
-  deleteFriendRequest,
-  setFriendRequests,
+  deleteBeAddFriend,
   setFriendRequestUnRead,
   updateFriendRequestUnRead,
 } from "store/friendSlice";
+import { getFriendRequests } from "util/handleFriendsEvent";
 
 // 取得狀態為 pending 的好友邀請
+/*
+[加好友]
+1. insert pending
+  addFriendRequest
+  deleteBeAddFriend
+
+2. insert rejected
+  deleteBeAddFriend
+
+*/
+
+/*
+[交友邀請]
+1. update pending
+  deleteFriendRequest
+
+2. update rejected
+  deleteFriendRequest
+
+3. update accepted
+  deleteFriendRequest
+
+*/
 export const useFriendRequests = () => {
   const personal = useAppSelector(selectUser);
 
@@ -21,29 +43,23 @@ export const useFriendRequests = () => {
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
-      // 初始載入好友邀請，僅獲取狀態為 pending 的記錄
-      const { data, error } = await supabase
-        .from("friend_requests")
-        .select("*")
-        .eq("receiver_id", personal.userId)
-        .eq("status", "pending");
+      const { data, success } = await getFriendRequests({
+        userId: personal.userId,
+      });
 
-      if (error) {
-        console.error("Error fetching friend requests:", error);
+      if (!success) {
         setLoading(false);
         return;
       }
 
-      // 使用通用转换函数处理数据
-      const transformedData = transformFriendRequests(data) || [];
-      // 更新 好友邀請 redux
-      dispatch(setFriendRequests(transformedData));
-      // 更新未讀的好友邀請數量
-      dispatch(
-        setFriendRequestUnRead(
-          transformedData.filter((req) => req.isRead === false).length
-        )
-      );
+      if (data.length > 0) {
+        // 更新未讀的好友邀請數量
+        dispatch(
+          setFriendRequestUnRead(
+            data.filter((req) => req.isRead === false).length
+          )
+        );
+      }
 
       setLoading(false);
     };
@@ -57,25 +73,42 @@ export const useFriendRequests = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "friend_requests" },
         (payload) => {
-          // 對方寄送交友邀請
+          const event = payload.eventType;
+
+          const friendRequests = payload.new as FriendRequestsDBType;
+          const friendRequestsStatus = friendRequests.status;
+          // 其他人寄給我的(加友、拒絕)邀請
           if (
-            payload.eventType === "INSERT" &&
-            payload.new.receiver_id === personal.userId &&
-            payload.new.status === "pending"
+            event === "INSERT" &&
+            friendRequests.receiver_id === personal.userId
           ) {
-            const newFriendRequest = payload.new as FriendRequestsDBType;
-            const transformedNew = transformFriendRequests([newFriendRequest]);
-            dispatch(addFriendRequest(transformedNew));
-            dispatch(updateFriendRequestUnRead());
-            // 對方接受交友邀請、拒絕交友邀請、刪除交好友頁面的使用者
-          } else if (
-            (payload.eventType === "UPDATE" ||
-              payload.eventType === "INSERT") &&
-            payload.new.status !== "pending"
-          ) {
-            const deletedFriendRequest = payload.old as FriendRequestsDBType;
-            dispatch(deleteFriendRequest(deletedFriendRequest.id));
+            // 刪除 "加好友" 的用戶
+            dispatch(deleteBeAddFriend(friendRequests.sender_id));
+            if (friendRequestsStatus === "pending") {
+              const transformedNew = transformFriendRequests([friendRequests]);
+              dispatch(addFriendRequest(transformedNew));
+              dispatch(updateFriendRequestUnRead());
+            }
           }
+
+          // // 對方寄送交友邀請
+          // if (
+          //   event === "INSERT" &&
+          //   payload.new.receiver_id === personal.userId &&
+          //   payload.new.status === "pending"
+          // ) {
+          //   const newFriendRequest = payload.new as FriendRequestsDBType;
+          //   const transformedNew = transformFriendRequests([newFriendRequest]);
+          //   dispatch(addFriendRequest(transformedNew));
+          //   dispatch(updateFriendRequestUnRead());
+          //   // 對方接受交友邀請、拒絕交友邀請、刪除交好友頁面的使用者
+          // } else if (
+          //   (event === "UPDATE" || event === "INSERT") &&
+          //   payload.new.status !== "pending"
+          // ) {
+          //   const deletedFriendRequest = payload.old as FriendRequestsDBType;
+          //   dispatch(deleteFriendRequest(deletedFriendRequest.id));
+          // }
         }
       )
       .subscribe();
@@ -85,23 +118,7 @@ export const useFriendRequests = () => {
     };
   }, [personal.userId]);
 
-  // 標記所有交友邀請為已讀
-  // const markInvitationsAsRead = async () => {
-  //   const { error } = await supabase
-  //     .from("friend_requests")
-  //     .update({ is_read: true })
-  //     .eq("receiver_id", personal.userId)
-  //     .eq("is_read", false); // 只更新尚未讀取的邀請
-
-  //   if (error) {
-  //     console.error("Error updating invitation read status:", error);
-  //   } else {
-  //     dispatch(setFriendRequestUnRead);
-  //   }
-  // };
-
   return {
     loading,
-    // markInvitationsAsRead,
   };
 };

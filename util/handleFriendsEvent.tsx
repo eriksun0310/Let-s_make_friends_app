@@ -2,7 +2,11 @@ import {
   transformFriendRequest,
   transformFriendRequests,
 } from "shared/friend/friendUtils";
-import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
+import {
+  FriendDBType,
+  UserHeadShotDBType,
+  UserSelectedOptionDBType,
+} from "../shared/dbType";
 import { FriendRequest, FriendState, Result, User } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
 import { getUserDetail, getUsersDetail } from "./handleUserEvent";
@@ -503,7 +507,7 @@ const insertFriend = async ({
     const { error: insertError1 } = await supabase.from("friends").insert({
       user_id: userId,
       friend_id: friendId,
-      notified: false,
+      is_read: false,
     });
     if (insertError1) {
       console.log("新增好友資訊 失敗", insertError1);
@@ -517,7 +521,7 @@ const insertFriend = async ({
     const { error: insertError2 } = await supabase.from("friends").insert({
       user_id: friendId,
       friend_id: userId,
-      notified: false,
+      is_read: false,
     });
 
     if (insertError2) {
@@ -656,7 +660,7 @@ export const updateRejectedFriendRequest = async ({
 };
 
 //☑️刪除(單一)好友
-export const deleteFriend = async ({
+export const deleteFriendDB = async ({
   userId,
   friendId,
 }: {
@@ -711,6 +715,74 @@ export const markInvitationsAsRead = async ({
     return {
       success: false,
       errorMessage: (error as Error).message,
+    };
+  }
+};
+
+//  標記所有新好友為已讀
+export const markNewFriendsAsRead = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<Result> => {
+  try {
+    const { error } = await supabase
+      .from("friends")
+      .update({ is_read: true }) // 更新为已通知
+      .eq("user_id", userId)
+      .eq("is_read", false); // 仅更新未通知的记录
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+      };
+    }
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
+  }
+};
+
+type GetFriendsUnRead = Result & {
+  data: FriendDBType[];
+};
+
+// 取得好友列表未已讀的紀錄
+export const getFriendsUnRead = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<GetFriendsUnRead> => {
+  try {
+    const { data, error } = await supabase
+      .from("friends")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_read", false); // 取得未已讀的紀錄
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: error.message,
+        data: [],
+      };
+    }
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
     };
   }
 };

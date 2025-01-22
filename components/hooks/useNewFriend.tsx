@@ -1,35 +1,45 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../util/supabaseClient";
-import { addFriend, useAppDispatch } from "../../store";
+import {
+  addFriend,
+  selectUser,
+  setNewFriendUnRead,
+  updateNewFriendUnRead,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 import { getUserDetail } from "../../util/handleUserEvent";
+import { getFriendsUnRead } from "util/handleFriendsEvent";
+import { FriendDBType } from "shared/dbType";
 
 // 監聽 成為新好友
-export const useNewFriend = (userId: string) => {
+export const useNewFriend = () => {
+  const personal = useAppSelector(selectUser);
+  const userId = personal.userId;
+
   const dispatch = useAppDispatch();
-  const [newFriend, setNewFriend] = useState([]);
-  const [newFriendsNumber, setNewFriendsNumber] = useState(0); // 新好友数量
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      const { data, error } = await supabase
-        .from("friends")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("notified", false); // 仅获取未通知的记录
+    const fetchFriendsUnRead = async () => {
+      const { data, success } = await getFriendsUnRead({
+        userId: userId,
+      });
 
-      if (error) {
-        console.error("Error fetching friends :", error);
+      if (!success) {
         setLoading(false);
         return;
       }
 
-      setNewFriend(data || []);
-      setNewFriendsNumber((data || []).length); // 统计未通知的数量
+      if (data.length > 0) {
+        dispatch(setNewFriendUnRead(data.length || []));
+      }
+
       setLoading(false);
     };
 
-    fetchFriends();
+    fetchFriendsUnRead();
 
     // 即時監聽好友邀請的變化
     const subscription = supabase
@@ -38,20 +48,20 @@ export const useNewFriend = (userId: string) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "friends" },
         async (payload) => {
+          const newFriend = payload.new as FriendDBType;
+          // 未讀的新好友
           if (
             payload.eventType === "INSERT" &&
-            payload.new.user_id === userId &&
-            !payload.new.notified // 確保是未通知的紀錄
+            newFriend.user_id === userId &&
+            !payload.new.is_read
           ) {
             // 取得詳細的好友資料
             const { data: friendDetails } = await getUserDetail({
-              userId: payload.new.user_id,
+              userId: newFriend.friend_id,
             });
+
             dispatch(addFriend(friendDetails));
-
-            setNewFriend((prev) => [...prev, payload.new]);
-
-            setNewFriendsNumber((prev) => prev + 1); // 更新新好友数量
+            dispatch(updateNewFriendUnRead());
           }
         }
       )
@@ -62,24 +72,5 @@ export const useNewFriend = (userId: string) => {
     };
   }, [userId]);
 
-  // 標記所有新好友為已通知
-  const markAllAsNotified = async () => {
-    try {
-      const { error } = await supabase
-        .from("friends")
-        .update({ notified: true }) // 更新为已通知
-        .eq("user_id", userId)
-        .eq("notified", false); // 仅更新未通知的记录
-
-      if (error) {
-        console.error("Error updating notified status:", error);
-      } else {
-        setNewFriendsNumber(0); // 重置本地状态
-      }
-    } catch (err) {
-      console.error("Error marking friends as notified:", err);
-    }
-  };
-
-  return { newFriend, loading, newFriendsNumber, markAllAsNotified };
+  return { loading };
 };
