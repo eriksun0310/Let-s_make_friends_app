@@ -39,7 +39,6 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
 } from "../store";
-
 import { NavigationProp } from "@react-navigation/native";
 import { useChatContext } from "../shared/chat/ChatContext";
 // import { handleMessageView } from "../shared/chatFuncs";
@@ -75,12 +74,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     preloadedMessages || []
   );
 
-  const [loading, setLoading] = useState();
-
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [inputText, setInputText] = useState("");
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList<MessageType>>(null);
 
   // 渲染訊息
   const renderMessage = ({ item }: { item: MessageType }) => (
@@ -109,9 +106,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       senderId: personal.userId,
       recipientId: friend.userId,
       content: inputText,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       isTemporary: true,
       isRead: false,
+      chatRoomId: currentChatRoomId || `temp_chatRoomId_${Date.now()}`,
     };
 
     setMessages((prevMessages) => [...prevMessages, tempMessage]);
@@ -131,7 +129,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
       // 如果沒有新的聊天室資料,則代表發送訊息失敗
       if (!success) {
-        console.error("Failed to create chat room and insert message");
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === tempMessage.id
@@ -174,7 +171,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
         msg.id === tempMessage.id
-          ? { ...messageResult, isTemporary: false }
+          ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
           : msg
       )
     );
@@ -211,17 +208,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       });
 
       if (success) {
-        // 處理訊息資料，加入分隔符標記
-        //const processedData = processMessageWithSeparators(messageData.data);
-
-        // console.log("processedData", processedData);
         setMessages(messageData as MessageType[]); // 設置處理後的訊息
-      } else {
-        setError("取得訊息失敗，請稍後再試");
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
-      setError("發生錯誤，請稍後再試");
     } finally {
       setLoading(false);
     }
@@ -270,6 +260,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   useEffect(() => {
     const markAllMessagesRead = async () => {
       if (currentChatRoomId && personal.userId) {
+        console.log("11111111111111");
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
         const { success } = await markChatRoomMessagesAsRead({
           chatRoomId: currentChatRoomId,
@@ -279,7 +270,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         if (success) {
           // 本地更新訊息列表：只標記屬於自己的訊息為已讀
           setMessages((prevMessages) => {
-            console.log("prevMessages", prevMessages);
             return prevMessages.map((msg) => ({
               ...msg,
               isRead: msg.recipientId === personal.userId ? true : msg.isRead,
@@ -294,7 +284,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
-    //console.log("聊天  当前导航堆栈:", navigation.getState());
     //更新 本地未讀數量歸0
     dispatch(
       resetUnreadUser({
@@ -332,12 +321,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
             <View style={styles.header}>
               <BackButton
                 onPress={handleReturnToChatList}
-                style={{
-                  marginRight: 15,
-                }}
+                style={{ marginRight: 15 }}
               />
               <Avatar
-                style={styles.avatar}
+                containerStyle={styles.avatar}
                 rounded
                 size="medium"
                 source={friend?.headShot?.imageUrl as ImageSourcePropType}
@@ -359,7 +346,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
               onContentSizeChange={() =>
                 flatListRef.current?.scrollToEnd({ animated: true })
               }
-              // onViewableItemsChanged={onViewableItemChanged}
             />
             <View style={styles.inputContainer}>
               <TouchableOpacity>

@@ -41,7 +41,10 @@
 4. 聊天室
     ☑️1.handleChatEvent
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
+[聊天室 整理code]
+1. ChatContextProvider 整理
+2. 看要不要像 useFriends() 放在 App.tsx 的AuthenticatedStack 上
+3.  
 
 [加好友 整理code]
 ✅1. 將 useAddFriendListeners 統整進 useFriendRequests

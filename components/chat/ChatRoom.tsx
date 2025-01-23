@@ -30,8 +30,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
-  const resetRef = useRef<() => void | null>(null); // 用於存儲 `reset` 函數
-
+  // const resetRef = useRef<() => void | null>(null); // current 是一個函數, 它的返回值可以是 void 或 null
+  const resetRef = useRef<(() => void) | null>(null); // current 是一個函數 或 null
   // 刪除聊天室 事件
   const handleDeleteChat = async (mode: "delete" | "cancel") => {
     setIsAlertVisible(false); // 關閉警告視窗
@@ -40,11 +40,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     }
 
     if (mode === "delete") {
-      const {
-        data: roomId,
-        success,
-        errorMessage,
-      } = await deleteChatRoomDB({
+      const { data: roomId, success } = await deleteChatRoomDB({
         chatRoomId: chatRoom.id,
         userId: personal.userId,
       });
@@ -52,9 +48,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
       if (success && roomId) {
         // 成功資料庫刪除, 更新redux狀態
         dispatch(deleteChatRoom(roomId));
-      } else {
-        console.log(errorMessage);
-        alert("刪除聊天室失敗, 請再試一次");
       }
     }
   };
@@ -130,7 +123,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
         onPress={handleChatRoomPress}
       >
         <Avatar
-          style={styles.chatIcon}
+          containerStyle={styles.chatIcon}
           rounded
           size="medium"
           source={friend?.headShot?.imageUrl as ImageSourcePropType}

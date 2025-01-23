@@ -43,32 +43,15 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
       const { data: rooms } = await getAllChatRooms({
         userId: personal.userId,
       });
-      // console.log("rooms is chatRoomList", rooms);
+
       dispatch(setChatRooms(rooms));
     };
 
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  // useEffect(() => {
-  //   // 判斷是否有未讀訊息
-  //   const hasUnreadMessages = chatRoomsData?.some((room) => {
-  //     const unreadCount =
-  //       room.user1Id === personal.userId
-  //         ? room.unreadCountUser1
-  //         : room.unreadCountUser2;
-  //     return unreadCount > 0;
-  //   });
-
-  //   console.log('hasUnreadMessages', hasUnreadMessages)
-  //   // navigation.setOptions({
-  //   //   // 動態設置底部導航的 tabBarBadge
-  //   //   tabBarBadge: hasUnreadMessages ? <View style={styles.dot} /> : null,
-  //   // });
-  // }, [navigation, chatRoomsData, personal.userId]);
-
+  console.log('chatRoomsData', chatRoomsData)
   return (
-    // <ChatContextProvider>
     <View style={styles.screen}>
       {/* 搜尋列 */}
       {chatRoomsData?.length > 0 && (
@@ -84,7 +67,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
         keyExtractor={(item) => item?.id}
       />
     </View>
-    // </ChatContextProvider>
   );
 };
 const styles = StyleSheet.create({

@@ -542,7 +542,7 @@ export const updateUnreadCount = async ({
   }
 };
 
-// ☑️更新 聊天室 未讀數為0
+// ✅更新 聊天室 未讀數為0
 export const resetUnreadCount = async ({
   chatRoomId,
   userId,
@@ -551,42 +551,54 @@ export const resetUnreadCount = async ({
   userId: string;
 }): Promise<Result> => {
   try {
-    // 獲取聊天室資料
-    const { data: updatedRoom, error } = await supabase
+    // 取得對應未讀的聊天室
+    const { data: chatRoom, error: chatRoomError } = await supabase
       .from("chat_rooms")
-      .update((room: ChatRoomsDBType) => {
-        const unreadColumn =
-          room.user1_id === userId
-            ? "unread_count_user1"
-            : room.user2_id === userId
-            ? "unread_count_user2"
-            : null;
+      .select("user1_id, user2_id, unread_count_user1, unread_count_user2")
+      .eq("id", chatRoomId)
+      .single();
 
-        if (!unreadColumn) return null;
+    if (!chatRoom || chatRoomError) {
+      return {
+        success: false,
+        errorMessage: chatRoomError?.message,
+      };
+    }
 
-        if (room[unreadColumn] > 0) {
-          return {
-            [unreadColumn]: 0,
-          };
-        }
+    const unreadColumn =
+      chatRoom.user1_id === userId
+        ? "unread_count_user1"
+        : chatRoom.user2_id === userId
+        ? "unread_count_user2"
+        : null;
 
-        return {}; // 如果不需要更新未讀數量,則返回空物件
-      })
+    if (!unreadColumn) {
+      return {
+        success: false,
+        errorMessage: "無權限更新未讀數量",
+      };
+    }
+
+    // 未讀數量為0, 不需要更新
+    if (chatRoom[unreadColumn] === 0) {
+      return {
+        success: true,
+      };
+    }
+
+    // 更新聊天室未讀數量為0
+    const { error: updatedChatRoomError } = await supabase
+      .from("chat_rooms")
+      .update({ [unreadColumn]: 0 })
       .eq("id", chatRoomId)
       .select("user1_id, user2_id, unread_count_user1, unread_count_user2")
       .single();
 
-    if (error || !updatedRoom) {
-      if (error?.message === "Empty or invalid json") {
-        console.log("未讀數量已經是0 不需要更新");
-        return {
-          success: true,
-        };
-      }
-      console.log("resetUnreadCount 更新聊天室未讀數量 失敗", error);
+    if (updatedChatRoomError) {
+      console.log("更新聊天室未讀數量為0 失敗", updatedChatRoomError);
       return {
         success: false,
-        errorMessage: error?.message,
+        errorMessage: updatedChatRoomError.message,
       };
     }
 
@@ -706,18 +718,18 @@ export const markChatRoomMessagesAllAsRead = async ({
 
 // 取得刪除聊天室對應的欄位
 const getDeleteColumns = ({
-  room,
+  chatRoom,
   userId,
 }: {
-  room: ChatRoomsDBType;
+  chatRoom: ChatRoomsDBType;
   userId: string;
 }) => {
   const deletedColumn =
-    room.user1_id === userId ? "user1_deleted" : "user2_deleted";
+    chatRoom.user1_id === userId ? "user1_deleted" : "user2_deleted";
   const deletedAtColumn =
-    room.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
+    chatRoom.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
   const unreadColumn =
-    room.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
+    chatRoom.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
 
   if (!deletedColumn) {
     throw new Error("沒有權限刪除聊天室");
@@ -731,7 +743,7 @@ const getDeleteColumns = ({
 };
 
 type DeleteChatRoomDBReturn = Result & {
-  data: string;
+  data: string | null;
 };
 
 // ☑️刪除聊天室
@@ -743,42 +755,55 @@ export const deleteChatRoomDB = async ({
   userId: string;
 }): Promise<DeleteChatRoomDBReturn> => {
   try {
-    // 更新聊天室對應的欄位 + 取得更新後的聊天室資料
-    const { data: updatedChatRoom, error } = await supabase
+    // 取得當前聊天室
+    const { data: chatRoom, error: chatRoomError } = await supabase
       .from("chat_rooms")
-      .update((room: ChatRoomsDBType) => {
-        const { deletedColumn, deletedAtColumn, unreadColumn } =
-          getDeleteColumns({
-            room,
-            userId,
-          });
-        return {
-          ...room,
-          [deletedColumn]: true,
-          [deletedAtColumn]: new Date().toISOString(),
-          [unreadColumn]: 0,
-        };
-      })
-      .eq("id", chatRoomId)
       .select("*")
+      .eq("id", chatRoomId)
       .single();
 
-    if (error || !updatedChatRoom) {
-      console.log("更新或查詢聊天室 失敗", error);
+    if (!chatRoom || chatRoomError) {
       return {
         success: false,
-        errorMessage: error?.message,
-        data: "",
+        errorMessage: chatRoomError?.message,
+        data: null,
       };
     }
 
-    // 如果雙方都已刪除, 執行訊息刪除
+    // 取得需要更新的欄位
+    const { deletedColumn, deletedAtColumn, unreadColumn } = getDeleteColumns({
+      chatRoom: chatRoom,
+      userId,
+    });
+
+    // 更新聊天室對應的欄位
+    const { data: updatedChatRoom, error: updatedChatRoomError } =
+      await supabase
+        .from("chat_rooms")
+        .update({
+          [deletedColumn]: true,
+          [deletedAtColumn]: new Date().toISOString(),
+          [unreadColumn]: 0,
+        })
+        .eq("id", chatRoomId)
+        .select("*")
+        .single();
+
+    if (!updatedChatRoom || updatedChatRoomError) {
+      return {
+        success: false,
+        errorMessage: updatedChatRoomError?.message,
+        data: null,
+      };
+    }
+
+    // 如果雙方都已刪除聊天室, 刪除該聊天室的所有訊息
     if (updatedChatRoom.user1_deleted && updatedChatRoom.user2_deleted) {
       const { success, errorMessage } = await deleteChatMessage({
         chatRoomId,
       });
       if (!success) {
-        console.log("刪除聊天室 訊息 失敗:", errorMessage);
+        console.log("刪除該聊天室的所有訊息 失敗:", errorMessage);
         return {
           success: false,
           errorMessage: errorMessage,
@@ -800,6 +825,73 @@ export const deleteChatRoomDB = async ({
     };
   }
 };
+
+// ☑️刪除聊天室 - origin
+// export const deleteChatRoomDB = async ({
+//   chatRoomId,
+//   userId,
+// }: {
+//   chatRoomId: string;
+//   userId: string;
+// }): Promise<DeleteChatRoomDBReturn> => {
+//   try {
+//     // 更新聊天室對應的欄位 + 取得更新後的聊天室資料
+//     const { data: updatedChatRoom, error } = await supabase
+//       .from("chat_rooms")
+//       .update((room: ChatRoomsDBType) => {
+//         const { deletedColumn, deletedAtColumn, unreadColumn } =
+//           getDeleteColumns({
+//             room,
+//             userId,
+//           });
+//         return {
+//           ...room,
+//           [deletedColumn]: true,
+//           [deletedAtColumn]: new Date().toISOString(),
+//           [unreadColumn]: 0,
+//         };
+//       })
+//       .eq("id", chatRoomId)
+//       .select("*")
+//       .single();
+
+//     if (error || !updatedChatRoom) {
+//       console.log("更新或查詢聊天室 失敗", error);
+//       return {
+//         success: false,
+//         errorMessage: error?.message,
+//         data: "",
+//       };
+//     }
+
+//     // 如果雙方都已刪除, 執行訊息刪除
+//     if (updatedChatRoom.user1_deleted && updatedChatRoom.user2_deleted) {
+//       const { success, errorMessage } = await deleteChatMessage({
+//         chatRoomId,
+//       });
+//       if (!success) {
+//         console.log("刪除聊天室 訊息 失敗:", errorMessage);
+//         return {
+//           success: false,
+//           errorMessage: errorMessage,
+//           data: "",
+//         };
+//       }
+//     }
+
+//     return {
+//       success: true,
+//       data: updatedChatRoom.id,
+//     };
+//   } catch (error) {
+//     console.log("刪除聊天室 失敗", error);
+//     return {
+//       success: false,
+//       errorMessage: (error as Error).message,
+//       data: "",
+//     };
+//   }
+// };
 
 // ☑️刪除聊天紀錄
 export const deleteChatMessage = async ({
