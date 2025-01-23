@@ -45,6 +45,7 @@ import { View, StyleSheet } from "react-native";
 import { useAppLifecycle } from "components/hooks/useAppLifecycle";
 import { useFriends } from "components/hooks/useFriends";
 import { useFriendRequests } from "components/hooks/useFriendRequests";
+import { useChatListeners } from "components/hooks/useChatListeners";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -181,6 +182,8 @@ const AuthenticatedStack = () => {
   useFriendRequests();
   // 監聽新好友
   useFriends();
+  // 監聽聊天室
+  useChatListeners();
 
   return (
     <Stack.Navigator
@@ -277,10 +280,11 @@ const Navigation = () => {
   return (
     <NavigationContainer>
       {isAuthenticated ? (
-        <ChatContextProvider>
-          <AuthenticatedStack />
-        </ChatContextProvider>
+        // <ChatContextProvider>
+        <AuthenticatedStack />
+        // </ChatContextProvider>
       ) : (
+        // </ChatContextProvider>
         <AuthStack />
       )}
     </NavigationContainer>

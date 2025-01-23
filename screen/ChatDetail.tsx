@@ -38,6 +38,7 @@ import {
   resetUnreadUser,
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
+  selectIsUserOnline,
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
 import { useChatContext } from "../shared/chat/ChatContext";
@@ -68,6 +69,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
+  // 檢查對方是否上線
+  const isUserOnline = useAppSelector((state) =>
+    selectIsUserOnline(state, friend.userId)
+  );
+
+  console.log("isUserOnline detail ===>", isUserOnline);
 
   const { newMessage, readMessages } = useChatContext();
   const [messages, setMessages] = useState<MessageType[]>(
@@ -151,6 +158,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         friendId: friend.userId,
         message: inputText,
         chatRoomId,
+        isRead: isUserOnline,
       });
 
       // 如果發送訊息失敗
@@ -229,7 +237,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     if (readMessages) {
       setMessages((prevMessages) => {
         return prevMessages.map((msg) => {
-          console.log("msg", msg);
           return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
         });
       });
@@ -260,7 +267,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   useEffect(() => {
     const markAllMessagesRead = async () => {
       if (currentChatRoomId && personal.userId) {
-        console.log("11111111111111");
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
         const { success } = await markChatRoomMessagesAsRead({
           chatRoomId: currentChatRoomId,

@@ -1,17 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ChatRoom } from "../shared/types";
+import { ChatRoom, Message } from "../shared/types";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
+
+/*
+messages:{
+  [chatRoomId]: [ Message, Message, Message],
+
+}
+*/
 import { getUserDetail } from "../util/handleUserEvent";
+import { update } from "firebase/database";
 interface InitialStateProps {
   chatRooms: ChatRoom[];
   currentChatRoomId?: string | null;
+  onlineUsers: string[]; // 儲存在線用戶
+  messages: Record<string, Message[]>;
 }
 
 //TODO: 要定義 聊天室的type
 const initialState: InitialStateProps = {
   chatRooms: [],
   currentChatRoomId: null,
+  onlineUsers: [],
+  messages: {},
 };
 
 const chatSlice = createSlice({
@@ -32,7 +44,7 @@ const chatSlice = createSlice({
       const incomingRoom = action.payload;
       const index = state.chatRooms.findIndex(
         (room) => room.id === incomingRoom.id
-    );
+      );
 
       // 如果聊天室不存在,添加
       if (index === -1) {
@@ -118,6 +130,23 @@ const chatSlice = createSlice({
         (room) => room.id !== action.payload
       );
     },
+
+    setMessage(state, action) {},
+    addMessage(state, action) {},
+    updateMessage(state, action) {},
+    setUserOnline(state, action) {
+      const index = state.onlineUsers.findIndex(
+        (userId) => userId === action.payload
+      );
+      if (index === -1) {
+        state.onlineUsers.push(action.payload);
+      }
+    },
+    setUserOffline(state, action) {
+      state.onlineUsers = state.onlineUsers.filter(
+        (userId) => userId !== action.payload
+      );
+    },
   },
 });
 
@@ -128,6 +157,8 @@ export const {
   resetUnreadUser,
   setCurrentChatRoomId,
   deleteChatRoom,
+  setUserOnline,
+  setUserOffline,
 } = chatSlice.actions;
 
 export const updateOrCreateChatRoom =
@@ -203,4 +234,8 @@ export const selectChatRooms = (state: RootState) => state.chat.chatRooms;
 export const selectCurrentChatRoomId = (state: RootState) =>
   state.chat.currentChatRoomId;
 
+export const selectIsUserOnline = (state: RootState, userId: string) =>
+  state.chat.onlineUsers.includes(userId);
+
+export const selectUserOnline = (state: RootState) => state.chat.onlineUsers;
 export default chatSlice.reducer;

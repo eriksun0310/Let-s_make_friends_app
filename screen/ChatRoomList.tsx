@@ -10,6 +10,8 @@ import {
   useAppSelector,
   selectChatRooms,
   setChatRooms,
+  selectIsUserOnline,
+  selectUserOnline,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -25,6 +27,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const chatRoomsData = useAppSelector(selectChatRooms);
+  const isUserOnline = useAppSelector(selectUserOnline);
+  console.log("isUserOnline", isUserOnline);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
@@ -50,7 +54,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  console.log('chatRoomsData', chatRoomsData)
+  console.log("chatRoomsData", chatRoomsData);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}

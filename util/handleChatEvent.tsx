@@ -467,11 +467,13 @@ export const sendMessage = async ({
   friendId,
   message,
   chatRoomId,
+  isRead,
 }: {
   userId: string;
   friendId: string;
   message: string;
   chatRoomId: string;
+  isRead: boolean;
 }): Promise<SendMessageReturn> => {
   try {
     // 發送訊息
@@ -482,6 +484,7 @@ export const sendMessage = async ({
         sender_id: userId,
         recipient_id: friendId,
         content: message,
+        is_read: isRead,
       })
       .select("*") // 插入後直接返回該條訊息
       .single(); // 確保只返回單條訊息
