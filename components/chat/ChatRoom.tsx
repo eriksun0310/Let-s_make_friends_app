@@ -105,12 +105,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     <>
       <AlertDialog
         alertTitle={`確定要刪除與 ${friend?.name} 的聊天紀錄嗎？此操作無法恢復，是否繼續？`}
-        leftBtnText="刪除"
-        rightBtnText="取消"
+        leftBtnText="取消"
+        rightBtnText="刪除"
         isVisible={isAlertVisible}
         // 刪除好友
-        leftBtnOnPress={() => handleDeleteChat("delete")} //確認刪除
-        rightBtnOnPress={() => handleDeleteChat("cancel")} //取消
+        leftBtnOnPress={() => handleDeleteChat("cancel")} //確認刪除
+        rightBtnOnPress={() => handleDeleteChat("delete")} //取消
         onBackdropPress={() => handleDeleteChat("cancel")}
       />
 

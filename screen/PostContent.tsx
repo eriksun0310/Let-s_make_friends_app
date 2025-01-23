@@ -206,6 +206,18 @@ const PostContent: React.FC<PostContentProps> = ({ route, navigation }) => {
         leftBtnOnPress={handleClosePost}
         rightBtnOnPress={handleCloseAlert}
         onBackdropPress={handleCloseAlert}
+        leftButtonStyle={{
+          backgroundColor: "#ffcccc",
+        }}
+        leftTitleStyle={{
+          color: "#d9534f",
+        }}
+        rightButtonStyle={{
+          backgroundColor: "#e1f5fe",
+        }}
+        rightTitleStyle={{
+          color: "#0277bd",
+        }}
       />
 
       <>

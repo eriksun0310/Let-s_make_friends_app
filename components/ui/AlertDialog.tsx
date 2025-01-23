@@ -10,6 +10,8 @@ interface AlertDialogProps {
   leftBtnOnPress: () => void; // 左側按鈕點擊事件
   rightBtnOnPress: () => void; // 右側按鈕點擊事件
   onBackdropPress: () => void; // 背景點擊事件
+  leftButtonStyle?: StyleProp<TextStyle>; // 左側按鈕樣式
+  leftTitleStyle?: StyleProp<TextStyle>; // 左側按鈕文字樣式
   rightButtonStyle?: StyleProp<TextStyle>; // 右側按鈕樣式
   rightTitleStyle?: StyleProp<TextStyle>; // 右側按鈕文字樣式
 }
@@ -21,6 +23,8 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
   leftBtnOnPress,
   rightBtnOnPress,
   onBackdropPress,
+  leftButtonStyle,
+  leftTitleStyle,
   rightButtonStyle,
   rightTitleStyle,
 }) => {
@@ -34,10 +38,8 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
           <Button
             title={leftBtnText}
             onPress={leftBtnOnPress}
-            buttonStyle={[styles.leftButton, { backgroundColor: "#e6e6e6" }]}
-            titleStyle={{ color: "#474747" }}
-            // buttonStyle={[styles.leftButton, { backgroundColor: "#ffcccc" }]}
-            // titleStyle={{ color: "#d9534f" }}
+            buttonStyle={[styles.leftButton, leftButtonStyle]}
+            titleStyle={[styles.leftText, leftTitleStyle]}
           />
           <Button
             title={rightBtnText}
@@ -58,17 +60,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   leftButton: {
+    backgroundColor: "#e6e6e6",
+    borderRadius: 5,
+    paddingVertical: 10,
+  },
+  leftText: {
+    color: "#474747",
+  },
+  rightButton: {
     backgroundColor: "#ffcccc",
     borderRadius: 5,
     paddingVertical: 10,
   },
-  rightButton: {
-    backgroundColor: "#e1f5fe",
-    borderRadius: 5,
-    paddingVertical: 10,
-  },
   rightText: {
-    color: "#0277bd",
+    color: "#d9534f",
   },
 });
 
