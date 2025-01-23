@@ -81,18 +81,12 @@ const Search: React.FC<SearchProps> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    // marginTop: 3,
     flex: 1,
     backgroundColor: "white",
   },
   container: {
     flex: 1,
     backgroundColor: "#f0f8ff",
-  },
-  cancelText: {
-    fontSize: 17,
-    color: "#999",
-    marginRight: 8,
   },
   recentSearchTitle: {
     fontSize: 16,

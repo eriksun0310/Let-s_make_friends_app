@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 2, // 外框線
     borderColor: "#ADD8E6", // 黑色的外框線
-    // backgroundColor:'#ADD8E6'
   },
   active: {
     backgroundColor: "#ADD8E6",

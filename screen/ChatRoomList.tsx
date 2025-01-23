@@ -93,34 +93,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     // paddingTop: 8,
   },
-  chatItem: {
-    flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffffff",
-  },
-  chatIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  chatInfo: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  chatName: {
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  chatMessage: {
-    color: "#7e7e7e",
-  },
-  dot: {
-    backgroundColor: "red",
-    borderRadius: 100,
-    width: 5,
-    height: 5,
-  },
 });
 export default ChatRoomList;

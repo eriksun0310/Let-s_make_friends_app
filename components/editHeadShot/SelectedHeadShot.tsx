@@ -27,10 +27,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
   },
-  optionImage: {
-    width: "100%",
-    height: "100%",
-  },
 });
 
 export default SelectedHeadShot;

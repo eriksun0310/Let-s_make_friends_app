@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
   label: {
     fontSize: 23,
     fontWeight: "bold",

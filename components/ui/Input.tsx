@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     marginTop: 13,
-    // margin: 13,
     borderWidth: 3,
     padding: 10,
     width: "70%",
@@ -77,7 +76,6 @@ const styles = StyleSheet.create({
   },
   requiredNone: {
     opacity: 0,
-
     marginRight: 4, // 與標籤間距
   },
 });

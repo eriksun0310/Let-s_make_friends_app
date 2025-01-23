@@ -77,12 +77,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  headerText: {
-    marginHorizontal: 15,
-  },
-  headerTextColor: {
-    color: Colors.textBlue,
-  },
 });
 
 export default EditHeadShot;

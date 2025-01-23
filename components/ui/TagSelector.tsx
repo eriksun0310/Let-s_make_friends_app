@@ -219,7 +219,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 12,
   },
-
   optionsContainer: {
     flex: 1, // 這裡讓 ScrollView 佔用剩餘空間
     paddingHorizontal: 16,

@@ -62,11 +62,6 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   );
 };
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 40,
-  },
   label: {
     fontSize: 18,
     fontWeight: "bold",

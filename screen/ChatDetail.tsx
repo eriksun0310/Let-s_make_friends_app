@@ -395,20 +395,6 @@ const styles = StyleSheet.create({
   messageList: {
     padding: 10,
   },
-  messageBubble: {
-    maxWidth: "80%",
-    padding: 10,
-    borderRadius: 20,
-    marginBottom: 10,
-  },
-  myMessage: {
-    alignSelf: "flex-end",
-    backgroundColor: "#a6d2ff",
-  },
-  theirMessage: {
-    alignSelf: "flex-start",
-    backgroundColor: "white",
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",

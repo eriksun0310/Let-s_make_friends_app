@@ -147,9 +147,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
       if (success) {
         dispatch(deleteFriendRequest(data?.id));
       }
-      // if (!result.success) {
-      //   console.error(`Failed to ${friendState} friend`);
-      // }
     } catch (error) {
       console.error(`Error while performing ${friendState} action:`, error);
     } finally {
@@ -220,19 +217,7 @@ const styles = StyleSheet.create({
     width: "50%",
   },
   card: {
-    // width: "40%",
-
     borderRadius: 12,
-  },
-  closeButton: {
-    position: "absolute",
-    right: -8,
-    top: -8,
-    zIndex: 1,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: "#666",
   },
   avatar: {
     backgroundColor: "#ff4444",

@@ -47,10 +47,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 8,
   },
-  requiredNone: {
-    opacity: 0,
-    color: "red",
-    marginRight: 4, // 與標籤間距
-  },
 });
 export default GenderButtons;

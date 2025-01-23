@@ -51,19 +51,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
-  iconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 20,
-  },
-  iconText: {
-    marginLeft: 5,
-    fontSize: 14,
-  },
 });
 
 export default Comments;

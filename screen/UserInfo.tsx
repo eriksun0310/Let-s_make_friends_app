@@ -18,7 +18,6 @@ import Button from "../components/ui/button/Button";
 import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import {
-
   selectPosts,
   selectUser,
   setCurrentChatRoomId,
@@ -250,22 +249,6 @@ const styles = StyleSheet.create({
     display: "flex",
     marginVertical: 30,
     alignItems: "center",
-  },
-  buttonView: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  actionButton: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    width: "20%",
-    marginHorizontal: 32,
   },
 });
 

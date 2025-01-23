@@ -78,7 +78,6 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // borderWidth: 5,
   },
   totalHeart: {
     marginVertical: 10,

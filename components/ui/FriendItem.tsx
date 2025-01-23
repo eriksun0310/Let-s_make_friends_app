@@ -96,7 +96,7 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
         )}
         onPress={handleUserInfoFriendPress}
       >
-        <View style={styles.AvatarContainer}>
+        <View style={styles.avatarContainer}>
           <Avatar
             rounded
             size="medium"
@@ -113,20 +113,15 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
   container: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    // marginBottom: 8,
     height: 100,
   },
-  AvatarContainer: {
+  avatarContainer: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

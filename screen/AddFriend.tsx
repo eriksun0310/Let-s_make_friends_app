@@ -142,10 +142,6 @@ const AddFriend: React.FC<AddFriendProps> = ({ navigation }) => {
     fetchFriendRequests();
   }, [personal.userId]);
 
-  // console.log("beAddFriends 11111", beAddFriends);
-  // console.log("friendRequests 1111", friendRequests);
-  // console.log("friendRequestUnRead 1111", friendRequestUnRead);
-
   // 不確定要不要
   if (loading) return <LoadingOverlay message="AddFriend loading ..." />;
   return (

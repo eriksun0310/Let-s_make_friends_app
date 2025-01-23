@@ -11,27 +11,19 @@ interface FriendInvitationItemProps {
 }
 
 const FriendInvitationItem: React.FC<FriendInvitationItemProps> = ({
-  // loading,
   friendRequest,
   navigation,
 }) => {
   const [senderData, setSenderData] = useState<User>(userInit);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSenderData = async () => {
-      try {
-        const { data } = await getUserDetail({
-          userId: friendRequest.senderId,
-        });
+      const { data } = await getUserDetail({
+        userId: friendRequest.senderId,
+      });
 
-        if (data) {
-          setSenderData(data);
-        }
-      } catch (error) {
-        console.log("error");
-      } finally {
-        setLoading(false);
+      if (data) {
+        setSenderData(data);
       }
     };
 

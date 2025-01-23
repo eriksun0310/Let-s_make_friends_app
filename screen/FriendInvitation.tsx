@@ -22,7 +22,6 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
 
- 
   const friendRequests = useAppSelector(selectFriendRequests);
 
   // 將未讀的邀請設為已讀
@@ -45,14 +44,12 @@ const FriendInvitation: React.FC<FriendInvitationProps> = ({ navigation }) => {
     fetchMarkInvitationsAsRead();
   }, [navigation, personal.userId]);
 
-
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {Object.entries(friendRequests).map(([requestId, friendRequest]) => {
           return (
             <FriendInvitationItem
-              // loading={loading}
               key={requestId}
               friendRequest={friendRequest}
               navigation={navigation}

@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-
   formContainer: {
     paddingHorizontal: 16,
     display: "flex",
@@ -160,18 +159,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
-  },
-  inputContainer: {
-    flexDirection: "row",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 3,
-    padding: 10,
-    width: "50%",
-    borderRadius: 8,
-    borderColor: Colors.button,
   },
 });
 

@@ -102,10 +102,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  tabButton: {
-    marginHorizontal: 20,
-    alignItems: "center",
-  },
   optionsContainer: {
     display: "flex",
     justifyContent: "center",

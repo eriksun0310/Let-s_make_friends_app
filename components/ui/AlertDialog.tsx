@@ -57,13 +57,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
   },
-
   leftButton: {
     backgroundColor: "#ffcccc",
     borderRadius: 5,
     paddingVertical: 10,
   },
-
   rightButton: {
     backgroundColor: "#e1f5fe",
     borderRadius: 5,

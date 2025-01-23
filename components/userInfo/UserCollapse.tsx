@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
   },
-
   listItemContainer: {
     display: "flex",
     flexDirection: "row",

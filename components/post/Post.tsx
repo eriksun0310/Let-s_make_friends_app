@@ -97,23 +97,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-  footer: {
-    marginTop: 15,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    //borderWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  iconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 20,
-  },
-  iconText: {
-    marginLeft: 5,
-    fontSize: 14,
-    color: Colors.icon,
-  },
   avatar: {
     width: 40,
     height: 40,

@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
   },
-
   tag: {
     flexDirection: "row",
     alignItems: "center",

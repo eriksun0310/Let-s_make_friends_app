@@ -41,7 +41,6 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
   const postData = useAppSelector(selectPosts);
 
   const personal = useAppSelector(selectUser);
-  const friendList = useAppSelector(selectFriendList);
 
   useEffect(() => {
     navigation.setOptions({

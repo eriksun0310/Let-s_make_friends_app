@@ -161,7 +161,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 const styles = StyleSheet.create({
   chatItem: {
     backgroundColor: "#fff",
-    // marginBottom: 7,
   },
   chatIcon: {
     width: 50,
@@ -181,7 +180,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    // alignItems: "center",
   },
   chatMessage: {
     color: "#7e7e7e",
@@ -198,7 +196,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 100,
-    // borderWidth: 1,
   },
 });
 export default ChatRoom;

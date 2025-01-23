@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { updatePostLikeDB } from "../../util/handlePostEvent";
-import {
-  selectUser,
-  useAppDispatch,
-  useAppSelector,
-  addPostLike,
-} from "../../store";
+import { selectUser, useAppDispatch, useAppSelector } from "../../store";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Icon } from "@rneui/themed";
 import { Colors } from "../../constants/style";

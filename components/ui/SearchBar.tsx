@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
   },
-
   searchBar: {
     flex: 1,
     flexDirection: "row",
@@ -80,7 +79,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginHorizontal: 10,
-    // width: "100%",
   },
   searchInput: {
     flex: 1,

@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
   messageContainerRecipient: {
     justifyContent: "flex-start",
   },
-
   messageBubble: {
     maxWidth: "80%",
     padding: 10,
@@ -91,12 +90,6 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
   },
-  messageTime: {
-    fontSize: 12,
-    color: "gray",
-    alignSelf: "flex-end",
-    marginTop: 5,
-  },
   senderTime: {
     marginRight: 8,
   },
@@ -108,10 +101,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginLeft: 8,
     color: Colors.msgGray,
-  },
-  recipientIsRead: {
-    //  alignSelf: "flex-start",
-    marginLeft: 10,
   },
 });
 
