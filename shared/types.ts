@@ -245,3 +245,5 @@ export type LastMessage = {
   created_at: Date;
   content: string;
 };
+
+export type EventType = "INSERT" | "UPDATE";

@@ -46,6 +46,8 @@ import { useAppLifecycle } from "components/hooks/useAppLifecycle";
 import { useFriends } from "components/hooks/useFriends";
 import { useFriendRequests } from "components/hooks/useFriendRequests";
 import { useChatListeners } from "components/hooks/useChatListeners";
+import { useChatRoomsListeners } from "components/hooks/useChatRoomsListeners";
+import { useMessagesListeners } from "components/hooks/useMessagesListeners";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -183,7 +185,11 @@ const AuthenticatedStack = () => {
   // 監聽新好友
   useFriends();
   // 監聽聊天室
-  useChatListeners();
+  useChatListeners(); // TODO: 到時候可以刪除, 因為已經 useChatRoomsListeners+ useMessagesListeners
+  // 監聽聊天列表
+  useChatRoomsListeners();
+  //監聽聊天室的訊息
+  useMessagesListeners();
 
   return (
     <Stack.Navigator
@@ -282,8 +288,8 @@ const Navigation = () => {
       {isAuthenticated ? (
         // <ChatContextProvider>
         <AuthenticatedStack />
-        // </ChatContextProvider>
       ) : (
+        // </ChatContextProvider>
         // </ChatContextProvider>
         <AuthStack />
       )}

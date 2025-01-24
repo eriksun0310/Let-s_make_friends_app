@@ -382,10 +382,53 @@ export const createNewChatRoomAndInsertMessage = async ({
   }
 };
 
+type GetChatRoomsMessage = Result & {
+  data: Message[];
+};
+
+// 批量查詢聊天室訊息
+export const getChatRoomsMessages = async ({
+  chatRoomIds,
+}: {
+  chatRoomIds: string[];
+}): Promise<GetChatRoomsMessage> => {
+  try {
+    // 取得聊天室資料
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .in("chat_room_id", chatRoomIds);
+
+    if (error) {
+      console.log("批量查詢聊天室資料 失敗", error);
+      return {
+        success: false,
+        errorMessage: error.message,
+        data: [],
+      };
+    }
+
+    console.log("批量查詢聊天室資料", data);
+    const transformedMessages = transformMessages(data);
+
+    return {
+      success: true,
+      data: transformedMessages,
+    };
+  } catch (error) {
+    console.log("批量查詢聊天室資料 失敗", error);
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: [],
+    };
+  }
+};
+
 type GetMessagesReturn = Result & {
   data: Message[];
 };
-// ☑️取得聊天室訊息
+// ☑️取得單一聊天室訊息
 export const getMessages = async ({
   chatRoomId,
   userId,

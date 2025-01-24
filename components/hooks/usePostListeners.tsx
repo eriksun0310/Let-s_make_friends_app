@@ -11,6 +11,7 @@ import {
 import { supabase } from "../../util/supabaseClient";
 import { PostsDBType } from "../../shared/dbType";
 import { getPostDetail } from "../../util/handlePostEvent";
+import { EventType } from "shared/types";
 
 //監聽 文章變化
 export const usePostListeners = () => {
@@ -25,7 +26,7 @@ export const usePostListeners = () => {
     event,
     post,
   }: {
-    event: "INSERT" | "UPDATE";
+    event: EventType;
     post: PostsDBType;
   }) => {
     // 判斷是否為自己的文章
@@ -78,14 +79,14 @@ export const usePostListeners = () => {
         },
         async (payload) => {
           const event = payload.eventType;
-   
+
           //監聽文章刪除事件
           if (event === "DELETE") {
             const deletePostId = payload.old.id;
             // 刪除 redux 文章
             dispatch(deletePost(deletePostId));
             //監聽文章(新增、更新事件)
-          } else if (event === "INSERT" || event === "UPDATE") {
+          } else {
             const post = payload.new as PostsDBType;
             await handlePostChange({
               event: event,

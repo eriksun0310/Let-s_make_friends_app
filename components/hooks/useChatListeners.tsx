@@ -118,8 +118,7 @@ export const useChatListeners = () => {
           // 當 (使用者離開應用程式、不在聊天室) 更新 資料庫 未讀數量
           if (
             newMsg.sender_id === userId &&
-            !isUserInRoom(newMsg.recipient_id, newMsg.chat_room_id) 
-            // !onlineUsers.includes(newMsg.recipient_id)
+            !isUserInRoom(newMsg.recipient_id, newMsg.chat_room_id)
           ) {
             await updateUnreadCount({
               chatRoomId: newMsg.chat_room_id,

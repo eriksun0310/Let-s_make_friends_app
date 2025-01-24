@@ -6,6 +6,7 @@ import AlertDialog from "../ui/AlertDialog";
 import {
   deleteChatRoom,
   resetUnreadUser,
+  selectMessages,
   setCurrentChatRoomId,
 } from "../../store/chatSlice";
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
@@ -55,10 +56,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
     // 開始加載聊天紀錄
+    // TODO: 這裡應該是用不到了
     const { data: messages } = await getMessages({
       chatRoomId: chatRoom.id,
       userId: personal.userId,
     });
+
+    const reduxMessages = useAppSelector((state) =>
+      selectMessages(state, chatRoom.id)
+    );
 
     // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
@@ -66,7 +72,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
-      messages: messages, // 預加載的聊天記錄
+      messages: messages, // 預加載的聊天記錄 // 傳入redux 的資料
     });
 
     // 清零未讀訊息

@@ -65,23 +65,5 @@ export const transformMessage = (data: MessagesDBType): Message => {
 };
 
 export const transformMessages = (data: MessagesDBType[]): Message[] => {
-  return (data || []).map(
-    ({
-      id,
-      chat_room_id,
-      sender_id,
-      recipient_id,
-      content,
-      is_read,
-      created_at,
-    }) => ({
-      id,
-      chatRoomId: chat_room_id,
-      senderId: sender_id,
-      recipientId: recipient_id,
-      content,
-      isRead: is_read,
-      createdAt: created_at,
-    })
-  );
+  return data.map((message) => transformMessage(message));
 };

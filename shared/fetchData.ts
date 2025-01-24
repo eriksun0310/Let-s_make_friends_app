@@ -5,10 +5,11 @@ import {
   setFriendList,
   setFriendRequests,
   setFriendRequestUnRead,
+  setMessage,
   setPosts,
 } from "store";
 import { AppDispatch } from "store/store";
-import { getAllChatRooms } from "util/handleChatEvent";
+import { getAllChatRooms, getChatRoomsMessages } from "util/handleChatEvent";
 import {
   getBeFriendUsers,
   getFriendList,
@@ -48,6 +49,15 @@ export const fetchAllData = async ({
       userId: userId,
     });
 
+    console.log("rooms ===> ", rooms);
+
+    const chatRoomIds = rooms.map((room) => room.id);
+    // 取得所有對應的聊天室訊息
+
+    const { data: messages } = await getChatRoomsMessages({
+      chatRoomIds: chatRoomIds,
+    });
+
     // 分別 把資料存到redux
     dispatch(setBeAddFriends(beFriendUsers));
 
@@ -64,6 +74,9 @@ export const fetchAllData = async ({
     dispatch(setPosts(allPosts));
 
     dispatch(setChatRooms(rooms));
+
+    // TODO:
+    dispatch(setMessage(messages));
   } catch (error) {
     console.log("取得用戶資料失敗", error);
   }

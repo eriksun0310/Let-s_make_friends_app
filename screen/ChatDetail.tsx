@@ -39,6 +39,7 @@ import {
   selectCurrentChatRoomId,
   setCurrentChatRoomId,
   selectIsUserOnline,
+  addMessage,
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
 import { useChatContext } from "../shared/chat/ChatContext";
@@ -175,6 +176,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
       messageResult = result;
     }
+
+    // TODO:新增自己的redux
+    dispatch(addMessage(messageResult));
 
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
