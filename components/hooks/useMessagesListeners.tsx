@@ -4,6 +4,7 @@ import { MessagesDBType } from "shared/dbType";
 import { EventType } from "shared/types";
 import {
   addMessage,
+  selectChatRooms,
   selectCurrentChatRoomId,
   selectUser,
   setUserOffline,
@@ -23,6 +24,10 @@ UPDATE: 更新訊息已讀狀態
 
 */
 export const useMessagesListeners = () => {
+  const chatRoomsData = useAppSelector(selectChatRooms);
+  const chatRoomIds = chatRoomsData.map((room) => room.id);
+
+  console.log("chatRoomIds", chatRoomIds);
   const personal = useAppSelector(selectUser);
   const userId = personal.userId;
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
@@ -100,7 +105,7 @@ export const useMessagesListeners = () => {
         });
 
         // TODO: 更新聊天室未讀數量
-        if (message.recipient_id === userId) {
+        if (message.sender_id === userId) {
           dispatch(
             updateChatRoomUnreadCount({
               chatRoomId: message.chat_room_id,
@@ -114,6 +119,7 @@ export const useMessagesListeners = () => {
       dispatch(updateChatRoomLastMessage(transformedMessage));
 
       if (transformedMessage.recipientId === userId) {
+        console.log(333333333);
         // TODO: 新增訊息
         dispatch(addMessage(transformedMessage));
       }
@@ -124,9 +130,72 @@ export const useMessagesListeners = () => {
       }
     }
   };
+
+  // 監聽使用者所有聊天室的訊息
   useEffect(() => {
     const subscribe = supabase
       .channel("public:messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chat_room_id=in.(${chatRoomIds.join(",")})`,
+        },
+        async (payload) => {
+          const event = payload.eventType;
+          const newMessage = payload.new as MessagesDBType;
+
+          const transformedMessage = transformMessage(newMessage);
+          console.log("newMessage", newMessage);
+          console.log("userId", userId);
+          const hasUserOffline =
+            newMessage.sender_id === userId &&
+            !isUserInRoom(newMessage.recipient_id, newMessage.chat_room_id);
+
+          console.log("hasUserOffline", hasUserOffline);
+          // 當 (使用者離開應用程式、不在聊天室) 更新 資料庫 未讀數量
+          if (hasUserOffline) {
+            await updateUnreadCount({
+              chatRoomId: newMessage.chat_room_id,
+              userId: newMessage.recipient_id,
+            });
+
+            // TODO: 更新聊天室未讀數量
+          }
+
+          if (newMessage.recipient_id === userId) {
+            dispatch(
+              updateChatRoomUnreadCount({
+                chatRoomId: newMessage.chat_room_id,
+                recipientId: newMessage.recipient_id,
+              })
+            );
+          }
+          // TODO: 更新聊天室最後一則訊息資訊
+          dispatch(updateChatRoomLastMessage(transformedMessage));
+
+          if (transformedMessage.recipientId === userId) {
+            console.log(44444);
+            // TODO: 新增訊息
+            dispatch(addMessage(transformedMessage));
+          }
+        }
+      )
+
+      .subscribe();
+
+    return () => {
+      subscribe.unsubscribe();
+    };
+  }, [chatRoomIds]);
+
+  // 監聽 目前聊天室的訊息
+  useEffect(() => {
+    const subscribe = supabase
+      .channel("public:messages")
+      // 監聽 目前聊天室的訊息
       .on(
         "postgres_changes",
         {
@@ -139,9 +208,9 @@ export const useMessagesListeners = () => {
           const event = payload.eventType;
           const newMessage = payload.new as MessagesDBType;
 
-          if (event !== "DELETE") {
-            handleMessagesChange({ event, message: newMessage });
-          }
+          // if (event !== "DELETE") {
+          //   handleMessagesChange({ event, message: newMessage });
+          // }
         }
       )
       .subscribe();
@@ -149,5 +218,5 @@ export const useMessagesListeners = () => {
     return () => {
       subscribe.unsubscribe();
     };
-  }, []);
+  }, [currentChatRoomId]);
 };

@@ -28,6 +28,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   // 好友資料
   const friend = chatRoom.friend;
 
+  const messages = useAppSelector((state) =>
+    selectMessages({
+      state: state,
+      chatRoomId: chatRoom.id,
+    })
+  );
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
@@ -55,24 +61,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
+    //console.log("redux messages", messages);
     // 開始加載聊天紀錄
     // TODO: 這裡應該是用不到了
-    const { data: messages } = await getMessages({
-      chatRoomId: chatRoom.id,
-      userId: personal.userId,
-    });
+    // const { data: messages } = await getMessages({
+    //   chatRoomId: chatRoom.id,
+    //   userId: personal.userId,
+    // });
 
-    const reduxMessages = useAppSelector((state) =>
-      selectMessages(state, chatRoom.id)
-    );
-
-    // 記在redux currentChatRoomId
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
-      messages: messages, // 預加載的聊天記錄 // 傳入redux 的資料
+      //messages: messages, // 預加載的聊天記錄 // 傳入redux 的資料
     });
 
     // 清零未讀訊息

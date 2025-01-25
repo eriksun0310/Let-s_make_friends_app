@@ -131,12 +131,23 @@ const chatSlice = createSlice({
     updateChatRoomLastMessage(state, action) {
       const message = action.payload as Message;
 
-      if (state.messages[message.chatRoomId]) {
-        state.messages[message.chatRoomId] = [
-          ...state.messages[message.chatRoomId],
-          message,
-        ];
+      const index = state.chatRooms.findIndex(
+        (room) => room.id === message.chatRoomId
+      );
+
+      // 如果聊天室存在
+      if (index !== -1) {
+        const chatRoom = state.chatRooms[index];
+        chatRoom.lastMessage = message.content;
+        chatRoom.lastTime = message.createdAt;
       }
+
+      // if (state.messages[message.chatRoomId]) {
+      //   state.messages[message.chatRoomId] = [
+      //     ...state.messages[message.chatRoomId],
+      //     message,
+      //   ];
+      // }
     },
 
     // 更新聊天室未讀數量
@@ -216,6 +227,8 @@ const chatSlice = createSlice({
       const message = action.payload as Message;
       const chatRoomId = message.chatRoomId;
 
+      console.log("chatRoomId", chatRoomId);
+      console.log("message", message);
       // 如果聊天室不存在
       if (!state.messages[chatRoomId]) {
         // 為新的聊天室創建一個消息列表
@@ -224,6 +237,7 @@ const chatSlice = createSlice({
         // 向現有的聊天室消息列表添加新的消息
       } else {
         state.messages[chatRoomId] = [...state.messages[chatRoomId], message];
+        //state.messages[chatRoomId].push(message);
       }
     },
     // updateMessage(state, action) {},
@@ -350,7 +364,12 @@ export const selectIsUserOnline = (state: RootState, userId: string) =>
 
 export const selectUserOnline = (state: RootState) => state.chat.onlineUsers;
 
-export const selectMessages = (state: RootState, chatRoomId: string) =>
-  state.chat.messages[chatRoomId];
+export const selectMessages = ({
+  state,
+  chatRoomId,
+}: {
+  state: RootState;
+  chatRoomId: string;
+}) => state.chat.messages[chatRoomId];
 
 export default chatSlice.reducer;

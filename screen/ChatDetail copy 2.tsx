@@ -40,7 +40,6 @@ import {
   setCurrentChatRoomId,
   selectIsUserOnline,
   addMessage,
-  selectMessages,
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
 import { useChatContext } from "../shared/chat/ChatContext";
@@ -65,19 +64,12 @@ interface ChatDetailProps {
 // 進到聊天室
 const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
-  const { chatRoom, chatRoomState } = route.params;
+  const { chatRoom, messages: preloadedMessages, chatRoomState } = route.params;
 
   const friend = chatRoom?.friend;
   const personal = useAppSelector(selectUser);
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
-
-  const messages = useAppSelector((state) =>
-    selectMessages({
-      state: state,
-      chatRoomId: currentChatRoomId,
-    })
-  );
   // 檢查對方是否上線
   const isUserOnline = useAppSelector((state) =>
     selectIsUserOnline(state, friend.userId)
@@ -85,10 +77,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   console.log("isUserOnline detail ===>", isUserOnline);
 
-  // const { newMessage, readMessages } = useChatContext();
-  // const [messages, setMessages] = useState<MessageType[]>(
-  //   preloadedMessages || []
-  // );
+  const { newMessage, readMessages } = useChatContext();
+  const [messages, setMessages] = useState<MessageType[]>(
+    preloadedMessages || []
+  );
 
   const [loading, setLoading] = useState(false);
 
@@ -128,7 +120,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       chatRoomId: currentChatRoomId || `temp_chatRoomId_${Date.now()}`,
     };
 
-    //setMessages((prevMessages) => [...prevMessages, tempMessage]);
+    setMessages((prevMessages) => [...prevMessages, tempMessage]);
     setInputText("");
 
     let chatRoomId = currentChatRoomId; // redux 的
@@ -145,13 +137,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
       // 如果沒有新的聊天室資料,則代表發送訊息失敗
       if (!success) {
-        // setMessages((prevMessages) =>
-        //   prevMessages.map((msg) =>
-        //     msg.id === tempMessage.id
-        //       ? { ...msg, isTemporary: false, failed: true }
-        //       : msg
-        //   )
-        // );
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === tempMessage.id
+              ? { ...msg, isTemporary: false, failed: true }
+              : msg
+          )
+        );
       }
 
       chatRoomId = newChatRoomData?.chatRoom?.id;
@@ -172,31 +164,29 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
       // 如果發送訊息失敗
       if (!success) {
-        // setMessages((prevMessages) =>
-        //   prevMessages.map((msg) =>
-        //     msg.id === tempMessage.id
-        //       ? { ...msg, isTemporary: false, failed: true }
-        //       : msg
-        //   )
-        // );
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === tempMessage.id
+              ? { ...msg, isTemporary: false, failed: true }
+              : msg
+          )
+        );
         return;
       }
 
       messageResult = result;
     }
 
-    console.log(1111111111);
-    console.log("messageResult", messageResult);
     // TODO:新增自己的redux
-    dispatch(addMessage(messageResult));
-    console.log(2222222223333 );
-    // setMessages((prevMessages) =>
-    //   prevMessages.map((msg) =>
-    //     msg.id === tempMessage.id
-    //       ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
-    //       : msg
-    //   )
-    // );
+    //dispatch(addMessage(messageResult));
+
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) =>
+        msg.id === tempMessage.id
+          ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
+          : msg
+      )
+    );
 
     // if (result.error) {
     //   console.error("Failed to send message:", result.error);
@@ -219,66 +209,63 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   };
 
   //  加載訊息
-  // const fetchMessagesIfNeeded = async () => {
-  //   if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
+  const fetchMessagesIfNeeded = async () => {
+    if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
 
-  //   try {
-  //     setLoading(true);
-  //     const { data: messageData, success } = await getMessages({
-  //       chatRoomId: currentChatRoomId || "",
-  //       userId: personal.userId,
-  //     });
+    try {
+      setLoading(true);
+      const { data: messageData, success } = await getMessages({
+        chatRoomId: currentChatRoomId || "",
+        userId: personal.userId,
+      });
 
-  //     if (success) {
-  //       //setMessages(messageData as MessageType[]); // 設置處理後的訊息
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching messages:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      if (success) {
+        setMessages(messageData as MessageType[]); // 設置處理後的訊息
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 加載聊天記錄(如果聊天室已存在且沒有預加載數據)
   useEffect(() => {
     if (currentChatRoomId && chatRoomState === "old") {
-      // fetchMessagesIfNeeded();
+      fetchMessagesIfNeeded();
     }
-  }, [
-    currentChatRoomId,
-    // preloadedMessages
-  ]);
+  }, [currentChatRoomId, preloadedMessages]);
 
   // 標記單條訊息已讀
-  // useEffect(() => {
-  //   if (readMessages) {
-  //     setMessages((prevMessages) => {
-  //       return prevMessages.map((msg) => {
-  //         return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
-  //       });
-  //     });
-  //   }
-  // }, [readMessages]);
+  useEffect(() => {
+    if (readMessages) {
+      setMessages((prevMessages) => {
+        return prevMessages.map((msg) => {
+          return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
+        });
+      });
+    }
+  }, [readMessages]);
 
   // 監聽新訊息
-  // useEffect(() => {
-  //   if (newMessage && newMessage.recipientId === personal.userId) {
-  //     // 更新消息列表，避免重複插入
-  //     setMessages((prevMessages) => {
-  //       const isDuplicate = prevMessages.some(
-  //         (msg) => msg.id === newMessage.id
-  //       );
-  //       return isDuplicate ? prevMessages : [...prevMessages, newMessage];
-  //     });
-  //   }
-  // }, [newMessage, personal.userId]);
+  useEffect(() => {
+    if (newMessage && newMessage.recipientId === personal.userId) {
+      // 更新消息列表，避免重複插入
+      setMessages((prevMessages) => {
+        const isDuplicate = prevMessages.some(
+          (msg) => msg.id === newMessage.id
+        );
+        return isDuplicate ? prevMessages : [...prevMessages, newMessage];
+      });
+    }
+  }, [newMessage, personal.userId]);
 
   // 確保 FlatList 自動滾動到底部
-  // useEffect(() => {
-  //   if (flatListRef.current) {
-  //     flatListRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, [messages]);
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   // 進入聊天室時標記全部訊息已讀
   useEffect(() => {
@@ -292,12 +279,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
         if (success) {
           // 本地更新訊息列表：只標記屬於自己的訊息為已讀
-          // setMessages((prevMessages) => {
-          //   return prevMessages.map((msg) => ({
-          //     ...msg,
-          //     isRead: msg.recipientId === personal.userId ? true : msg.isRead,
-          //   }));
-          // });
+          setMessages((prevMessages) => {
+            return prevMessages.map((msg) => ({
+              ...msg,
+              isRead: msg.recipientId === personal.userId ? true : msg.isRead,
+            }));
+          });
         }
       }
     };
@@ -332,7 +319,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   if (loading) return <LoadingOverlay message="loading ..." />;
 
-  console.log("messages chatDetail", messages);
   return (
     <>
       <KeyboardAvoidingView

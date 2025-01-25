@@ -32,10 +32,11 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
-
+  
+  console.log("chatRoomsData", chatRoomsData);
   // 過濾符合條件的聊天室列表
   const filteredChatRooms = chatRoomsData.filter((room) =>
-    room.friend.name.toLowerCase().includes(searchText.toLowerCase())
+    room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())
   );
 
   const renderChatRoom = ({ item }: { item: ChatRoomType }) => (

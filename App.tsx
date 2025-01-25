@@ -185,7 +185,7 @@ const AuthenticatedStack = () => {
   // 監聽新好友
   useFriends();
   // 監聽聊天室
-  useChatListeners(); // TODO: 到時候可以刪除, 因為已經 useChatRoomsListeners+ useMessagesListeners
+  //useChatListeners(); // TODO: 到時候可以刪除, 因為已經 useChatRoomsListeners+ useMessagesListeners
   // 監聽聊天列表
   useChatRoomsListeners();
   //監聽聊天室的訊息

@@ -36,7 +36,6 @@ export const useChatRoomsListeners = () => {
           table: "chat_rooms",
         },
         async (payload) => {
-          const event = payload.eventType;
           const newChatRoom = payload.new as ChatRoomsDBType;
 
           const transformedChatRoom = transformChatRoom({ data: newChatRoom });
