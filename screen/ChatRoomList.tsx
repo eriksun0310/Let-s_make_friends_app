@@ -28,12 +28,12 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
   const chatRoomsData = useAppSelector(selectChatRooms);
   const isUserOnline = useAppSelector(selectUserOnline);
-  console.log("isUserOnline", isUserOnline);
+  //console.log("isUserOnline", isUserOnline);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
   
-  console.log("chatRoomsData", chatRoomsData);
+  console.log("chatRoomsData ===>", chatRoomsData);
   // 過濾符合條件的聊天室列表
   const filteredChatRooms = chatRoomsData.filter((room) =>
     room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())

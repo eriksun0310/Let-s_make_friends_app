@@ -309,6 +309,7 @@ export const createNewChatRoomAndInsertMessage = async ({
       .insert({
         user1_id: userId,
         user2_id: friendId,
+        unread_count_user2: 1, // 設置對方未讀數為1
       })
       .select("*")
       .single();
@@ -1007,6 +1008,59 @@ export const resetDeleteChatRoomDB = async ({
     return {
       success: false,
       errorMessage: (error as Error).message,
+    };
+  }
+};
+
+type GetNewChatRoomMessages = Result & {
+  data: {
+    messages: Message[];
+    lastMessageData: LastMessage | null;
+  };
+};
+
+// 取得新聊天室的訊息
+export const getNewChatRoomMessages = async ({
+  chatRoomId,
+}: {
+  chatRoomId: string;
+}): Promise<GetNewChatRoomMessages> => {
+  try {
+    // 取得對應聊天室的所有訊息
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("chat_room_id", chatRoomId)
+      .order("created_at", { ascending: true }); // 依照 created_at 由舊到新排序
+
+    if (error) {
+      return {
+        success: false,
+        errorMessage: (error as Error).message,
+        data: {
+          messages: [],
+          lastMessageData: null,
+        },
+      };
+    }
+
+    const transformedMessages = transformMessages(data);
+
+    return {
+      success: true,
+      data: {
+        messages: transformedMessages,
+        lastMessageData: data.length > 0 ? data[data.length - 1] : null,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+      data: {
+        messages: [],
+        lastMessageData: null,
+      },
     };
   }
 };

@@ -157,6 +157,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       chatRoomId = newChatRoomData?.chatRoom?.id;
       messageResult = newChatRoomData.messageResult!;
 
+      // 新增自己的聊天室的redux
       if (newChatRoomData.chatRoom) {
         dispatch(addChatRoom(newChatRoomData.chatRoom));
         dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
