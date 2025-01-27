@@ -6,7 +6,11 @@ import {
 import { Result, User, UserSettings } from "../shared/types";
 import { supabase } from "./supabaseClient";
 import { initUserSettings } from "../shared/static";
-import { UserHeadShotDBType, UserSelectedOptionDBType } from "../shared/dbType";
+import {
+  UserHeadShotDBType,
+  UserSelectedOptionDBType,
+  UserSettingsDBType,
+} from "../shared/dbType";
 
 /*
 ☑️: 已經整理好的
@@ -121,7 +125,8 @@ export const getUserDetail = async ({
        created_at, 
        updated_at,
        user_head_shot(image_url, image_type),
-       user_selected_option(interests, favorite_food, disliked_food)
+       user_selected_option(interests, favorite_food, disliked_food),
+       user_settings(hide_likes, hide_comments, mark_as_read)
        `
       )
       .eq("id", userId)
@@ -145,11 +150,17 @@ export const getUserDetail = async ({
         data: null,
       };
     }
+
     // 如果查有資料，進行資料轉換
     const transformedUser = transformUser({
       users: data,
-      userHeadShot: (data.user_head_shot as any) ?? null,
-      userSelectedOption: (data.user_selected_option as any) ?? null,
+      userHeadShot:
+        (data.user_head_shot as unknown as UserHeadShotDBType) ?? null,
+      userSelectedOption:
+        (data.user_selected_option as unknown as UserSelectedOptionDBType) ??
+        null,
+      userSettings:
+        (data.user_settings as unknown as UserSettingsDBType) ?? null,
     });
 
     return {
@@ -191,7 +202,8 @@ export const getUsersDetail = async ({
         created_at, 
         updated_at,
         user_head_shot(image_url, image_type),
-        user_selected_option(interests, favorite_food, disliked_food)
+        user_selected_option(interests, favorite_food, disliked_food),
+        user_settings(hide_likes, hide_comments, mark_as_read)
         `
       )
       .in("id", userIds);
@@ -218,6 +230,7 @@ export const getUsersDetail = async ({
         userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
         userSelectedOption:
           user.user_selected_option as unknown as UserSelectedOptionDBType,
+        userSettings: user.user_settings as unknown as UserSettingsDBType,
       })
     );
 

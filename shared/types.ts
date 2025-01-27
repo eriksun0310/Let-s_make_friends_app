@@ -71,6 +71,7 @@ export type User = {
 
   headShot: HeadShot;
   selectedOption: SelectedOption;
+  settings: Omit<UserSettings, "userId">;
 };
 
 export type UserState = "personal" | "friend" | "visitor";

@@ -47,15 +47,15 @@ export const useFriends = () => {
       .channel("public:friends") // 訂閱 friends 資料表的變化
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "friends",
-          filter: `user_id=eq.${userId}`,
-        },
+        { event: "*", schema: "public", table: "friends" },
         async (payload) => {
+          const event = payload.eventType;
           // 未讀的新好友
-          if (!payload.new.is_read) {
+          if (
+            event === "INSERT" &&
+            !payload.new.is_read &&
+            payload.new.user_id === userId
+          ) {
             const newFriend = payload.new as FriendDBType;
             // 取得詳細的好友資料
             const { data: friendDetails } = await getUserDetail({
@@ -64,21 +64,12 @@ export const useFriends = () => {
 
             dispatch(addFriend(friendDetails));
             dispatch(updateNewFriendUnRead());
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          schema: "public",
-          table: "friends",
-        },
-        (payload) => {
-          console.log("payload", payload);
-          const currentDeleteFriend = payload.old as FriendDBType;
-          if (currentDeleteFriend.user_id === userId) {
-            dispatch(deleteFriend(currentDeleteFriend.friend_id));
+          } else if (event === "DELETE") {
+            console.log("payload", payload);
+            const currentDeleteFriend = payload.old as FriendDBType;
+            if (currentDeleteFriend.user_id === userId) {
+              dispatch(deleteFriend(currentDeleteFriend.friend_id));
+            }
           }
         }
       )

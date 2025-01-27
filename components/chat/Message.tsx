@@ -8,10 +8,10 @@ import { Message as MessageType } from "../../shared/types";
 
 interface MessageProps {
   item: MessageType;
-  // onView?: (messageId: string) => void;
+  showIsRead: boolean; // 是否顯示已讀
 }
 
-const Message: React.FC<MessageProps> = ({ item }) => {
+const Message: React.FC<MessageProps> = ({ item, showIsRead }) => {
   const personal = useAppSelector(selectUser);
 
   // useEffect(() => {
@@ -20,6 +20,7 @@ const Message: React.FC<MessageProps> = ({ item }) => {
   //     onView?.(item.id);
   //   }
   // }, []);
+
 
   return (
     <View
@@ -32,7 +33,10 @@ const Message: React.FC<MessageProps> = ({ item }) => {
     >
       {item.senderId === personal.userId && (
         <View>
-          <Text style={styles.senderIsRead}>{item.isRead && "已讀"}</Text>
+          {showIsRead && (
+            <Text style={styles.senderIsRead}>{item.isRead && "已讀"}</Text>
+          )}
+
           <Text style={styles.senderTime}>
             {formatTimeWithDayjs(item.createdAt)}
           </Text>

@@ -10,10 +10,12 @@ export const transformUser = ({
   users,
   userHeadShot,
   userSelectedOption,
+  userSettings,
 }: {
   users: UsersDBType;
   userHeadShot: UserHeadShotDBType;
   userSelectedOption: UserSelectedOptionDBType;
+  userSettings: UserSettingsDBType;
 }): User => {
   const {
     id,
@@ -48,6 +50,14 @@ export const transformUser = ({
         dislikedFood: [],
       };
 
+  const settings = userSettings
+    ? {
+        hideLikes: userSettings.hide_likes,
+        hideComments: userSettings.hide_comments,
+        markAsRead: userSettings.mark_as_read,
+      }
+    : { hideLikes: false, hideComments: false, markAsRead: true };
+
   return {
     userId: id,
     name,
@@ -59,6 +69,7 @@ export const transformUser = ({
     updatedAt: updated_at,
     headShot,
     selectedOption,
+    settings,
   };
 };
 
@@ -76,4 +87,3 @@ export const transformAllUserSettings = (
 ): UserSettings[] => {
   return (userSettings || []).map(transformUserSettings);
 };
-

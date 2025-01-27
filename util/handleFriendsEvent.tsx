@@ -6,6 +6,7 @@ import {
   FriendDBType,
   UserHeadShotDBType,
   UserSelectedOptionDBType,
+  UserSettingsDBType,
 } from "../shared/dbType";
 import { FriendRequest, FriendState, Result, User } from "../shared/types";
 import { transformUser } from "../shared/user/userUtils";
@@ -268,7 +269,8 @@ export const getBeFriendUsers = async ({
         created_at, 
         updated_at,
         user_head_shot(image_url, image_type),
-        user_selected_option(interests, favorite_food, disliked_food)
+        user_selected_option(interests, favorite_food, disliked_food),
+        user_settings(hide_likes, hide_comments, mark_as_read)
         `
       )
       .not("id", "in", `(${excludeUserIds.join(",")})`); // 排除自己、好友邀請中的用戶
@@ -288,6 +290,8 @@ export const getBeFriendUsers = async ({
         userHeadShot: user.user_head_shot as unknown as UserHeadShotDBType,
         userSelectedOption:
           user.user_selected_option as unknown as UserSelectedOptionDBType,
+        userSettings:
+          (user.user_settings as unknown as UserSettingsDBType) ?? null,
       });
       return transformedUser;
     });

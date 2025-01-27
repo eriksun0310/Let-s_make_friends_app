@@ -68,6 +68,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const { chatRoom, chatRoomState } = route.params;
 
   const friend = chatRoom?.friend;
+  const showIsRead = friend?.settings?.markAsRead;
   const personal = useAppSelector(selectUser);
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
@@ -75,7 +76,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const messages = useAppSelector((state) =>
     selectChatRoomMessages({
       state: state,
-      chatRoomId: currentChatRoomId,
+      chatRoomId: currentChatRoomId || "",
     })
   );
   // 檢查對方是否上線
@@ -101,6 +102,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       <Message
         key={item.id}
         item={item}
+        showIsRead={showIsRead}
         // onView={(messageId: string) => handleMessageView(messageId)}
       />
 

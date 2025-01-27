@@ -71,17 +71,19 @@ export const useFriendRequests = () => {
       .channel("public:friend_requests") // 訂閱 friend_requests 資料表的變化
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "friend_requests" },
+        {
+          event: "*",
+          schema: "public",
+          table: "friend_requests",
+          filter: `receiver_id=eq.${personal.userId}`,
+        },
         (payload) => {
           const event = payload.eventType;
 
           const friendRequests = payload.new as FriendRequestsDBType;
           const friendRequestsStatus = friendRequests.status;
           // 其他人寄給我的(加友、拒絕)邀請
-          if (
-            event === "INSERT" &&
-            friendRequests.receiver_id === personal.userId
-          ) {
+          if (event === "INSERT") {
             // 刪除 "加好友" 的用戶
             dispatch(deleteBeAddFriend(friendRequests.sender_id));
             if (friendRequestsStatus === "pending") {
