@@ -44,7 +44,6 @@
 [聊天室 整理code + BUG ]
 1. ChatContextProvider 整理
 2. 看要不要像 useFriends() 放在 App.tsx 的AuthenticatedStack 上
-3.  串接用戶設定的聊天室已讀標記
 ✅4. 傳送給對方的第一則訊息,必須更新聊天室未讀數量,以及對方redux 的chatRooms 跟messages
 ✅5. 監聽chat_rooms 必須限制為自己是user2_id,確保只有自己有關的chat_rooms 有變動  才會被監聽到
 ✅1/27 6. 當使用者進到聊天室的話, UI 需呈現已讀
