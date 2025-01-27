@@ -1,7 +1,7 @@
 import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
 import { NavigationProp } from "@react-navigation/native";
 import {
@@ -12,6 +12,7 @@ import {
   setChatRooms,
   selectIsUserOnline,
   selectUserOnline,
+  selectAllMessages,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -27,17 +28,18 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const chatRoomsData = useAppSelector(selectChatRooms);
-  const isUserOnline = useAppSelector(selectUserOnline);
+  const allMessages = useAppSelector(selectAllMessages);
   //console.log("isUserOnline", isUserOnline);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
-  
-  console.log("chatRoomsData ===>", chatRoomsData);
+
   // 過濾符合條件的聊天室列表
-  const filteredChatRooms = chatRoomsData.filter((room) =>
-    room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())
-  );
+  const filteredChatRooms = useMemo(() => {
+    return chatRoomsData.filter((room) =>
+      room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())
+    );
+  }, [chatRoomsData, searchText]);
 
   const renderChatRoom = ({ item }: { item: ChatRoomType }) => (
     <ChatRoom chatRoom={item} navigation={navigation} />
@@ -55,7 +57,9 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  console.log("chatRoomsData", chatRoomsData);
+  console.log(" allMessages ===>", allMessages);
+  console.log("聊天室列表 ===>", chatRoomsData);
+  console.log("聊天室列表render filteredChatRooms", filteredChatRooms);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}

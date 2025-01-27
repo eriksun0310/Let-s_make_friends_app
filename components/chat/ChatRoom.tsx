@@ -6,7 +6,6 @@ import AlertDialog from "../ui/AlertDialog";
 import {
   deleteChatRoom,
   resetUnreadUser,
-  selectMessages,
   setCurrentChatRoomId,
 } from "../../store/chatSlice";
 import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
@@ -28,12 +27,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   // 好友資料
   const friend = chatRoom.friend;
 
-  const messages = useAppSelector((state) =>
-    selectMessages({
-      state: state,
-      chatRoomId: chatRoom.id,
-    })
-  );
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 

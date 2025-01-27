@@ -40,10 +40,10 @@ import {
   setCurrentChatRoomId,
   selectIsUserOnline,
   addMessage,
-  selectMessages,
+  updateAllMessageIsRead,
+  selectChatRoomMessages,
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
-import { useChatContext } from "../shared/chat/ChatContext";
 // import { handleMessageView } from "../shared/chatFuncs";
 /*
 chatRoomState: 'old' | 'new'
@@ -73,7 +73,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
 
   const messages = useAppSelector((state) =>
-    selectMessages({
+    selectChatRoomMessages({
       state: state,
       chatRoomId: currentChatRoomId,
     })
@@ -83,7 +83,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     selectIsUserOnline(state, friend.userId)
   );
 
-  console.log("isUserOnline detail ===>", isUserOnline);
+  //console.log("isUserOnline detail ===>", isUserOnline);
 
   // const { newMessage, readMessages } = useChatContext();
   // const [messages, setMessages] = useState<MessageType[]>(
@@ -134,6 +134,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     let chatRoomId = currentChatRoomId; // redux 的
     let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
 
+    console.log("chatRoomId", chatRoomId);
     // 新聊天室
     if (!chatRoomId) {
       const { data: newChatRoomData, success } =
@@ -186,11 +187,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       messageResult = result;
     }
 
-    console.log(1111111111);
-    console.log("messageResult", messageResult);
+    // console.log(1111111111);
+
     // TODO:新增自己的redux
     dispatch(addMessage(messageResult));
-    console.log(2222222223333 );
+    //console.log(2222222223333 );
     // setMessages((prevMessages) =>
     //   prevMessages.map((msg) =>
     //     msg.id === tempMessage.id
@@ -292,6 +293,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         });
 
         if (success) {
+          // dispatch(
+          //   updateAllMessageIsRead({
+          //     chatRoomId: currentChatRoomId,
+          //     userId: personal.userId,
+          //   })
+          // );
           // 本地更新訊息列表：只標記屬於自己的訊息為已讀
           // setMessages((prevMessages) => {
           //   return prevMessages.map((msg) => ({

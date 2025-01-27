@@ -409,7 +409,6 @@ export const getChatRoomsMessages = async ({
       };
     }
 
-    console.log("批量查詢聊天室資料", data);
     const transformedMessages = transformMessages(data);
 
     return {
@@ -534,7 +533,7 @@ export const sendMessage = async ({
       .single(); // 確保只返回單條訊息
 
     if (error) {
-      console.log("建立新訊息 失敗", error);
+      console.log("建立新訊息 失敗 ", error);
       return {
         success: false,
         errorMessage: error.message,

@@ -277,7 +277,6 @@ const Navigation = () => {
   const initialized = useAppSelector(selectInitialized);
   // 是否已經登入
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  console.log("isAuthenticated", isAuthenticated);
 
   if (!initialized) {
     return <LoadingOverlay message="loading ..." />; // 顯示載入頁面直到初始化完成
@@ -285,14 +284,7 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? (
-        // <ChatContextProvider>
-        <AuthenticatedStack />
-      ) : (
-        // </ChatContextProvider>
-        // </ChatContextProvider>
-        <AuthStack />
-      )}
+      {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

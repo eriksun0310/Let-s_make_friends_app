@@ -36,14 +36,12 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
     }
 
     if (mode === "delete") {
-      console.log("delete");
       const { success } = await deleteFriendDB({
         userId: personal.userId,
         friendId: friend.userId,
       });
 
       if (success) {
-        console.log("刪除好友 friend.userId", friend.userId);
         dispatch(deleteFriend(friend.userId));
       }
     }

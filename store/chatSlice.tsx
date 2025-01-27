@@ -72,6 +72,8 @@ const chatSlice = createSlice({
 
     addChatRoom(state, action) {
       const incomingRoom = action.payload;
+
+      console.log("addChatRoom", incomingRoom);
       const index = state.chatRooms.findIndex(
         (room) => room.id === incomingRoom.id
       );
@@ -148,6 +150,12 @@ const chatSlice = createSlice({
       //     message,
       //   ];
       // }
+
+      // 排序聊天室, 按照最後一則訊息的時間排序
+      state.chatRooms.sort(
+        (a, b) =>
+          new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime()
+      );
     },
 
     // 更新聊天室未讀數量
@@ -155,10 +163,14 @@ const chatSlice = createSlice({
       // TODO: 需要判斷要對誰的未讀數量進行更新
       const { chatRoomId, recipientId } = action.payload;
       state.chatRooms = state.chatRooms.map((room) => {
+        console.log("room", room);
+        console.log("room.user1Id", room.user1Id);
+        console.log("recipientId", recipientId);
         const unreadCountUser =
           room.user1Id === recipientId
             ? "unreadCountUser1"
             : "unreadCountUser2";
+        console.log("unreadCountUser", unreadCountUser);
         return room.id === chatRoomId
           ? {
               ...room,
@@ -201,9 +213,7 @@ const chatSlice = createSlice({
     // ☑️
     setMessage(state, action) {
       const messages = action.payload as Message[];
-      console.log("messages 00000000000000000", messages);
       messages.forEach((message) => {
-        console.log("message 11111111111111111111111", message);
         const chatRoomId = message.chatRoomId;
 
         // 初始化聊天室的消息列表（如果尚未存在）
@@ -219,16 +229,12 @@ const chatSlice = createSlice({
           state.messages[chatRoomId] = [...state.messages[chatRoomId], message];
         }
       });
-
-      console.log("state.messages 22222222222", state.messages);
     },
     // ☑️ 新增訊息
     addMessage(state, action) {
       const message = action.payload as Message;
       const chatRoomId = message.chatRoomId;
 
-      console.log("chatRoomId", chatRoomId);
-      console.log("message", message);
       // 如果聊天室不存在
       if (!state.messages[chatRoomId]) {
         // 為新的聊天室創建一個消息列表
@@ -237,20 +243,34 @@ const chatSlice = createSlice({
         // 向現有的聊天室消息列表添加新的消息
       } else {
         state.messages[chatRoomId] = [...state.messages[chatRoomId], message];
-        //state.messages[chatRoomId].push(message);
       }
     },
     // updateMessage(state, action) {},
     // ☑️ 更新訊息的已讀狀態
-    updateMessageIsRead(state, action) {
-      const { chatRoomId, id } = action.payload as Message;
+    // updateMessageIsRead(state, action) {
+    //   const { chatRoomId, id } = action.payload as Message;
+
+    //   console.log("updateMessageIsRead", chatRoomId, id);
+    //   // 如果聊天室不存在
+    //   if (!state.messages[chatRoomId]) return;
+
+    //   // 更新指定消息的 isRead 狀態
+    //   state.messages[chatRoomId] = state.messages[chatRoomId].map((msg) =>
+    //     msg.id === id ? { ...msg, isRead: true } : msg
+    //   );
+    // },
+    // 更新該聊天室所有未讀訊息
+    updateAllMessageIsRead(state, action) {
+      const { chatRoomId, userId } = action.payload;
 
       // 如果聊天室不存在
       if (!state.messages[chatRoomId]) return;
 
       // 更新指定消息的 isRead 狀態
       state.messages[chatRoomId] = state.messages[chatRoomId].map((msg) =>
-        msg.id === id ? { ...msg, isRead: true } : msg
+        msg.isRead === false && msg.senderId === userId
+          ? { ...msg, isRead: true }
+          : msg
       );
     },
     setUserOnline(state, action) {
@@ -281,7 +301,8 @@ export const {
   setMessage,
   addMessage,
   // updateMessage,
-  updateMessageIsRead,
+  // updateMessageIsRead,
+  updateAllMessageIsRead,
   setUserOnline,
   setUserOffline,
 } = chatSlice.actions;
@@ -364,12 +385,16 @@ export const selectIsUserOnline = (state: RootState, userId: string) =>
 
 export const selectUserOnline = (state: RootState) => state.chat.onlineUsers;
 
-export const selectMessages = ({
+// 取得特定聊天室的訊息
+export const selectChatRoomMessages = ({
   state,
   chatRoomId,
 }: {
   state: RootState;
   chatRoomId: string;
 }) => state.chat.messages[chatRoomId];
+
+// 取得所有聊天室的訊息
+export const selectAllMessages = (state: RootState) => state.chat.messages;
 
 export default chatSlice.reducer;

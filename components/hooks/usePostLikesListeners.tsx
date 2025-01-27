@@ -41,8 +41,6 @@ export const usePostLikesListeners = () => {
       (friend) => friend.userId === newPostLike.user_id
     );
 
-    console.log("hasFriendPostLike", hasFriendPostLike);
-
     // 好友按讚
     if (hasFriendPostLike) {
       const findFriend = friendList.find(

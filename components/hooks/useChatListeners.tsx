@@ -19,6 +19,8 @@ import { AppState } from "react-native";
 import { transformMessage } from "../../shared/chat/chatUtils";
 import { MessagesDBType } from "../../shared/dbType";
 
+
+// 這個 已經改用 useChatRoomsListeners ＋ useMessagesListeners
 export const useChatListeners = () => {
   const personal = useAppSelector(selectUser);
   const userId = personal.userId;

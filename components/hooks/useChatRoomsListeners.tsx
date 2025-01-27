@@ -9,6 +9,7 @@ import {
   useAppSelector,
 } from "store";
 import { getNewChatRoomMessages } from "util/handleChatEvent";
+import { getUserDetail } from "util/handleUserEvent";
 import { supabase } from "util/supabaseClient";
 
 /*
@@ -36,21 +37,27 @@ export const useChatRoomsListeners = () => {
           const transformedChatRoom = transformChatRoom({ data: newChatRoom });
 
           // 取得新聊天室的訊息
-          const { data } = await getNewChatRoomMessages({
+          const { data:chatRoomMessages } = await getNewChatRoomMessages({
             chatRoomId: newChatRoom.id,
+          });
+
+          // 取得聊天室好友的資料
+          const { data: chatRoomFriend } = await getUserDetail({
+            userId: transformedChatRoom.user1Id,
           });
 
           // 新增聊天室
           dispatch(
             addChatRoom({
               ...transformedChatRoom,
-              lastMessage: data.lastMessageData?.content,
-              lastTime: data.lastMessageData?.created_at,
+              lastMessage: chatRoomMessages.lastMessageData?.content,
+              lastTime: chatRoomMessages.lastMessageData?.created_at,
+              friend: chatRoomFriend,
             })
           );
 
           // 新增聊天室的訊息
-          dispatch(setMessage(data.messages));
+          dispatch(setMessage(chatRoomMessages.messages));
         }
       )
       .subscribe();
