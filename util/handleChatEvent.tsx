@@ -1,5 +1,11 @@
 import { supabase } from "./supabaseClient";
-import { ChatRoom, LastMessage, Message, Result } from "../shared/types";
+import {
+  ChatRoom,
+  DeletedChatRoom,
+  LastMessage,
+  Message,
+  Result,
+} from "../shared/types";
 import {
   transformChatRoom,
   transformMessage,
@@ -788,8 +794,15 @@ const getDeleteColumns = ({
   };
 };
 
+const deletedChatRoomInitialState = {
+  deletedChatRoomId: null,
+  deletedColumn: null,
+  deletedAtColumn: null,
+  unreadColumn: null,
+};
+
 type DeleteChatRoomDBReturn = Result & {
-  data: string | null;
+  data: DeletedChatRoom;
 };
 
 // ☑️刪除聊天室
@@ -812,7 +825,7 @@ export const deleteChatRoomDB = async ({
       return {
         success: false,
         errorMessage: chatRoomError?.message,
-        data: null,
+        data: deletedChatRoomInitialState,
       };
     }
 
@@ -823,7 +836,7 @@ export const deleteChatRoomDB = async ({
     });
 
     // 更新聊天室對應的欄位
-    const { data: updatedChatRoom, error: updatedChatRoomError } =
+    const { data: deletedChatRoom, error: deletedChatRoomError } =
       await supabase
         .from("chat_rooms")
         .update({
@@ -835,16 +848,16 @@ export const deleteChatRoomDB = async ({
         .select("*")
         .single();
 
-    if (!updatedChatRoom || updatedChatRoomError) {
+    if (!deletedChatRoom || deletedChatRoomError) {
       return {
         success: false,
-        errorMessage: updatedChatRoomError?.message,
-        data: null,
+        errorMessage: deletedChatRoomError?.message,
+        data: deletedChatRoomInitialState,
       };
     }
 
     // 如果雙方都已刪除聊天室, 刪除該聊天室的所有訊息
-    if (updatedChatRoom.user1_deleted && updatedChatRoom.user2_deleted) {
+    if (deletedChatRoom.user1_deleted && deletedChatRoom.user2_deleted) {
       const { success, errorMessage } = await deleteChatMessage({
         chatRoomId,
       });
@@ -853,21 +866,33 @@ export const deleteChatRoomDB = async ({
         return {
           success: false,
           errorMessage: errorMessage,
-          data: "",
+          data: deletedChatRoomInitialState,
         };
       }
     }
 
     return {
       success: true,
-      data: updatedChatRoom.id,
+      data: {
+        deletedChatRoomId: deletedChatRoom.id,
+        deletedColumn:
+          deletedColumn === "user1_deleted" ? "user1Deleted" : "user2Deleted",
+        deletedAtColumn:
+          deletedAtColumn === "user1_deleted_at"
+            ? "user1DeletedAt"
+            : "user2DeletedAt",
+        unreadColumn:
+          unreadColumn === "unread_count_user1"
+            ? "unreadCountUser1"
+            : "unreadCountUser2",
+      },
     };
   } catch (error) {
     console.log("刪除聊天室 失敗", error);
     return {
       success: false,
       errorMessage: (error as Error).message,
-      data: "",
+      data: deletedChatRoomInitialState,
     };
   }
 };

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { transformMessage } from "shared/chat/chatUtils";
 import { MessagesDBType } from "shared/dbType";
-import { EventType } from "shared/types";
+import { ChatRoom, EventType } from "shared/types";
 import {
   addMessage,
+  resetDeletedChatRoomState,
   selectChatRooms,
   selectCurrentChatRoomId,
   selectUser,
@@ -33,7 +34,8 @@ export const useMessagesListeners = () => {
   const dispatch = useAppDispatch();
 
   const [presenceChannel, setPresenceChannel] = useState<any>(null);
-
+  console.log("chatRoomsData", chatRoomsData);
+  console.log("chatRoomIds", chatRoomIds);
   // 初始化 Presence
   useEffect(() => {
     if (!userId) return;
@@ -154,6 +156,20 @@ export const useMessagesListeners = () => {
 
           if (event === "INSERT") {
             const newMessage = payload.new as MessagesDBType;
+
+            // 檢查是否有刪除聊天室
+            const findDeleteChatRoom = chatRoomsData.find(
+              (chatRoom) => chatRoom.id === newMessage.chat_room_id
+            );
+
+            if (
+              findDeleteChatRoom?.user1Deleted ||
+              findDeleteChatRoom?.user2Deleted
+            ) {
+              // 重置聊天室刪除狀態
+              dispatch(resetDeletedChatRoomState(newMessage.chat_room_id));
+            }
+
             const transformedMessage = transformMessage(newMessage);
 
             const hasUserOffline =

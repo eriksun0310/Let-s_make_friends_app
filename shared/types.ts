@@ -248,3 +248,10 @@ export type LastMessage = {
 };
 
 export type EventType = "INSERT" | "UPDATE";
+
+export type DeletedChatRoom = {
+  deletedChatRoomId: string | null;
+  deletedColumn: string | null;
+  deletedAtColumn: string | null;
+  unreadColumn: string | null;
+};

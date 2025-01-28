@@ -125,7 +125,7 @@ const chatSlice = createSlice({
     },
 
     // 刪除單一聊天室
-    deleteChatRoom(state, action) {
+    (state, action) {
       // 刪除聊天室
       state.chatRooms = state.chatRooms.filter(
         (room) => room.id !== action.payload
@@ -159,7 +159,7 @@ export const {
   updateChatRoom,
   resetUnreadUser,
   setCurrentChatRoomId,
-  deleteChatRoom,
+  ,
   setUserOnline,
   setUserOffline,
 } = chatSlice.actions;

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ChatRoom, Message } from "../shared/types";
+import { ChatRoom, DeletedChatRoom, Message } from "../shared/types";
 import { RootState } from "./store";
 import { getChatRoomDetail } from "../util/handleChatEvent";
 
@@ -163,9 +163,9 @@ const chatSlice = createSlice({
       // TODO: 需要判斷要對誰的未讀數量進行更新
       const { chatRoomId, recipientId } = action.payload;
       state.chatRooms = state.chatRooms.map((room) => {
-        console.log("room", room);
-        console.log("room.user1Id", room.user1Id);
-        console.log("recipientId", recipientId);
+        // console.log("room", room);
+        // console.log("room.user1Id", room.user1Id);
+        // console.log("recipientId", recipientId);
         const unreadCountUser =
           room.user1Id === recipientId
             ? "unreadCountUser1"
@@ -199,16 +199,43 @@ const chatSlice = createSlice({
 
     // ☑️ 刪除聊天室 及聊天室中的所有訊息
     deleteChatRoom(state, action) {
-      const deleteChatRoomId = action.payload;
+      const deleteChatRoom = action.payload as DeletedChatRoom;
+
+      state.chatRooms = state.chatRooms.map((room) => {
+        if (room.id === deleteChatRoom.deletedChatRoomId) {
+          return {
+            ...room,
+            [deleteChatRoom.deletedColumn as string]: true,
+            [deleteChatRoom.deletedAtColumn as string]:
+              new Date().toISOString(),
+            [deleteChatRoom.unreadColumn as string]: 0,
+          };
+        } else {
+          return room;
+        }
+      });
       // 刪除聊天室
-      state.chatRooms = state.chatRooms.filter(
-        (room) => room.id !== deleteChatRoomId
-      );
+      // state.chatRooms = state.chatRooms.filter(
+      //   (room) => room.id !== deleteChatRoomId
+      // );
       // TODO:刪除聊天室中的所有訊息
-      if (state.messages[deleteChatRoomId]) {
-        delete state.messages[deleteChatRoomId];
+      if (state.messages[deleteChatRoom.deletedChatRoomId as string]) {
+        delete state.messages[deleteChatRoom.deletedChatRoomId as string];
       }
     },
+
+    // ☑️ 刪除聊天室 及聊天室中的所有訊息
+    // deleteChatRoom(state, action) {
+    //   const deleteChatRoomId = action.payload;
+    //   // 刪除聊天室
+    //   state.chatRooms = state.chatRooms.filter(
+    //     (room) => room.id !== deleteChatRoomId
+    //   );
+    //   // TODO:刪除聊天室中的所有訊息
+    //   if (state.messages[deleteChatRoomId]) {
+    //     delete state.messages[deleteChatRoomId];
+    //   }
+    // },
 
     // ☑️
     setMessage(state, action) {
@@ -286,6 +313,29 @@ const chatSlice = createSlice({
         (userId) => userId !== action.payload
       );
     },
+
+    resetDeletedChatRoomState(state, action) {
+      const deletedChatRoomId = action.payload;
+      state.chatRooms = state.chatRooms.map((room) => {
+        if (room.id === deletedChatRoomId) {
+          const deletedColumn = room.user1Deleted
+            ? "user1Deleted"
+            : "user2Deleted";
+          const deletedAtColumn = room.user1Deleted
+            ? "user1DeletedAt"
+            : "user2DeletedAt";
+          const unreadColumn = room.user1Deleted
+            ? "unreadCountUser1"
+            : "unreadCountUser2";
+          return {
+            ...room,
+            [deletedColumn]: false,
+            [deletedAtColumn]: null,
+            [unreadColumn]: 0,
+          };
+        } else return room;
+      });
+    },
   },
 });
 
@@ -305,6 +355,7 @@ export const {
   updateAllMessageIsRead,
   setUserOnline,
   setUserOffline,
+  resetDeletedChatRoomState,
 } = chatSlice.actions;
 
 export const updateOrCreateChatRoom =
@@ -377,6 +428,20 @@ export const updateOrCreateChatRoom =
 
 export const selectChatRooms = (state: RootState) => state.chat.chatRooms;
 
+export const selectCurrentChatRoom = ({
+  state,
+  userId,
+}: {
+  state: RootState;
+  userId: string;
+}) =>
+  state.chat.chatRooms.filter((room) => {
+    if (!room) return false;
+    const isUser1 = room.user1Id === userId;
+    return !(isUser1 ? room.user1Deleted : room.user2Deleted);
+  });
+
+// 過濾已刪除的聊天室
 export const selectCurrentChatRoomId = (state: RootState) =>
   state.chat.currentChatRoomId;
 

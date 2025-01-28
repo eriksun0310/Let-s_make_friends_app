@@ -40,14 +40,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     }
 
     if (mode === "delete") {
-      const { data: roomId, success } = await deleteChatRoomDB({
+      const { data: deletedChatRoomResult, success } = await deleteChatRoomDB({
         chatRoomId: chatRoom.id,
         userId: personal.userId,
       });
 
-      if (success && roomId) {
+      if (success && deletedChatRoomResult.deletedChatRoomId) {
         // 成功資料庫刪除, 更新redux狀態
-        dispatch(deleteChatRoom(roomId));
+        dispatch(deleteChatRoom(deletedChatRoomResult));
       }
     }
   };

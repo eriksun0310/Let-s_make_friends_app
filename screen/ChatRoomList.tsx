@@ -12,6 +12,7 @@ import {
   setChatRooms,
   setCurrentChatRoomId,
   selectAllMessages,
+  selectCurrentChatRoom,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -27,7 +28,12 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
   const allMessages = useAppSelector(selectAllMessages);
 
-  const chatRoomsData = useAppSelector(selectChatRooms);
+  const chatRoomsData = useAppSelector((state) =>
+    selectCurrentChatRoom({
+      state: state,
+      userId: personal.userId,
+    })
+  );
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
@@ -63,6 +69,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   );
 
   console.log("allMessages", allMessages);
+  console.log("chatRoomsData", chatRoomsData);
+  console.log("filteredChatRooms", filteredChatRooms);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}
