@@ -775,7 +775,7 @@ const getDeleteColumns = ({
   const deletedAtColumn =
     chatRoom.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
   const unreadColumn =
-    chatRoom.user1_id === userId ? "user1_deleted_at" : "user2_deleted_at";
+    chatRoom.user1_id === userId ? "unread_count_user1" : "unread_count_user2";
 
   if (!deletedColumn) {
     throw new Error("沒有權限刪除聊天室");

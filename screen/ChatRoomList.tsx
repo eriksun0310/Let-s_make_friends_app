@@ -11,6 +11,7 @@ import {
   selectChatRooms,
   setChatRooms,
   setCurrentChatRoomId,
+  selectAllMessages,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -24,6 +25,7 @@ interface ChatRoomListProps {
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
+  const allMessages = useAppSelector(selectAllMessages);
 
   const chatRoomsData = useAppSelector(selectChatRooms);
 
@@ -60,6 +62,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     }, [])
   );
 
+  console.log("allMessages", allMessages);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}
