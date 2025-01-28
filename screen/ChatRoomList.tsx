@@ -3,16 +3,14 @@ import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 import {
   selectUser,
   useAppDispatch,
   useAppSelector,
   selectChatRooms,
   setChatRooms,
-  selectIsUserOnline,
-  selectUserOnline,
-  selectAllMessages,
+  setCurrentChatRoomId,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -28,8 +26,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const chatRoomsData = useAppSelector(selectChatRooms);
-  const allMessages = useAppSelector(selectAllMessages);
-  //console.log("isUserOnline", isUserOnline);
 
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
@@ -57,9 +53,13 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  console.log(" allMessages ===>", allMessages);
-  console.log("聊天室列表 ===>", chatRoomsData);
-  console.log("聊天室列表render filteredChatRooms", filteredChatRooms);
+  // 回到聊天列表時, 清除聊天室id
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(setCurrentChatRoomId(null));
+    }, [])
+  );
+
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: Colors.background,
-    // paddingTop: 8,
   },
 });
 export default ChatRoomList;

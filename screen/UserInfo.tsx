@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
 import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
@@ -167,6 +167,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
 
     fetchUserSettings();
   }, [personal.userId]);
+
+  // 回到好友資訊時, 清除聊天室id
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(setCurrentChatRoomId(null));
+    }, [])
+  );
 
   return (
     <PaperProvider>

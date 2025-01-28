@@ -136,7 +136,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     let chatRoomId = currentChatRoomId; // redux 的
     let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
 
-    console.log("chatRoomId", chatRoomId);
     // 新聊天室
     if (!chatRoomId) {
       const { data: newChatRoomData, success } =
@@ -342,7 +341,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   if (loading) return <LoadingOverlay message="loading ..." />;
 
-  console.log("messages chatDetail", messages);
   return (
     <>
       <KeyboardAvoidingView
