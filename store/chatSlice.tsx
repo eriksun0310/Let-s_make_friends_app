@@ -272,20 +272,31 @@ const chatSlice = createSlice({
         state.messages[chatRoomId] = [...state.messages[chatRoomId], message];
       }
     },
-    // updateMessage(state, action) {},
-    // ☑️ 更新訊息的已讀狀態
-    // updateMessageIsRead(state, action) {
-    //   const { chatRoomId, id } = action.payload as Message;
+    // 更新訊息(用 supabase 返回的訊息替換掉tempMessage)
+    updateMessage(state, action) {
+      const { tempId, tempChatRoomId, realMessage } = action.payload;
 
-    //   console.log("updateMessageIsRead", chatRoomId, id);
-    //   // 如果聊天室不存在
-    //   if (!state.messages[chatRoomId]) return;
+      // 先檢查 tempMessage 是否存在
+      if (!state.messages[tempChatRoomId]) return;
 
-    //   // 更新指定消息的 isRead 狀態
-    //   state.messages[chatRoomId] = state.messages[chatRoomId].map((msg) =>
-    //     msg.id === id ? { ...msg, isRead: true } : msg
-    //   );
-    // },
+      // 替換 tempMessage 為 realMessage
+      state.messages[tempChatRoomId] = state.messages[tempChatRoomId].map(
+        (msg) => (msg.id === tempId ? realMessage : msg)
+      );
+
+      // 如果聊天室 ID 改變了,轉移訊息並刪除 tempChatRoomId
+      if (tempChatRoomId !== realMessage.chatRoomId) {
+        if (!state.messages[realMessage.chatRoomId]) {
+          state.messages[realMessage.chatRoomId] = [];
+        }
+        // 把 tempChatRoomId 裡的訊息搬移到真正的聊天室 ID 下
+        state.messages[realMessage.chatRoomId].push(
+          ...state.messages[tempChatRoomId]
+        );
+        delete state.messages[tempChatRoomId]; // 刪除 temp_chatRoomId
+      }
+    },
+
     // 更新該聊天室所有未讀訊息
     updateAllMessageIsRead(state, action) {
       const { chatRoomId, userId } = action.payload;
@@ -314,6 +325,7 @@ const chatSlice = createSlice({
       );
     },
 
+    // 重置已刪除聊天室的狀態
     resetDeletedChatRoomState(state, action) {
       const deletedChatRoomId = action.payload;
       state.chatRooms = state.chatRooms.map((room) => {
@@ -350,8 +362,7 @@ export const {
   deleteChatRoom,
   setMessage,
   addMessage,
-  // updateMessage,
-  // updateMessageIsRead,
+  updateMessage,
   updateAllMessageIsRead,
   setUserOnline,
   setUserOffline,

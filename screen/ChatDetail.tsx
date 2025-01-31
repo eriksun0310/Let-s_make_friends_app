@@ -42,6 +42,7 @@ import {
   addMessage,
   updateAllMessageIsRead,
   selectChatRoomMessages,
+  updateMessage,
 } from "../store";
 import { NavigationProp } from "@react-navigation/native";
 // import { handleMessageView } from "../shared/chatFuncs";
@@ -115,29 +116,140 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   );
 
   // 發送訊息
+  // const handleSend = async () => {
+  //   if (!inputText.trim()) return;
+
+  //   const tempId = `temp_${Date.now()}`;
+  //   const tempMessage = {
+  //     id: tempId,
+  //     senderId: personal.userId,
+  //     recipientId: friend.userId,
+  //     content: inputText,
+  //     createdAt: new Date(),
+  //     isTemporary: true,
+  //     isRead: false,
+  //     chatRoomId: currentChatRoomId || `temp_chatRoomId_${Date.now()}`,
+  //   };
+
+  //   //setMessages((prevMessages) => [...prevMessages, tempMessage]);
+  //   setInputText("");
+
+  //   let chatRoomId = currentChatRoomId; // redux 的
+  //   let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
+
+  //   // 新聊天室
+  //   if (!chatRoomId) {
+  //     const { data: newChatRoomData, success } =
+  //       await createNewChatRoomAndInsertMessage({
+  //         userId: personal.userId,
+  //         friendId: friend.userId,
+  //         message: inputText,
+  //       });
+
+  //     // 如果沒有新的聊天室資料,則代表發送訊息失敗
+  //     if (!success) {
+  //       // setMessages((prevMessages) =>
+  //       //   prevMessages.map((msg) =>
+  //       //     msg.id === tempMessage.id
+  //       //       ? { ...msg, isTemporary: false, failed: true }
+  //       //       : msg
+  //       //   )
+  //       // );
+  //     }
+
+  //     chatRoomId = newChatRoomData?.chatRoom?.id;
+  //     messageResult = newChatRoomData.messageResult!;
+
+  //     // 新增自己的聊天室的redux
+  //     if (newChatRoomData.chatRoom) {
+  //       dispatch(addChatRoom(newChatRoomData.chatRoom));
+  //       dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
+  //     }
+  //   } else {
+  //     const { data: result, success } = await sendMessage({
+  //       userId: personal.userId,
+  //       friendId: friend.userId,
+  //       message: inputText,
+  //       chatRoomId,
+  //       isRead: isUserOnline,
+  //     });
+
+  //     // 如果發送訊息失敗
+  //     if (!success) {
+  //       // setMessages((prevMessages) =>
+  //       //   prevMessages.map((msg) =>
+  //       //     msg.id === tempMessage.id
+  //       //       ? { ...msg, isTemporary: false, failed: true }
+  //       //       : msg
+  //       //   )
+  //       // );
+  //       return;
+  //     }
+
+  //     messageResult = result;
+  //   }
+
+  //   // console.log(1111111111);
+
+  //   // TODO:新增自己的redux
+  //   dispatch(addMessage(messageResult));
+  //   //console.log(2222222223333 );
+  //   // setMessages((prevMessages) =>
+  //   //   prevMessages.map((msg) =>
+  //   //     msg.id === tempMessage.id
+  //   //       ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
+  //   //       : msg
+  //   //   )
+  //   // );
+
+  //   // if (result.error) {
+  //   //   console.error("Failed to send message:", result.error);
+  //   //   setMessages((prevMessages) =>
+  //   //     prevMessages.map((msg) =>
+  //   //       msg.id === tempMessage.id
+  //   //         ? { ...msg, isTemporary: false, failed: true }
+  //   //         : msg
+  //   //     )
+  //   //   );
+  //   // } else {
+  //   //   setMessages((prevMessages) =>
+  //   //     prevMessages.map((msg) =>
+  //   //       msg.id === tempMessage.id
+  //   //         ? { ...result.data, isTemporary: false }
+  //   //         : msg
+  //   //     )
+  //   //   );
+  //   // }
+  // };
+
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
+    // 訊息的id
     const tempId = `temp_${Date.now()}`;
+    // 聊天室的id
+    const tempChatRoomId = currentChatRoomId || `temp_chatRoomId_${Date.now()}`;
     const tempMessage = {
       id: tempId,
       senderId: personal.userId,
       recipientId: friend.userId,
       content: inputText,
-      createdAt: new Date(),
-      isTemporary: true,
+      createdAt: Date.now(),
+      //isTemporary: true,
       isRead: false,
-      chatRoomId: currentChatRoomId || `temp_chatRoomId_${Date.now()}`,
+      chatRoomId: tempChatRoomId,
     };
 
-    //setMessages((prevMessages) => [...prevMessages, tempMessage]);
     setInputText("");
+    // 先將訊息存到redux(避免在聊天室UI呈現上慢一拍)
+    dispatch(addMessage(tempMessage));
 
     let chatRoomId = currentChatRoomId; // redux 的
-    let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
+    let messageResult: MessageType | null = null; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
 
     // 新聊天室
     if (!chatRoomId) {
+      // 新聊天室的處理
       const { data: newChatRoomData, success } =
         await createNewChatRoomAndInsertMessage({
           userId: personal.userId,
@@ -146,25 +258,16 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
         });
 
       // 如果沒有新的聊天室資料,則代表發送訊息失敗
-      if (!success) {
-        // setMessages((prevMessages) =>
-        //   prevMessages.map((msg) =>
-        //     msg.id === tempMessage.id
-        //       ? { ...msg, isTemporary: false, failed: true }
-        //       : msg
-        //   )
-        // );
-      }
+      if (!success || !newChatRoomData?.chatRoom) return;
 
       chatRoomId = newChatRoomData?.chatRoom?.id;
       messageResult = newChatRoomData.messageResult!;
 
       // 新增自己的聊天室的redux
-      if (newChatRoomData.chatRoom) {
-        dispatch(addChatRoom(newChatRoomData.chatRoom));
-        dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
-      }
+      dispatch(addChatRoom(newChatRoomData.chatRoom));
+      dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
     } else {
+      // 既有聊天室，直接發送
       const { data: result, success } = await sendMessage({
         userId: personal.userId,
         friendId: friend.userId,
@@ -174,51 +277,20 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       });
 
       // 如果發送訊息失敗
-      if (!success) {
-        // setMessages((prevMessages) =>
-        //   prevMessages.map((msg) =>
-        //     msg.id === tempMessage.id
-        //       ? { ...msg, isTemporary: false, failed: true }
-        //       : msg
-        //   )
-        // );
-        return;
-      }
-
+      if (!success) return;
       messageResult = result;
     }
 
-    // console.log(1111111111);
-
-    // TODO:新增自己的redux
-    dispatch(addMessage(messageResult));
-    //console.log(2222222223333 );
-    // setMessages((prevMessages) =>
-    //   prevMessages.map((msg) =>
-    //     msg.id === tempMessage.id
-    //       ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
-    //       : msg
-    //   )
-    // );
-
-    // if (result.error) {
-    //   console.error("Failed to send message:", result.error);
-    //   setMessages((prevMessages) =>
-    //     prevMessages.map((msg) =>
-    //       msg.id === tempMessage.id
-    //         ? { ...msg, isTemporary: false, failed: true }
-    //         : msg
-    //     )
-    //   );
-    // } else {
-    //   setMessages((prevMessages) =>
-    //     prevMessages.map((msg) =>
-    //       msg.id === tempMessage.id
-    //         ? { ...result.data, isTemporary: false }
-    //         : msg
-    //     )
-    //   );
-    // }
+    // 用真正的訊息替換掉tempMessage
+    if (messageResult) {
+      dispatch(
+        updateMessage({
+          tempId,
+          tempChatRoomId,
+          realMessage: messageResult,
+        })
+      );
+    }
   };
 
   //  加載訊息
@@ -339,6 +411,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+  console.log("messages", messages);
   if (loading) return <LoadingOverlay message="loading ..." />;
 
   return (
