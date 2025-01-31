@@ -38,6 +38,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({
   return (
     <View style={styles.container}>
       <ListItem.Accordion
+        key={user.userId}
         content={
           <>
             <ListItem.Content>

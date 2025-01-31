@@ -18,6 +18,7 @@ import Button from "../components/ui/button/Button";
 import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import {
+  resetUnreadUser,
   selectPosts,
   selectUser,
   setCurrentChatRoomId,
@@ -89,11 +90,20 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       messages: messages,
     });
 
+
+    // dispatch(
+    //   resetUnreadUser({
+    //     chatRoomId: chatRoom?.id,
+    //     resetUnreadUser1: chatRoom?.user1Id === personal.userId,
+    //     resetUnreadUser2: chatRoom?.user2Id === personal.userId,
+    //   })
+    // );
+
     // 重製聊天室狀態
-    resetDeleteChatRoomState({
-      chatRoom: chatRoom,
-      userId: personal.userId,
-    });
+    // resetDeleteChatRoomState({
+    //   chatRoom: chatRoom,
+    //   userId: personal.userId,
+    // });
   };
 
   // 設定
@@ -178,7 +188,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
   return (
     <PaperProvider>
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent} key={user.userId}>
           {/* 大頭貼 */}
           <HeadShot
             userState={userState}

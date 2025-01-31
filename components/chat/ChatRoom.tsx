@@ -80,10 +80,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
     );
 
     // 重製聊天室狀態
-    resetDeleteChatRoomState({
-      chatRoom: chatRoom,
-      userId: personal.userId,
-    });
+    // resetDeleteChatRoomState({
+    //   chatRoom: chatRoom,
+    //   userId: personal.userId,
+    // });
   };
 
   const getUnreadCount = (chatRoom: ChatRoomType, userId: string) => {

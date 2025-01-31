@@ -16,7 +16,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "store";
-import { updateUnreadCount } from "util/handleChatEvent";
+import { resetDeleteChatRoomDB, updateUnreadCount } from "util/handleChatEvent";
 import { supabase } from "util/supabaseClient";
 
 /*
@@ -168,6 +168,10 @@ export const useMessagesListeners = () => {
             ) {
               // 重置聊天室刪除狀態
               dispatch(resetDeletedChatRoomState(newMessage.chat_room_id));
+              await resetDeleteChatRoomDB({
+                deletedColumn: findDeleteChatRoom?.user1Deleted ? 'user1Deleted':'user2Deleted',
+                chatRoomId: newMessage.chat_room_id,
+              });
             }
 
             const transformedMessage = transformMessage(newMessage);
