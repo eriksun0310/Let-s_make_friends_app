@@ -294,9 +294,7 @@ export default function App() {
     <>
       <StatusBar style="dark"></StatusBar>
       <AppReduxProvider store={store}>
-        {/* <ChatContextProvider> */}
         <Navigation />
-        {/* </ChatContextProvider> */}
       </AppReduxProvider>
     </>
   );
