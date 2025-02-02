@@ -129,7 +129,7 @@ const chatSlice = createSlice({
       );
     },
 
-    // 更新聊天室(未讀訊息數量、最後一則訊息、最後一則訊息時間)
+    // 更新聊天室(最後一則訊息、最後一則訊息時間)
     updateChatRoomLastMessage(state, action) {
       const message = action.payload as Message;
 
@@ -186,6 +186,9 @@ const chatSlice = createSlice({
       // 找出對應的聊天室
       const chatRoom = state.chatRooms.find((room) => room.id === chatRoomId);
 
+      console.log('chatRoom', chatRoom)
+      console.log('resetUnreadUser1', resetUnreadUser1) 
+      console.log('unreadCountUser2', resetUnreadUser2) 
       if (chatRoom) {
         // 重置未讀數量
         if (resetUnreadUser1) {

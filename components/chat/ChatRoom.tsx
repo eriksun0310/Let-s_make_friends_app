@@ -3,14 +3,9 @@ import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
-import {
-  deleteChatRoom,
-  resetUnreadUser,
-  setCurrentChatRoomId,
-} from "../../store/chatSlice";
-import { deleteChatRoomDB, getMessages } from "../../util/handleChatEvent";
+import { deleteChatRoom, setCurrentChatRoomId } from "../../store/chatSlice";
+import { deleteChatRoomDB } from "../../util/handleChatEvent";
 import { selectUser, useAppDispatch, useAppSelector } from "../../store";
-import { resetDeleteChatRoomState } from "../../shared/chat/chatFuncs";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import { ChatRoom as ChatRoomType } from "../../shared/types";
 import { NavigationProp } from "@react-navigation/native";
@@ -54,31 +49,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
-    //console.log("redux messages", messages);
-    // 開始加載聊天紀錄
-    // TODO: 這裡應該是用不到了
-    // const { data: messages } = await getMessages({
-    //   chatRoomId: chatRoom.id,
-    //   userId: personal.userId,
-    // });
-
     dispatch(setCurrentChatRoomId(chatRoom.id));
 
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
-      //messages: messages, // 預加載的聊天記錄 // 傳入redux 的資料
     });
-
-    // 清零未讀訊息
-    dispatch(
-      resetUnreadUser({
-        chatRoomId: chatRoom.id,
-        resetUnreadUser1: chatRoom.user1Id === personal.userId,
-        resetUnreadUser2: chatRoom.user2Id === personal.userId,
-      })
-    );
-
     // 重製聊天室狀態
     // resetDeleteChatRoomState({
     //   chatRoom: chatRoom,

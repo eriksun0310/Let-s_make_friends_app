@@ -1,16 +1,14 @@
 import { View, StyleSheet, FlatList } from "react-native";
 import { Colors } from "../constants/style";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getAllChatRooms } from "../util/handleChatEvent";
-import { NavigationProp, useFocusEffect } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import {
   selectUser,
   useAppDispatch,
   useAppSelector,
-  selectChatRooms,
   setChatRooms,
-  setCurrentChatRoomId,
   selectAllMessages,
   selectCurrentChatRoom,
 } from "../store";
@@ -27,7 +25,6 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
   const allMessages = useAppSelector(selectAllMessages);
-
   const chatRoomsData = useAppSelector((state) =>
     selectCurrentChatRoom({
       state: state,
@@ -61,12 +58,26 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  // 回到聊天列表時, 清除聊天室id
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(setCurrentChatRoomId(null));
-    }, [])
-  );
+  // 回到聊天列表時, 重製聊天室未讀狀態、 清除聊天室id
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const chatRoom = chatRoomsData?.find(
+  //       (room) => room.id === currentChatRoomId
+  //     );
+  //     if (chatRoom) {
+  //       //更新 本地未讀數量歸0
+  //       dispatch(
+  //         resetUnreadUser({
+  //           chatRoomId: currentChatRoomId,
+  //           resetUnreadUser1: chatRoom.user1Id === personal.userId,
+  //           resetUnreadUser2: chatRoom.user2Id === personal.userId,
+  //         })
+  //       );
+  //       // 清除聊天室id
+  //       dispatch(setCurrentChatRoomId(null));
+  //     }
+  //   }, [currentChatRoomId])
+  // );
 
   console.log("allMessages", allMessages);
   console.log("chatRoomsData", chatRoomsData);

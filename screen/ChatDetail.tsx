@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -18,7 +18,6 @@ import { Avatar } from "react-native-elements";
 import { Colors } from "../constants/style";
 import {
   createNewChatRoomAndInsertMessage,
-  getMessages,
   markChatRoomMessagesAsRead,
   resetUnreadCount,
   sendMessage,
@@ -44,7 +43,7 @@ import {
   selectChatRoomMessages,
   updateMessage,
 } from "../store";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 // import { handleMessageView } from "../shared/chatFuncs";
 /*
 chatRoomState: 'old' | 'new'
@@ -73,7 +72,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const personal = useAppSelector(selectUser);
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
-
   const messages = useAppSelector((state) =>
     selectChatRoomMessages({
       state: state,
@@ -388,14 +386,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
-    //更新 本地未讀數量歸0
-    dispatch(
-      resetUnreadUser({
-        chatRoomId: currentChatRoomId,
-        resetUnreadUser1: chatRoom.user1Id === personal.userId,
-        resetUnreadUser2: chatRoom.user2Id === personal.userId,
-      })
-    );
+    //更新 本地未讀數量歸0 :
+    // dispatch(
+    //   resetUnreadUser({
+    //     chatRoomId: currentChatRoomId,
+    //     resetUnreadUser1: chatRoom.user1Id === personal.userId,
+    //     resetUnreadUser2: chatRoom.user2Id === personal.userId,
+    //   })
+    // );
 
     // 更新資料庫的未讀數量歸0
     const { success, errorMessage } = await resetUnreadCount({
@@ -406,12 +404,44 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       console.error("更新未讀數量失敗", errorMessage);
     }
 
-    dispatch(setCurrentChatRoomId(null));
+    //dispatch(setCurrentChatRoomId(null));
 
     navigation.goBack();
   };
 
   console.log("messages", messages);
+
+  // 監聽當前聊天室(進入、離開)
+  useFocusEffect(
+    useCallback(() => {
+      // 進到聊天室時標記未讀數量歸0
+      dispatch(
+        resetUnreadUser({
+          chatRoomId: currentChatRoomId,
+          resetUnreadUser1: chatRoom.user1Id === personal.userId,
+          resetUnreadUser2: chatRoom.user2Id === personal.userId,
+        })
+      );
+
+      //離開聊天室
+      return () => {
+        if (currentChatRoomId) {
+          console.log("離開當前聊天室", personal.userId);
+          dispatch(
+            resetUnreadUser({
+              chatRoomId: currentChatRoomId,
+              resetUnreadUser1: chatRoom.user1Id === personal.userId,
+              resetUnreadUser2: chatRoom.user2Id === personal.userId,
+            })
+          );
+
+          // 清除聊天室id
+          dispatch(setCurrentChatRoomId(null));
+        }
+      };
+    }, [currentChatRoomId])
+  );
+
   if (loading) return <LoadingOverlay message="loading ..." />;
 
   return (

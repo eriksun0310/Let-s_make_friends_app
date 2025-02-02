@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { NavigationProp, useFocusEffect } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import HeadShot from "../components/userInfo/HeadShot";
 import { Colors } from "../constants/style";
 import UserCollapse from "../components/userInfo/UserCollapse";
@@ -18,7 +18,6 @@ import Button from "../components/ui/button/Button";
 import { MessageCircleMore, Settings2 } from "lucide-react-native";
 import CustomIcon from "../components/ui/button/CustomIcon";
 import {
-  resetUnreadUser,
   selectPosts,
   selectUser,
   setCurrentChatRoomId,
@@ -27,8 +26,7 @@ import {
   useAppSelector,
 } from "../store";
 import { getUserSettings } from "../util/handleUserEvent";
-import { getChatRoomDetail, getMessages } from "util/handleChatEvent";
-import { resetDeleteChatRoomState } from "shared/chat/chatFuncs";
+import { getChatRoomDetail } from "util/handleChatEvent";
 import { logout } from "components/hooks/useAppLifecycle";
 
 interface UserInfoProps {
@@ -74,22 +72,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
       friendId: friend.userId,
     });
 
-    // 開始加載聊天紀錄
-    const { data: messages } = await getMessages({
-      chatRoomId: chatRoom?.id || "",
-      userId: personal.userId,
-    });
     dispatch(setCurrentChatRoomId(chatRoom?.id));
-
+    const combinedChatRoom = {
+      ...chatRoom,
+      friend: friend,
+    };
     navigation.navigate("chatDetail", {
       chatRoomState: chatRoom?.id ? "old" : "new", //  區分新舊聊天室
-      chatRoom: {
-        id: chatRoom?.id,
-        friend: friend,
-      },
-      messages: messages,
+      chatRoom: combinedChatRoom,
     });
-
 
     // dispatch(
     //   resetUnreadUser({
@@ -178,17 +169,38 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
     fetchUserSettings();
   }, [personal.userId]);
 
-  // 回到好友資訊時, 清除聊天室id
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(setCurrentChatRoomId(null));
-    }, [])
-  );
+  // 回到好友資訊時, 重製聊天室未讀狀態、 清除聊天室id
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (userState === "friend") {
+  //       const chatRoom = chatRoomsData?.find(
+  //         (room) => room.id === currentChatRoomId
+  //       );
+
+  //       if (chatRoom) {
+  //         //更新 本地未讀數量歸0
+  //         dispatch(
+  //           resetUnreadUser({
+  //             chatRoomId: currentChatRoomId,
+  //             resetUnreadUser1: chatRoom.user1Id === personal.userId,
+  //             resetUnreadUser2: chatRoom.user2Id === personal.userId,
+  //           })
+  //         );
+
+  //         // 清除聊天室id
+  //         dispatch(setCurrentChatRoomId(null));
+  //       }
+  //     }
+  //   }, [currentChatRoomId, userState])
+  // );
 
   return (
     <PaperProvider>
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent} key={user.userId}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          key={user.userId}
+        >
           {/* 大頭貼 */}
           <HeadShot
             userState={userState}
@@ -222,22 +234,20 @@ const UserInfo: React.FC<UserInfoProps> = ({ route, navigation }) => {
           )}
 
           <View style={{ marginTop: 10 }} />
-
-          {filteredPost?.map((post) => {
-            if (post?.user?.userId === user.userId) {
-              return (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate("postDetail", {
-                      postId: post.post.id,
-                    })
-                  }
-                >
-                  <Post screen="home" userState={userState} postDetail={post} />
-                </TouchableOpacity>
-              );
-            }
-          })}
+          {filteredPost
+            ?.filter((post) => post?.user?.userId === user.userId)
+            .map((post) => (
+              <TouchableOpacity
+                key={post.post.id}
+                onPress={() =>
+                  navigation.navigate("postDetail", {
+                    postId: post.post.id,
+                  })
+                }
+              >
+                <Post screen="home" userState={userState} postDetail={post} />
+              </TouchableOpacity>
+            ))}
 
           {userState === "personal" && (
             <View style={styles.formContainer}>

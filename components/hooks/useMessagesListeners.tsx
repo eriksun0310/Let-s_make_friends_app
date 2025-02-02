@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { transformMessage } from "shared/chat/chatUtils";
 import { MessagesDBType } from "shared/dbType";
-import { ChatRoom, EventType } from "shared/types";
+import { EventType } from "shared/types";
 import {
   addMessage,
   resetDeletedChatRoomState,
@@ -34,8 +34,7 @@ export const useMessagesListeners = () => {
   const dispatch = useAppDispatch();
 
   const [presenceChannel, setPresenceChannel] = useState<any>(null);
-  console.log("chatRoomsData", chatRoomsData);
-  console.log("chatRoomIds", chatRoomIds);
+
   // 初始化 Presence
   useEffect(() => {
     if (!userId) return;
@@ -169,7 +168,9 @@ export const useMessagesListeners = () => {
               // 重置聊天室刪除狀態
               dispatch(resetDeletedChatRoomState(newMessage.chat_room_id));
               await resetDeleteChatRoomDB({
-                deletedColumn: findDeleteChatRoom?.user1Deleted ? 'user1Deleted':'user2Deleted',
+                deletedColumn: findDeleteChatRoom?.user1Deleted
+                  ? "user1Deleted"
+                  : "user2Deleted",
                 chatRoomId: newMessage.chat_room_id,
               });
             }
