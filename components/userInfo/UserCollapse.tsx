@@ -121,7 +121,7 @@ const UserCollapse: React.FC<UserCollapseProps> = ({
 
         {Object.keys(tabs).map((key) => {
           return (
-            <ListItem>
+            <ListItem key={key}>
               <ListItem.Content>
                 <TouchableOpacity
                   style={styles.listItemContainer}
