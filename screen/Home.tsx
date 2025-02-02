@@ -30,6 +30,8 @@ interface HomePostProps {
   navigation: NavigationProp<any>;
 }
 const Home: React.FC<HomePostProps> = ({ navigation }) => {
+  const friendList = useAppSelector(selectFriendList);
+
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   // 監聽 新文章變化
@@ -89,6 +91,8 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
     fetchAllPosts();
     fetchFriendList();
   }, [dispatch, personal.userId]);
+
+  console.log("friendList", friendList);
   if (loading) return <LoadingOverlay message=" searching ..." />;
 
   return (

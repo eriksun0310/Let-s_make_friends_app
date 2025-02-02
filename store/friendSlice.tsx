@@ -104,6 +104,22 @@ const friendSlice = createSlice({
     updateNewFriendUnRead(state) {
       state.newFriendUnRead += 1;
     },
+    updateFriend(state, action) {
+      const { userId, name, introduce, headShot, selectedOption } =
+        action.payload;
+
+      state.friendList = state.friendList.map((friend) =>
+        friend.userId === userId
+          ? {
+              ...friend,
+              ...(name !== undefined && { name }),
+              ...(introduce !== undefined && { introduce }),
+              ...(headShot !== undefined && { headShot }),
+              ...(selectedOption !== undefined && { selectedOption }),
+            }
+          : friend
+      );
+    },
   },
 });
 
@@ -122,6 +138,7 @@ export const {
   addBeAddFriend,
   updateBeAddFriend,
   deleteBeAddFriend,
+  updateFriend,
 } = friendSlice.actions;
 
 export const selectBeAddFriends = (state: RootState) =>

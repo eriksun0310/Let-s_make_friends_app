@@ -67,7 +67,7 @@ export const useFriendRequests = () => {
     fetchFriendRequests();
 
     // 即時監聽好友邀請的變化
-    const subscription = supabase
+    const subscribe = supabase
       .channel("public:friend_requests") // 訂閱 friend_requests 資料表的變化
       .on(
         "postgres_changes",
@@ -92,31 +92,12 @@ export const useFriendRequests = () => {
               dispatch(updateFriendRequestUnRead());
             }
           }
-
-          // // 對方寄送交友邀請
-          // if (
-          //   event === "INSERT" &&
-          //   payload.new.receiver_id === personal.userId &&
-          //   payload.new.status === "pending"
-          // ) {
-          //   const newFriendRequest = payload.new as FriendRequestsDBType;
-          //   const transformedNew = transformFriendRequests([newFriendRequest]);
-          //   dispatch(addFriendRequest(transformedNew));
-          //   dispatch(updateFriendRequestUnRead());
-          //   // 對方接受交友邀請、拒絕交友邀請、刪除交好友頁面的使用者
-          // } else if (
-          //   (event === "UPDATE" || event === "INSERT") &&
-          //   payload.new.status !== "pending"
-          // ) {
-          //   const deletedFriendRequest = payload.old as FriendRequestsDBType;
-          //   dispatch(deleteFriendRequest(deletedFriendRequest.id));
-          // }
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(subscription); // 清理訂閱
+      subscribe.unsubscribe();
     };
   }, [personal.userId]);
 

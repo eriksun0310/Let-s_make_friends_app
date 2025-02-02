@@ -46,6 +46,9 @@ import { useFriends } from "components/hooks/useFriends";
 import { useFriendRequests } from "components/hooks/useFriendRequests";
 import { useChatRoomsListeners } from "components/hooks/useChatRoomsListeners";
 import { useMessagesListeners } from "components/hooks/useMessagesListeners";
+import { useUsersListeners } from "components/hooks/useUsersListeners";
+import { useUserSelectedOptionListeners } from "components/hooks/useUserSelectedOptionListeners";
+import { useUserHeadShotListeners } from "components/hooks/useUserHeadShotListeners";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -177,6 +180,13 @@ const AuthenticatedStack = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   // TODO：到時候需要把 所有監聽事件都放在這裡
   //(ex: 交友邀請 、新好友、聊天室、貼文按讚、貼文回覆等等)
+
+  // 監聽 新用戶、好友變更名字或自介
+  useUsersListeners();
+  // 監聽 好友變更大頭貼
+  useUserHeadShotListeners();
+  // 監聽 好友變更喜好
+  useUserSelectedOptionListeners();
 
   // 監聽好友邀請
   useFriendRequests();

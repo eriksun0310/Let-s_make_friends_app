@@ -43,7 +43,7 @@ export const useFriends = () => {
     fetchFriendsUnRead();
 
     // 即時監聽好友邀請的變化
-    const subscription = supabase
+    const subscribe = supabase
       .channel("public:friends") // 訂閱 friends 資料表的變化
       .on(
         "postgres_changes",
@@ -85,7 +85,7 @@ export const useFriends = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(subscription); // 清理訂閱
+      subscribe.unsubscribe();
     };
   }, [userId]);
 

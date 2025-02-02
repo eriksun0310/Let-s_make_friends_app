@@ -11,6 +11,7 @@ messages:{
 */
 import { getUserDetail } from "../util/handleUserEvent";
 import { update } from "firebase/database";
+
 interface InitialStateProps {
   chatRooms: ChatRoom[];
   currentChatRoomId?: string | null;
@@ -186,9 +187,9 @@ const chatSlice = createSlice({
       // 找出對應的聊天室
       const chatRoom = state.chatRooms.find((room) => room.id === chatRoomId);
 
-      console.log('chatRoom', chatRoom)
-      console.log('resetUnreadUser1', resetUnreadUser1) 
-      console.log('unreadCountUser2', resetUnreadUser2) 
+      console.log("chatRoom", chatRoom);
+      console.log("resetUnreadUser1", resetUnreadUser1);
+      console.log("unreadCountUser2", resetUnreadUser2);
       if (chatRoom) {
         // 重置未讀數量
         if (resetUnreadUser1) {
@@ -351,6 +352,28 @@ const chatSlice = createSlice({
         } else return room;
       });
     },
+
+    // 更新聊天室的好友資料(名字、自我介紹、大頭貼、喜好)
+
+    updateChatRoomFriend(state, action) {
+      const { userId, name, introduce, headShot, selectedOption } =
+        action.payload;
+
+      state.chatRooms = state.chatRooms.map((room) =>
+        room.user1Id === userId || room.user2Id === userId
+          ? {
+              ...room,
+              friend: {
+                ...room.friend,
+                ...(name !== undefined && { name }),
+                ...(introduce !== undefined && { introduce }),
+                ...(headShot !== undefined && { headShot }),
+                ...(selectedOption !== undefined && { selectedOption }),
+              },
+            }
+          : room
+      );
+    },
   },
 });
 
@@ -370,6 +393,7 @@ export const {
   setUserOnline,
   setUserOffline,
   resetDeletedChatRoomState,
+  updateChatRoomFriend,
 } = chatSlice.actions;
 
 export const updateOrCreateChatRoom =
