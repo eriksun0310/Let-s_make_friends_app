@@ -38,14 +38,12 @@ import {
   selectChatRooms,
   selectNewFriendUnRead,
 } from "./store";
-import { ChatContextProvider } from "./shared/chat/ChatContext";
 import PostContent from "./screen/PostContent";
 import Settings from "./screen/Settings";
 import { View, StyleSheet } from "react-native";
 import { useAppLifecycle } from "components/hooks/useAppLifecycle";
 import { useFriends } from "components/hooks/useFriends";
 import { useFriendRequests } from "components/hooks/useFriendRequests";
-import { useChatListeners } from "components/hooks/useChatListeners";
 import { useChatRoomsListeners } from "components/hooks/useChatRoomsListeners";
 import { useMessagesListeners } from "components/hooks/useMessagesListeners";
 
@@ -266,12 +264,6 @@ const AuthenticatedStack = () => {
 };
 
 const Navigation = () => {
-  // const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   dispatch(initializeAuth()); // 應用程式啟動時初始化 Firebase 認證狀態
-  // }, [dispatch]);
-
   useAppLifecycle();
   // 應用程式初始化
   const initialized = useAppSelector(selectInitialized);

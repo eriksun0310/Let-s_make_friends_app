@@ -1,14 +1,3 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { child, get, push, ref, set, update } from "firebase/database";
-import { User } from "../shared/types";
-import {
-  getDownloadURL,
-  ref as storageRef,
-  uploadBytes,
-} from "firebase/storage";
 import { supabase } from "./supabaseClient";
 
 // 會員註冊

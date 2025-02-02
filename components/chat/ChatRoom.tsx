@@ -55,11 +55,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
     });
-    // 重製聊天室狀態
-    // resetDeleteChatRoomState({
-    //   chatRoom: chatRoom,
-    //   userId: personal.userId,
-    // });
   };
 
   const getUnreadCount = (chatRoom: ChatRoomType, userId: string) => {

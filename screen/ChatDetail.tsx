@@ -39,12 +39,10 @@ import {
   setCurrentChatRoomId,
   selectIsUserOnline,
   addMessage,
-  updateAllMessageIsRead,
   selectChatRoomMessages,
   updateMessage,
 } from "../store";
 import { NavigationProp, useFocusEffect } from "@react-navigation/native";
-// import { handleMessageView } from "../shared/chatFuncs";
 /*
 chatRoomState: 'old' | 'new'
 從好友列表進來 不一定是新舊聊天室
@@ -65,7 +63,7 @@ interface ChatDetailProps {
 // 進到聊天室
 const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
-  const { chatRoom, chatRoomState } = route.params;
+  const { chatRoom } = route.params;
 
   const friend = chatRoom?.friend;
   const showIsRead = friend?.settings?.markAsRead;
@@ -83,13 +81,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     selectIsUserOnline(state, friend.userId)
   );
 
-  //console.log("isUserOnline detail ===>", isUserOnline);
-
-  // const { newMessage, readMessages } = useChatContext();
-  // const [messages, setMessages] = useState<MessageType[]>(
-  //   preloadedMessages || []
-  // );
-
   const [loading, setLoading] = useState(false);
 
   const [inputText, setInputText] = useState("");
@@ -98,127 +89,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   // 渲染訊息
   const renderMessage = ({ item }: { item: MessageType }) => (
     <>
-      <Message
-        key={item.id}
-        item={item}
-        showIsRead={showIsRead}
-        // onView={(messageId: string) => handleMessageView(messageId)}
-      />
-
-      {/* {item.showSeparator && hasUnreadSeparator && (
-        <Text style={styles.separatorText}>
-          ------------ 以下為查看訊息 ------------
-        </Text>
-      )} */}
+      <Message key={item.id} item={item} showIsRead={showIsRead} />
     </>
   );
-
-  // 發送訊息
-  // const handleSend = async () => {
-  //   if (!inputText.trim()) return;
-
-  //   const tempId = `temp_${Date.now()}`;
-  //   const tempMessage = {
-  //     id: tempId,
-  //     senderId: personal.userId,
-  //     recipientId: friend.userId,
-  //     content: inputText,
-  //     createdAt: new Date(),
-  //     isTemporary: true,
-  //     isRead: false,
-  //     chatRoomId: currentChatRoomId || `temp_chatRoomId_${Date.now()}`,
-  //   };
-
-  //   //setMessages((prevMessages) => [...prevMessages, tempMessage]);
-  //   setInputText("");
-
-  //   let chatRoomId = currentChatRoomId; // redux 的
-  //   let messageResult; // 存到messages 裡的資料(要把tempMessage 替換成 真的存在在)
-
-  //   // 新聊天室
-  //   if (!chatRoomId) {
-  //     const { data: newChatRoomData, success } =
-  //       await createNewChatRoomAndInsertMessage({
-  //         userId: personal.userId,
-  //         friendId: friend.userId,
-  //         message: inputText,
-  //       });
-
-  //     // 如果沒有新的聊天室資料,則代表發送訊息失敗
-  //     if (!success) {
-  //       // setMessages((prevMessages) =>
-  //       //   prevMessages.map((msg) =>
-  //       //     msg.id === tempMessage.id
-  //       //       ? { ...msg, isTemporary: false, failed: true }
-  //       //       : msg
-  //       //   )
-  //       // );
-  //     }
-
-  //     chatRoomId = newChatRoomData?.chatRoom?.id;
-  //     messageResult = newChatRoomData.messageResult!;
-
-  //     // 新增自己的聊天室的redux
-  //     if (newChatRoomData.chatRoom) {
-  //       dispatch(addChatRoom(newChatRoomData.chatRoom));
-  //       dispatch(setCurrentChatRoomId(newChatRoomData.chatRoom.id));
-  //     }
-  //   } else {
-  //     const { data: result, success } = await sendMessage({
-  //       userId: personal.userId,
-  //       friendId: friend.userId,
-  //       message: inputText,
-  //       chatRoomId,
-  //       isRead: isUserOnline,
-  //     });
-
-  //     // 如果發送訊息失敗
-  //     if (!success) {
-  //       // setMessages((prevMessages) =>
-  //       //   prevMessages.map((msg) =>
-  //       //     msg.id === tempMessage.id
-  //       //       ? { ...msg, isTemporary: false, failed: true }
-  //       //       : msg
-  //       //   )
-  //       // );
-  //       return;
-  //     }
-
-  //     messageResult = result;
-  //   }
-
-  //   // console.log(1111111111);
-
-  //   // TODO:新增自己的redux
-  //   dispatch(addMessage(messageResult));
-  //   //console.log(2222222223333 );
-  //   // setMessages((prevMessages) =>
-  //   //   prevMessages.map((msg) =>
-  //   //     msg.id === tempMessage.id
-  //   //       ? { ...messageResult, isTemporary: false, chatRoomId: chatRoomId }
-  //   //       : msg
-  //   //   )
-  //   // );
-
-  //   // if (result.error) {
-  //   //   console.error("Failed to send message:", result.error);
-  //   //   setMessages((prevMessages) =>
-  //   //     prevMessages.map((msg) =>
-  //   //       msg.id === tempMessage.id
-  //   //         ? { ...msg, isTemporary: false, failed: true }
-  //   //         : msg
-  //   //     )
-  //   //   );
-  //   // } else {
-  //   //   setMessages((prevMessages) =>
-  //   //     prevMessages.map((msg) =>
-  //   //       msg.id === tempMessage.id
-  //   //         ? { ...result.data, isTemporary: false }
-  //   //         : msg
-  //   //     )
-  //   //   );
-  //   // }
-  // };
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -291,93 +164,15 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     }
   };
 
-  //  加載訊息
-  // const fetchMessagesIfNeeded = async () => {
-  //   if (preloadedMessages) return; // 如果有預加載的訊息,直接使用
-
-  //   try {
-  //     setLoading(true);
-  //     const { data: messageData, success } = await getMessages({
-  //       chatRoomId: currentChatRoomId || "",
-  //       userId: personal.userId,
-  //     });
-
-  //     if (success) {
-  //       //setMessages(messageData as MessageType[]); // 設置處理後的訊息
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching messages:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // 加載聊天記錄(如果聊天室已存在且沒有預加載數據)
-  useEffect(() => {
-    if (currentChatRoomId && chatRoomState === "old") {
-      // fetchMessagesIfNeeded();
-    }
-  }, [
-    currentChatRoomId,
-    // preloadedMessages
-  ]);
-
-  // 標記單條訊息已讀
-  // useEffect(() => {
-  //   if (readMessages) {
-  //     setMessages((prevMessages) => {
-  //       return prevMessages.map((msg) => {
-  //         return readMessages.includes(msg.id) ? { ...msg, isRead: true } : msg;
-  //       });
-  //     });
-  //   }
-  // }, [readMessages]);
-
-  // 監聽新訊息
-  // useEffect(() => {
-  //   if (newMessage && newMessage.recipientId === personal.userId) {
-  //     // 更新消息列表，避免重複插入
-  //     setMessages((prevMessages) => {
-  //       const isDuplicate = prevMessages.some(
-  //         (msg) => msg.id === newMessage.id
-  //       );
-  //       return isDuplicate ? prevMessages : [...prevMessages, newMessage];
-  //     });
-  //   }
-  // }, [newMessage, personal.userId]);
-
-  // 確保 FlatList 自動滾動到底部
-  // useEffect(() => {
-  //   if (flatListRef.current) {
-  //     flatListRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, [messages]);
-
   // 進入聊天室時標記全部訊息已讀
   useEffect(() => {
     const markAllMessagesRead = async () => {
       if (currentChatRoomId && personal.userId) {
         // 更新資料庫：將自己相關的未讀訊息標記為已讀
-        const { success } = await markChatRoomMessagesAsRead({
+        await markChatRoomMessagesAsRead({
           chatRoomId: currentChatRoomId,
           userId: personal.userId,
         });
-
-        if (success) {
-          // dispatch(
-          //   updateAllMessageIsRead({
-          //     chatRoomId: currentChatRoomId,
-          //     userId: personal.userId,
-          //   })
-          // );
-          // 本地更新訊息列表：只標記屬於自己的訊息為已讀
-          // setMessages((prevMessages) => {
-          //   return prevMessages.map((msg) => ({
-          //     ...msg,
-          //     isRead: msg.recipientId === personal.userId ? true : msg.isRead,
-          //   }));
-          // });
-        }
       }
     };
 
@@ -386,15 +181,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
 
   // 返回聊天列表
   const handleReturnToChatList = async () => {
-    //更新 本地未讀數量歸0 :
-    // dispatch(
-    //   resetUnreadUser({
-    //     chatRoomId: currentChatRoomId,
-    //     resetUnreadUser1: chatRoom.user1Id === personal.userId,
-    //     resetUnreadUser2: chatRoom.user2Id === personal.userId,
-    //   })
-    // );
-
     // 更新資料庫的未讀數量歸0
     const { success, errorMessage } = await resetUnreadCount({
       chatRoomId: currentChatRoomId!,
@@ -403,8 +189,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     if (!success) {
       console.error("更新未讀數量失敗", errorMessage);
     }
-
-    //dispatch(setCurrentChatRoomId(null));
 
     navigation.goBack();
   };

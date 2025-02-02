@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import { Colors } from "../../constants/style";
@@ -13,14 +13,6 @@ interface MessageProps {
 
 const Message: React.FC<MessageProps> = ({ item, showIsRead }) => {
   const personal = useAppSelector(selectUser);
-
-  // useEffect(() => {
-  //   // 當組件掛載且是接收者的訊息時，觸發已讀
-  //   if (item.recipientId === personal.userId && !item.isRead) {
-  //     onView?.(item.id);
-  //   }
-  // }, []);
-
 
   return (
     <View
