@@ -21,7 +21,7 @@ export const useChatRoomsListeners = () => {
   const personal = useAppSelector(selectUser);
 
   useEffect(() => {
-    const subscribe = supabase
+    const chatRoomsChannel = supabase
       .channel("public:chat_rooms")
       .on(
         "postgres_changes",
@@ -37,7 +37,7 @@ export const useChatRoomsListeners = () => {
           const transformedChatRoom = transformChatRoom({ data: newChatRoom });
 
           // 取得新聊天室的訊息
-          const { data:chatRoomMessages } = await getNewChatRoomMessages({
+          const { data: chatRoomMessages } = await getNewChatRoomMessages({
             chatRoomId: newChatRoom.id,
           });
 
@@ -63,7 +63,7 @@ export const useChatRoomsListeners = () => {
       .subscribe();
 
     return () => {
-      subscribe.unsubscribe();
+      supabase.removeChannel(chatRoomsChannel);
     };
   }, [personal.userId]);
 };

@@ -67,7 +67,7 @@ export const usePostListeners = () => {
   };
 
   useEffect(() => {
-    const subscribe = supabase
+    const postChannel = supabase
       .channel("public:posts")
       //監聽文章新增事件
       .on(
@@ -98,7 +98,7 @@ export const usePostListeners = () => {
       .subscribe();
 
     return () => {
-      subscribe.unsubscribe();
+      supabase.removeChannel(postChannel);
     };
   }, [friendList]);
 };

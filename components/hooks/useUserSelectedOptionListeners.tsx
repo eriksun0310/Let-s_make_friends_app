@@ -20,7 +20,7 @@ export const useUserSelectedOptionListeners = () => {
 
   useEffect(() => {
     if (friendIds.length === 0) return; // 避免無好友時訂閱
-    const updateChannel = supabase
+    const userSelectedOptionChannel = supabase
       .channel("public:user_selected_option_update")
       .on(
         "postgres_changes",
@@ -51,7 +51,7 @@ export const useUserSelectedOptionListeners = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(updateChannel);
+      supabase.removeChannel(userSelectedOptionChannel);
     };
   }, [friendIds]);
 };

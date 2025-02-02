@@ -20,7 +20,7 @@ export const useUserHeadShotListeners = () => {
 
   useEffect(() => {
     if (friendIds.length === 0) return; // 避免無好友時訂閱
-    const updateChannel = supabase
+    const userHeadShotChannel = supabase
       .channel("public:user_head_shot_update")
       .on(
         "postgres_changes",
@@ -52,7 +52,7 @@ export const useUserHeadShotListeners = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(updateChannel);
+      supabase.removeChannel(userHeadShotChannel);
     };
   }, [friendIds]);
 };

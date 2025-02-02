@@ -72,7 +72,7 @@ export const usePostLikesListeners = () => {
   };
 
   useEffect(() => {
-    const subscribe = supabase
+    const postChannel = supabase
       .channel("public:post_likes")
       // 監聽文章的按讚
       .on(
@@ -124,7 +124,7 @@ export const usePostLikesListeners = () => {
       .subscribe();
 
     return () => {
-      subscribe.unsubscribe();
+      supabase.removeChannel(postChannel);
     };
   }, []);
 };

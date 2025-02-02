@@ -23,7 +23,7 @@ export const useUsersListeners = () => {
 
   // 監聽新用戶
   useEffect(() => {
-    const insertChannel = supabase
+    const insertUsersChannel = supabase
       .channel("public:user_insert")
       .on(
         "postgres_changes",
@@ -40,14 +40,14 @@ export const useUsersListeners = () => {
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(insertChannel);
+      supabase.removeChannel(insertUsersChannel);
     };
   }, []);
 
   // 監聽好友有變更name 、introduce
   useEffect(() => {
     if (friendIds.length === 0) return; // 避免無好友時訂閱
-    const updateChannel = supabase
+    const updateUsersChannel = supabase
       .channel("public:user_update")
       .on(
         "postgres_changes",
@@ -75,7 +75,7 @@ export const useUsersListeners = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(updateChannel);
+      supabase.removeChannel(updateUsersChannel);
     };
   }, [friendIds]);
 };

@@ -22,6 +22,7 @@ export const useFriends = () => {
 
   const [loading, setLoading] = useState(true);
 
+  // friends 初始資料請求
   useEffect(() => {
     const fetchFriendsUnRead = async () => {
       const { data, success } = await getFriendsUnRead({
@@ -41,9 +42,11 @@ export const useFriends = () => {
     };
 
     fetchFriendsUnRead();
+  }, [userId, dispatch]);
 
+  useEffect(() => {
     // 即時監聽好友邀請的變化
-    const subscribe = supabase
+    const friendChannel = supabase
       .channel("public:friends") // 訂閱 friends 資料表的變化
       .on(
         "postgres_changes",
@@ -75,7 +78,6 @@ export const useFriends = () => {
           table: "friends",
         },
         (payload) => {
-          console.log("payload", payload);
           const currentDeleteFriend = payload.old as FriendDBType;
           if (currentDeleteFriend.user_id === userId) {
             dispatch(deleteFriend(currentDeleteFriend.friend_id));
@@ -85,9 +87,9 @@ export const useFriends = () => {
       .subscribe();
 
     return () => {
-      subscribe.unsubscribe();
+      supabase.removeChannel(friendChannel);
     };
-  }, [userId]);
+  }, [userId, dispatch]);
 
   return { loading };
 };

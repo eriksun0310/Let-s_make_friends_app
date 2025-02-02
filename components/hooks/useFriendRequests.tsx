@@ -41,6 +41,7 @@ export const useFriendRequests = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
+  // friend_requests 初始資料請求
   useEffect(() => {
     const fetchFriendRequests = async () => {
       const { data, success } = await getFriendRequests({
@@ -65,41 +66,40 @@ export const useFriendRequests = () => {
     };
 
     fetchFriendRequests();
+  }, [dispatch, personal.userId]);
 
+  useEffect(() => {
     // 即時監聽好友邀請的變化
-    const subscribe = supabase
+    const friendRequestsChannel = supabase
       .channel("public:friend_requests") // 訂閱 friend_requests 資料表的變化
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "friend_requests",
           filter: `receiver_id=eq.${personal.userId}`,
         },
         (payload) => {
-          const event = payload.eventType;
-
           const friendRequests = payload.new as FriendRequestsDBType;
           const friendRequestsStatus = friendRequests.status;
           // 其他人寄給我的(加友、拒絕)邀請
-          if (event === "INSERT") {
-            // 刪除 "加好友" 的用戶
-            dispatch(deleteBeAddFriend(friendRequests.sender_id));
-            if (friendRequestsStatus === "pending") {
-              const transformedNew = transformFriendRequests([friendRequests]);
-              dispatch(addFriendRequest(transformedNew));
-              dispatch(updateFriendRequestUnRead());
-            }
+
+          // 刪除 "加好友" 的用戶
+          dispatch(deleteBeAddFriend(friendRequests.sender_id));
+          if (friendRequestsStatus === "pending") {
+            const transformedNew = transformFriendRequests([friendRequests]);
+            dispatch(addFriendRequest(transformedNew));
+            dispatch(updateFriendRequestUnRead());
           }
         }
       )
       .subscribe();
 
     return () => {
-      subscribe.unsubscribe();
+      supabase.removeChannel(friendRequestsChannel);
     };
-  }, [personal.userId]);
+  }, [dispatch, personal.userId]);
 
   return {
     loading,
