@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { UserHeadShotDBType } from "shared/dbType";
 import {
   selectFriendList,
+  selectUser,
   updateFriendUser,
   updatePostUser,
   useAppDispatch,
@@ -14,7 +15,10 @@ UPDATE: 好友變更大頭貼
 */
 export const useUserHeadShotListeners = () => {
   const friendList = useAppSelector(selectFriendList);
-  const friendIds = friendList.map((friend) => friend.userId);
+  const personal = useAppSelector(selectUser);
+  const friendIds = friendList
+    .map((friend) => friend.userId)
+    .concat(personal.userId);
 
   const dispatch = useAppDispatch();
 

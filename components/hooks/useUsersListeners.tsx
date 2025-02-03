@@ -3,6 +3,7 @@ import { UsersDBType } from "shared/dbType";
 import {
   addBeAddFriend,
   selectFriendList,
+  selectUser,
   updateFriendUser,
   updatePostUser,
   useAppDispatch,
@@ -17,9 +18,14 @@ UPDATE: 好友變更名字或自介
 */
 export const useUsersListeners = () => {
   const friendList = useAppSelector(selectFriendList);
-  const friendIds = friendList.map((friend) => friend.userId);
+  const personal = useAppSelector(selectUser);
+  const friendIds = friendList
+    .map((friend) => friend.userId)
+    .concat(personal.userId);
 
   const dispatch = useAppDispatch();
+
+  console.log("friendIds", friendIds);
 
   // 監聽新用戶
   useEffect(() => {
