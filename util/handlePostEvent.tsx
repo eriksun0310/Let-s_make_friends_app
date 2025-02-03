@@ -286,9 +286,6 @@ export const getAllPosts = async ({
       userIds,
     });
 
-    // 取得所有用戶設定
-    const { data: allUsersSettings } = await getAllUsersSettings({ userIds });
-
     // 取得文章標籤
     const { data: postTags } = await getPostTags({ postIds });
 
@@ -305,11 +302,6 @@ export const getAllPosts = async ({
     const postDetails = postsData.map((post) => {
       // 找到對應的發文者資訊
       const user = users.find((user) => user.userId === post.user_id);
-
-      //找到對應的用戶設定
-      const userSettings = allUsersSettings?.find(
-        (setting) => setting.userId === post.user_id
-      ) as UserSettings;
 
       // 過濾對應的標籤、按讚數和留言
       const tags = postTags.filter((tag) => tag.postId === post.id);
@@ -332,7 +324,6 @@ export const getAllPosts = async ({
         tags: tags?.map((tag) => tag.tag) || [],
         postLikes: postLikes,
         postComments: comments,
-        userSettings: userSettings,
       };
 
       return transformedPostDetail;
@@ -384,10 +375,6 @@ export const getPostDetail = async ({
     // 取得發文者資訊
     const { data: user } = await getUserDetail({ userId: post.user_id });
 
-    // 取得用戶設定
-    const { data: userSettings } = await getUserSettings({
-      userId: post.user_id,
-    });
     // 取得文章標籤
     const { data: postTags } = await getPostTags({ postIds: [post.id] });
 
@@ -414,7 +401,6 @@ export const getPostDetail = async ({
 
     const returnData = {
       user: user,
-      userSettings: userSettings,
       post: transformedPost,
       tags: findPostTagsData.map((tag) => tag.tag),
       postLikes: postLikesWithUsers,
@@ -688,7 +674,6 @@ yu:之後要改成 取每個留言順便帶user資料
 type GetPostCommentsByPostIdReturn = Result & {
   data: PostComments[];
 };
-
 
 //⛔
 export const getPostCommentsByPostId = async ({

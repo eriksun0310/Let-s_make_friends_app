@@ -17,7 +17,8 @@ const LikesAndComments: React.FC<LikesAndCommentsProps> = ({
   postDetail,
   screen,
 }) => {
-  const { post, postLikes, postComments, userSettings } = postDetail;
+  const { post, postLikes, postComments, user } = postDetail;
+  const userSettings = user?.settings;
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
   const [like, setLike] = useState(false);
@@ -59,10 +60,10 @@ const LikesAndComments: React.FC<LikesAndCommentsProps> = ({
     post.userId === personal.userId && screen === "postDetail";
 
   // 顯示按讚數　(用戶設定 按讚數隱藏）
-  const showLikeCount = !userSettings.hideLikes;
+  const showLikeCount = !userSettings?.hideLikes;
 
   // 顯示留言(用戶設定 留言數隱藏 || 文章是自己的貼文 & UI是貼文詳細)
-  const showComments = !userSettings.hideComments
+  const showComments = !userSettings?.hideComments
     ? true
     : post.userId === personal.userId && screen === "postDetail";
 

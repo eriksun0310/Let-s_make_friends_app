@@ -197,7 +197,6 @@ export type PostDetail = {
   tags: string[];
   postLikes: PostLikeUser[];
   postComments: PostComments[];
-  userSettings: UserSettings;
 };
 
 //新增文章

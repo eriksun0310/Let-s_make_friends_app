@@ -29,6 +29,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
     (post) => post.post.id === postId
   ) as PostDetailType;
 
+  const userSettings = currentPost?.user?.settings;
+
   const personal = useAppSelector(selectUser);
 
   useEffect(() => {
@@ -79,8 +81,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
 
           <View style={{ marginTop: 10 }} />
           {/* 留言 */}
-          {!currentPost.userSettings.hideComments &&
-            currentPost.userSettings.userId === personal.userId && (
+          {!userSettings?.hideComments &&
+            currentPost?.user?.userId === personal.userId && (
               <>
                 {currentPost?.postComments.map((comment) => {
                   return <Comments />;
