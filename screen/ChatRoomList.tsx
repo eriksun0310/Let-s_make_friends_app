@@ -10,6 +10,7 @@ import {
   useAppSelector,
   setChatRooms,
   selectCurrentChatRoom,
+  selectFriendList,
 } from "../store";
 import React from "react";
 import SearchBar from "../components/ui/SearchBar";
@@ -23,6 +24,8 @@ interface ChatRoomListProps {
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const personal = useAppSelector(selectUser);
+  const friendList = useAppSelector(selectFriendList);
+
   const chatRoomsData = useAppSelector((state) =>
     selectCurrentChatRoom({
       state: state,
@@ -34,9 +37,18 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
 
   // 過濾符合條件的聊天室列表
+  // const filteredChatRooms = useMemo(() => {
+  //   return chatRoomsData.filter((room) =>
+  //     room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())
+  //   );
+  // }, [chatRoomsData, searchText]);
+
   const filteredChatRooms = useMemo(() => {
     return chatRoomsData.filter((room) =>
-      room?.friend?.name?.toLowerCase()?.includes(searchText.toLowerCase())
+      friendList
+        .find((friend) => friend.userId === room?.friendId)
+        ?.name.toLowerCase()
+        ?.includes(searchText.toLowerCase())
     );
   }, [chatRoomsData, searchText]);
 
@@ -56,7 +68,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
     fetchChatData();
   }, [personal.userId, dispatch]);
 
-  console.log('filteredChatRooms', filteredChatRooms);
+  console.log("filteredChatRooms", filteredChatRooms);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}

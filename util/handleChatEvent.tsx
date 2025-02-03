@@ -116,7 +116,7 @@ export const getAllChatRooms = async ({
       const transformedChatRoom = transformChatRoom({
         data: room,
         options: {
-          friend,
+          friendId,
           lastMessage: lastMessage,
         },
       });

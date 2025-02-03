@@ -10,7 +10,7 @@ export const transformChatRoom = ({
 }: {
   data: ChatRoomsDBType;
   options?: {
-    friend: User | null;
+    friendId: string;
     lastMessage?: LastMessage | null;
   };
 }): ChatRoom => {
@@ -38,7 +38,8 @@ export const transformChatRoom = ({
     lastMessage: options?.lastMessage?.content || "",
     unreadCountUser1: unread_count_user1,
     unreadCountUser2: unread_count_user2,
-    friend: options?.friend || ({} as User),
+    // friend: options?.friend || ({} as User),
+    friendId: options?.friendId || "",
     createdAt: created_at,
   };
 };

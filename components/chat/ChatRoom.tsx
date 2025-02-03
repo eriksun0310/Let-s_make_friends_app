@@ -5,7 +5,12 @@ import { ListItem } from "@rneui/themed";
 import AlertDialog from "../ui/AlertDialog";
 import { deleteChatRoom, setCurrentChatRoomId } from "../../store/chatSlice";
 import { deleteChatRoomDB } from "../../util/handleChatEvent";
-import { selectUser, useAppDispatch, useAppSelector } from "../../store";
+import {
+  selectFriendList,
+  selectUser,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 import { formatTimeWithDayjs } from "../../shared/user/userFuncs";
 import { ChatRoom as ChatRoomType } from "../../shared/types";
 import { NavigationProp } from "@react-navigation/native";
@@ -17,10 +22,13 @@ interface ChatRoomProps {
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
   const personal = useAppSelector(selectUser);
+  const friendList = useAppSelector(selectFriendList);
 
   const dispatch = useAppDispatch();
   // 好友資料
-  const friend = chatRoom.friend;
+  const friend = chatRoom.friendId
+    ? friendList.find((friend) => friend.userId === chatRoom.friendId)
+    : null;
 
   // 警告視窗 開啟狀態
   const [isAlertVisible, setIsAlertVisible] = useState(false);

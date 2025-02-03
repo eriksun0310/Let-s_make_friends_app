@@ -69,7 +69,7 @@ export const useUsersListeners = () => {
             introduce: updatePayload.introduce,
           };
           dispatch(updateFriend(updatedFriend));
-          dispatch(updateChatRoomFriend(updatedFriend));
+          // TODO: dispatch(updatePostUser(updatedFriend));
         }
       )
       .subscribe();

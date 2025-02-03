@@ -352,28 +352,6 @@ const chatSlice = createSlice({
         } else return room;
       });
     },
-
-    // 更新聊天室的好友資料(名字、自我介紹、大頭貼、喜好)
-
-    updateChatRoomFriend(state, action) {
-      const { userId, name, introduce, headShot, selectedOption } =
-        action.payload;
-
-      state.chatRooms = state.chatRooms.map((room) =>
-        room.user1Id === userId || room.user2Id === userId
-          ? {
-              ...room,
-              friend: {
-                ...room.friend,
-                ...(name !== undefined && { name }),
-                ...(introduce !== undefined && { introduce }),
-                ...(headShot !== undefined && { headShot }),
-                ...(selectedOption !== undefined && { selectedOption }),
-              },
-            }
-          : room
-      );
-    },
   },
 });
 
@@ -393,7 +371,6 @@ export const {
   setUserOnline,
   setUserOffline,
   resetDeletedChatRoomState,
-  updateChatRoomFriend,
 } = chatSlice.actions;
 
 export const updateOrCreateChatRoom =

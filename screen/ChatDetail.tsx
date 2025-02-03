@@ -41,6 +41,7 @@ import {
   addMessage,
   selectChatRoomMessages,
   updateMessage,
+  selectFriendList,
 } from "../store";
 import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 /*
@@ -64,10 +65,14 @@ interface ChatDetailProps {
 const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
   const { chatRoom } = route.params;
-
-  const friend = chatRoom?.friend;
-  const showIsRead = friend?.settings?.markAsRead;
   const personal = useAppSelector(selectUser);
+  const friendList = useAppSelector(selectFriendList);
+
+  const friend = chatRoom?.friendId
+    ? friendList.find((friend) => friend.userId === chatRoom.friendId)
+    : null;
+
+  const showIsRead = friend?.settings?.markAsRead;
 
   const currentChatRoomId = useAppSelector(selectCurrentChatRoomId);
   const messages = useAppSelector((state) =>
@@ -78,7 +83,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   );
   // 檢查對方是否上線
   const isUserOnline = useAppSelector((state) =>
-    selectIsUserOnline(state, friend.userId)
+    selectIsUserOnline(state, chatRoom?.friendId)
   );
 
   const [loading, setLoading] = useState(false);
@@ -89,7 +94,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
   // 渲染訊息
   const renderMessage = ({ item }: { item: MessageType }) => (
     <>
-      <Message key={item.id} item={item} showIsRead={showIsRead} />
+      <Message key={item.id} item={item} showIsRead={showIsRead ?? false} />
     </>
   );
 
@@ -103,7 +108,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     const tempMessage = {
       id: tempId,
       senderId: personal.userId,
-      recipientId: friend.userId,
+      recipientId: chatRoom?.friendId,
       content: inputText,
       createdAt: Date.now(),
       //isTemporary: true,
@@ -124,7 +129,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       const { data: newChatRoomData, success } =
         await createNewChatRoomAndInsertMessage({
           userId: personal.userId,
-          friendId: friend.userId,
+          friendId: chatRoom?.friendId,
           message: inputText,
         });
 
@@ -141,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
       // 既有聊天室，直接發送
       const { data: result, success } = await sendMessage({
         userId: personal.userId,
-        friendId: friend.userId,
+        friendId: chatRoom?.friendId,
         message: inputText,
         chatRoomId,
         isRead: isUserOnline,
@@ -193,7 +198,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  console.log("messages", messages);
+  // console.log("messages", messages);
 
   // 監聽當前聊天室(進入、離開)
   useFocusEffect(

@@ -119,7 +119,8 @@ export type ChatRoom = {
   lastMessage: string;
   unreadCountUser1: number;
   unreadCountUser2: number;
-  friend: User;
+  // friend: User;
+  friendId: string;
   createdAt: Date;
 };
 

@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { UserSelectedOptionDBType } from "shared/dbType";
 import {
   selectFriendList,
-  updateChatRoomFriend,
   updateFriend,
   useAppDispatch,
   useAppSelector,
@@ -45,7 +44,7 @@ export const useUserSelectedOptionListeners = () => {
             },
           };
           dispatch(updateFriend(updatedFriend));
-          dispatch(updateChatRoomFriend(updatedFriend));
+          // TODO: dispatch(updatePostUser(updatedFriend));
         }
       )
       .subscribe();

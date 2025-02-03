@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { UserHeadShotDBType } from "shared/dbType";
 import {
   selectFriendList,
-  updateChatRoomFriend,
   updateFriend,
   useAppDispatch,
   useAppSelector,
@@ -44,9 +43,9 @@ export const useUserHeadShotListeners = () => {
             },
           };
 
-          console.log('updatedFriend  ====>', updatedFriend)
+          console.log("updatedFriend  ====>", updatedFriend);
           dispatch(updateFriend(updatedFriend));
-          dispatch(updateChatRoomFriend(updatedFriend));
+          // TODO: dispatch(updatePostUser(updatedFriend));
         }
       )
       .subscribe();
