@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { UserSelectedOptionDBType } from "shared/dbType";
 import {
   selectFriendList,
-  updateFriend,
+  updateFriendUser,
+  updatePostUser,
   useAppDispatch,
   useAppSelector,
 } from "store";
@@ -35,7 +36,7 @@ export const useUserSelectedOptionListeners = () => {
           };
           console.log("好友喜好更新", updatePayload);
 
-          const updatedFriend = {
+          const updatedUser = {
             userId: updatePayload.user_id,
             selectedOption: {
               interests: updatePayload.interests,
@@ -43,8 +44,8 @@ export const useUserSelectedOptionListeners = () => {
               dislikedFood: updatePayload.disliked_food,
             },
           };
-          dispatch(updateFriend(updatedFriend));
-          // TODO: dispatch(updatePostUser(updatedFriend));
+          dispatch(updateFriendUser(updatedUser));
+          dispatch(updatePostUser(updatedUser));
         }
       )
       .subscribe();

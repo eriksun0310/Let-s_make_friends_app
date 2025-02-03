@@ -89,10 +89,14 @@
 [重構 redux 的結構]
 1. posts、 chatRooms, 需參考 redux.json 檔案
 ✅2. 原本從 chatRooms 就可以取得 user 的資料 要改從friendList 拿
-✅3. 所以監聽的(users、user_selected_option、user_head_shot)更新流程   dispatch(updateFriend(updatedFriend)) 、 dispatch(updatePostUser(updatedFriend))
+✅3. 所以監聽的(users、user_selected_option、user_head_shot)更新流程   dispatch(updateFriendUser(updatedFriend)) 、 dispatch(updatePostUser(updatedFriend))
 , 移除 dispatch(updateChatRoomFriend(updatedFriend));
-4. 寫 redux action updatePostUser
+✅4. 寫 redux action updatePostUser, 並測試  (users、user_selected_option、user_head_shot) 是否有更新成功
 ✅5. posts 的 userSettings 改從 user 的settings 拿
+6. 監聽個人資料的三張表的條件
+    1. friendIds:  dispatch(updateFriendUser(updatedFriend)) 、 dispatch(updatePostUser(updatedFriend))
+    2. beAddFriendIds:  dispatch(updateFriendUser(updatedBeAddFriend))
+    2. beAddFriendIds -> beAddUserIds:  dispatch(updateFriendUser(updatedBeAddFriend))
 
 
 

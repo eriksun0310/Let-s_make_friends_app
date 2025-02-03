@@ -104,7 +104,7 @@ const friendSlice = createSlice({
     updateNewFriendUnRead(state) {
       state.newFriendUnRead += 1;
     },
-    updateFriend(state, action) {
+    updateFriendUser(state, action) {
       const { userId, name, introduce, headShot, selectedOption } =
         action.payload;
 
@@ -138,7 +138,7 @@ export const {
   addBeAddFriend,
   updateBeAddFriend,
   deleteBeAddFriend,
-  updateFriend,
+  updateFriendUser,
 } = friendSlice.actions;
 
 export const selectBeAddFriends = (state: RootState) =>

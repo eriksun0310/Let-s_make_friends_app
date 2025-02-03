@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { UserHeadShotDBType } from "shared/dbType";
 import {
   selectFriendList,
-  updateFriend,
+  updateFriendUser,
+  updatePostUser,
   useAppDispatch,
   useAppSelector,
 } from "store";
@@ -35,7 +36,7 @@ export const useUserHeadShotListeners = () => {
           };
           console.log("好友頭像更新", updatePayload);
 
-          const updatedFriend = {
+          const updatedUser = {
             userId: updatePayload.user_id,
             headShot: {
               imageUrl: updatePayload.image_url,
@@ -43,9 +44,9 @@ export const useUserHeadShotListeners = () => {
             },
           };
 
-          console.log("updatedFriend  ====>", updatedFriend);
-          dispatch(updateFriend(updatedFriend));
-          // TODO: dispatch(updatePostUser(updatedFriend));
+          console.log("updatedUser  ====>", updatedUser);
+          dispatch(updateFriendUser(updatedUser));
+          dispatch(updatePostUser(updatedUser));
         }
       )
       .subscribe();

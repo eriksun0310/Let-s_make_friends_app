@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { PostTags, PostComments, PostLikes, PostDetail } from "../shared/types";
+import { PostTags, PostComments, PostLikes, PostDetail, User } from "../shared/types";
 
 interface InitialStateProps {
   tags: PostTags[];
@@ -199,6 +199,25 @@ const postSlice = createSlice({
     setLikeDrawer(state, action) {
       state.likeDrawer = action.payload;
     },
+    updatePostUser(state, action) {
+      const { userId, name, introduce, headShot, selectedOption } =
+        action.payload;
+
+      state.posts = state.posts.map((post) =>
+        (post.user as User).userId === (userId as string)
+          ? {
+              ...post,
+              user: {
+                ...post.user,
+                ...(name !== undefined && { name }),
+                ...(introduce !== undefined && { introduce }),
+                ...(headShot !== undefined && { headShot }),
+                ...(selectedOption !== undefined && { selectedOption }),
+              },
+            }
+          : post
+      );
+    },
   },
 });
 
@@ -216,6 +235,7 @@ export const {
   addPostLike,
   deletePostLike,
   setLikeDrawer,
+  updatePostUser,
 } = postSlice.actions;
 
 export const selectTags = (state: RootState) => state.post.tags;

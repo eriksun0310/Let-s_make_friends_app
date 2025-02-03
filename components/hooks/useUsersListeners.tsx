@@ -3,8 +3,8 @@ import { UsersDBType } from "shared/dbType";
 import {
   addBeAddFriend,
   selectFriendList,
-  updateChatRoomFriend,
-  updateFriend,
+  updateFriendUser,
+  updatePostUser,
   useAppDispatch,
   useAppSelector,
 } from "store";
@@ -63,13 +63,13 @@ export const useUsersListeners = () => {
 
           const updatePayload = payload.new as UsersDBType;
 
-          const updatedFriend = {
+          const updatedUser = {
             userId: updatePayload.id,
             name: updatePayload.name,
             introduce: updatePayload.introduce,
           };
-          dispatch(updateFriend(updatedFriend));
-          // TODO: dispatch(updatePostUser(updatedFriend));
+          dispatch(updateFriendUser(updatedUser));
+          dispatch(updatePostUser(updatedUser));
         }
       )
       .subscribe();
