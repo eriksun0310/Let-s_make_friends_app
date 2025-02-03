@@ -164,7 +164,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
           rounded
           size="medium"
           containerStyle={styles.avatar}
-          source={friend.headShot.imageUrl as ImageSourcePropType}
+          source={friend?.headShot?.imageUrl as ImageSourcePropType}
         />
 
         <Card.Title>{friend.name}</Card.Title>

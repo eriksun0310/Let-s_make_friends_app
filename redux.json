@@ -1,0 +1,106 @@
+ User = {
+    userId: string;
+    name: string;
+    gender: Gender;
+    introduce: string;
+    birthday: string;
+    email: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    headShot: HeadShot;
+    selectedOption: SelectedOption;
+    settings: Omit<UserSettings, "userId">;
+};
+
+friendList: [
+    {
+        userId: string;
+        name: string;
+        gender: Gender;
+        introduce: string;
+        birthday: string;
+        email: string;
+        createdAt?: Date;
+        updatedAt?: Date;
+        headShot: HeadShot;
+        selectedOption: SelectedOption;
+        settings: Omit<UserSettings, "userId">
+    }
+
+] as User[]
+
+
+posts:[
+    {
+        post: Post;
+        user: User | null;
+        tags: string[];
+        postLikes: PostLikeUser[];
+        postComments: PostComments[];
+        userSettings: UserSettings;
+    }
+]
+[post redux]
+1. 移除 posts的 userSettings, 改從 user.settings 拿
+2. 不用 post.userId 從 friendList 找對應的 user的原因是, 因為有可能發文的人不是好友,發文設定公開所以也可以看到
+
+posts:[
+    {
+        post:  {
+            id: string;
+            userId: string;
+            content: string;
+            visibility: PostVisibility;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+        tags: string[];
+        postLikes: PostLikeUser[];
+        postComments: PostComments[];
+    }
+]
+
+
+
+
+chatRooms:[
+    {
+        id: string;
+        user1Id: string;
+        user2Id: string;
+        user1Deleted: boolean;
+        user2Deleted: boolean;
+        user1DeletedAt: Date;
+        user2DeletedAt: Date;
+        lastTime: Date;
+        lastMessage: string;
+        unreadCountUser1: number;
+        unreadCountUser2: number;
+        friend: User;
+        createdAt: Date;
+    }
+]
+
+[chatRooms redux]
+1. 多記 friendId
+2. 拿 friendId 來找 friendList 的 userId
+3. 移除 chatRooms 的 friend
+
+
+chatRooms:[
+    {
+        id: string;
+        user1Id: string;
+        user2Id: string;
+        user1Deleted: boolean;
+        user2Deleted: boolean;
+        user1DeletedAt: Date;
+        user2DeletedAt: Date;
+        lastTime: Date;
+        lastMessage: string;
+        unreadCountUser1: number;
+        unreadCountUser2: number;
+        friendId: string;
+        createdAt: Date;
+    }
+]

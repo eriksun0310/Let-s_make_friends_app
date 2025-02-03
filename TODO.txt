@@ -41,6 +41,64 @@
 4. 聊天室
     ☑️1.handleChatEvent
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+[監聽表]
+1. users
+    ✅INSERT: 新用戶
+    ✅UPDATE: 更新名字、自我介紹
+2. user_selected_option
+    ✅UPDATE: 更新喜好
+3. user_head_shot
+    ✅UPDATE: 更新喜好
+4. user_setting 
+    UPDATE: 更新貼文設定、聊天室設定
+5. chat_rooms
+    ✅INSERT: 新增聊天室
+6. friend_requests
+    ✅INSERT: 用戶寄送交友邀請
+7. friends
+    ✅INSERT: 新好友
+    ✅DELETE: 刪除好友
+8. messages
+    ✅INSERT: 發送訊息
+    ✅DELETE: 更新已讀
+9. posts
+    INSERT: 新增文章
+    UPDATE: 更新文章
+    DELETE: 刪除文章
+10. post_tags
+    UPDATE: 更新文章的tags
+11. post_likes
+    INSERT: 按讚
+    DELETE: 收回讚
+12. post_comment    
+    INSERT: 新增留言
+    UPDATE: 編輯留言
+    DELETE: 刪除留言
+
+
+
+⌛[聊天室]
+1. 傳送訊息前還必須檢查對方是不是好友 (避免對方刪除好友還可以傳遞訊息)
+    1-1.檢查 redux friendList  傳訊息的對方是否有在 friendList
+    1-2.若對方刪除好友, 則無法傳訊息, 提示用戶對方已將你刪除等字樣, 是否要刪除聊天室
+        是: 更新 chat_rooms 的 自己的delete 的相關狀態, 後續流程會刪除 messages 的關於這個聊天室的訊息(必須確認這個流程是否有正確執行)
+        否: 保留聊天室訊息,不做任何動作
+    
+
+[重構 redux 的結構]
+1. posts、 chatRooms, 需參考 redux.json 檔案
+2. 原本從 chatRooms 就可以取得 user 的資料 要改從friendList 拿
+3. 所以監聽的(users、user_selected_option、user_head_shot)更新流程   dispatch(updateFriend(updatedFriend)) 、 dispatch(updatePostUser(updatedFriend))
+, 移除 dispatch(updateChatRoomFriend(updatedFriend));
+
+
+
+
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+
+
 [聊天室 整理code + BUG ]
 1. ChatContextProvider 整理
 2. 看要不要像 useFriends() 放在 App.tsx 的AuthenticatedStack 上
@@ -61,6 +119,7 @@
 ✅2/2 2. 如果是在好友資料進去的聊天室, 剛好在線已讀, 在回到聊天列表還會顯示未讀數量
 
 
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
 [加好友 整理code]
 ✅1. 將 useAddFriendListeners 統整進 useFriendRequests

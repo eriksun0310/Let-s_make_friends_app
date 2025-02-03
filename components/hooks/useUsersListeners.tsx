@@ -34,7 +34,7 @@ export const useUsersListeners = () => {
             userId: newUser.id,
           });
 
-          // 這裡還要轉換
+          console.log("新用戶", userDetail);
           dispatch(addBeAddFriend(userDetail));
         }
       )

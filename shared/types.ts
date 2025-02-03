@@ -68,7 +68,6 @@ export type User = {
   email: string;
   createdAt?: Date;
   updatedAt?: Date;
-
   headShot: HeadShot;
   selectedOption: SelectedOption;
   settings: Omit<UserSettings, "userId">;

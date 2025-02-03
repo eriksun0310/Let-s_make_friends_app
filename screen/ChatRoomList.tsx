@@ -55,6 +55,8 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({ navigation }) => {
 
     fetchChatData();
   }, [personal.userId, dispatch]);
+
+  console.log('filteredChatRooms', filteredChatRooms);
   return (
     <View style={styles.screen}>
       {/* 搜尋列 */}
