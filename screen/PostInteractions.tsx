@@ -5,6 +5,9 @@ import { Colors } from "../constants/style";
 import { NavigationProp } from "@react-navigation/native";
 import ostrich from "../assets/animal/ostrich.png";
 import BackButton from "components/ui/button/BackButton";
+import { selectPostInteractions, useAppSelector } from "store";
+import { PostInteraction } from "shared/types";
+import { formatTimeAgo } from "shared/post/postFuncs";
 const recentSearches = [
   { id: "1", name: "1111" },
   { id: "2", name: "2222" },
@@ -19,6 +22,39 @@ const PostInteractions: React.FC<SearchProps> = ({ navigation }) => {
   // search bar 的輸入文字
   const [searchText, setSearchText] = useState("");
 
+  const postInteractions = useAppSelector(selectPostInteractions);
+
+  const renderItem = ({ item }: { item: PostInteraction }) => {
+    const user = item.user;
+
+    return (
+      <View style={styles.itemView}>
+        <Avatar rounded source={user?.headShot?.imageUrl} size="medium" />
+        <View
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            borderWidth: 1,
+          }}
+        >
+          <Text style={styles.text}>{user?.name}</Text>
+          {item.type === "like" ? (
+            <Text style={styles.text1}>
+              按讚了你的貼文。{formatTimeAgo(item.createdAt)}
+            </Text>
+          ) : (
+            <Text style={styles.text1}>
+              留言了你的貼文。{formatTimeAgo(item.createdAt)}
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: "",
@@ -26,6 +62,8 @@ const PostInteractions: React.FC<SearchProps> = ({ navigation }) => {
       headerLeft: () => <BackButton onPress={() => navigation.goBack()} />,
     });
   }, [navigation]);
+
+  console.log("postInteractions", postInteractions);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,28 +75,9 @@ const PostInteractions: React.FC<SearchProps> = ({ navigation }) => {
         >
           {/* 有按讚的人、留言的人 */}
           <FlatList
-            data={recentSearches}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.itemView}>
-                <Avatar rounded source={ostrich} size="medium" />
-                <View
-                  style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    borderWidth: 1,
-                  }}
-                >
-                  <Text style={styles.text}>{item.name}</Text>
-                  <Text style={styles.text1}>說你的貼文讚 3分鐘</Text>
-                  <Text style={styles.text}>{item.name}</Text>
-                  <Text style={styles.text1}>對你的貼文 留言 3分鐘</Text>
-                </View>
-              </View>
-            )}
+            data={postInteractions}
+            keyExtractor={(item) => item.user.userId}
+            renderItem={renderItem}
           />
         </View>
       </View>

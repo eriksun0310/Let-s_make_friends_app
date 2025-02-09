@@ -18,7 +18,7 @@
 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
 [文章功能]
-1. 提醒按讚的UI(跳新的頁面)
+1. 貼文互動通知UI(跳新的頁面)
 
 2. 搜尋貼文的功能
     a.tag
@@ -27,17 +27,20 @@
 3. 近期搜尋的邏輯(是要再多開一張表嗎)
 4. 顯示符合搜尋該條件的UI
 
-[提醒按讚、留言的流程]
+[2/9 提醒按讚、留言的流程]
+❤️ 按讚的  
+✉️ 留言的
 1. 紀錄 postInteractions = [ 
 {type:'like' , user:User & UserState, postId:'', createAt: },
 {type:'comment', user:User & UserState, postId:'', content:'', createAt:'', updatedAt:'' }
 ]
-2. 監聽的 post_likes、post_comments filter： 用postData 找出自己發文的id
-3. 有獲取資料後, dispatch(addPostInteraction({
+❤️ 2. 監聽的 post_likes、post_comments filter： 用postData 找出自己發文的id
+❤️ 3. 有獲取資料後, dispatch(addPostInteraction({
     type:'like'、 'comments' 
 } ))
 
-4. LikesAndComments 元件在用 postInteractions render
+❤️ 4. LikesAndComments 元件在用 postInteractions render
+5. 在fetchAll 要去 dispatch(setPostInteractions()), 要先找自己發文的id 
 
 
 

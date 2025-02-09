@@ -30,7 +30,7 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
   };
 
 
-  console.log('postLikes',postLikes)
+  console.log('postLikes like Drawer ====>',postLikes)
   useEffect(() => {
     if (likeDrawer) {
       modalizeRef.current?.open(); // 如果 likeDrawer 是 true，打開 Modal
@@ -70,7 +70,7 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
         <FlatList
           data={postLikes}
           renderItem={renderLikeUser}
-          keyExtractor={(item) => item?.userId}
+          keyExtractor={(item) => item?.user?.userId}
         />
       </View>
     </Modalize>

@@ -866,10 +866,13 @@ export const getPostLikesWithUsers = async ({
       ) as UserState;
 
       return {
+        user: {
+          ...user,
+          userState,
+        },
         postId: like.post_id,
+        createdAt: like.created_at,
         // userId: like.user_id,
-        ...user,
-        userState,
       };
     });
     return {

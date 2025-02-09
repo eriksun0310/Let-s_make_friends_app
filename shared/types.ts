@@ -164,29 +164,33 @@ export type PostLikes = {
   createdAt: Date;
 };
 
-export type PostLikeUser = User & {
-  postId: string;
-  userState: UserState;
+// export type PostLikeUser = User & {
+//   postId: string;
+//   userState: UserState;
 
-  // userId: string;
-};
+//   // userId: string;
+// };
 
 // TODO: 未來要把 PostLikeUser 改成這個樣子
-// export type PostLikeUser = {
-//   user: User & UserState
-//   postId: string;
-//   createdAt: Date;
-// };
+export type PostLikeUser = {
+  user: User & {
+    userState: UserState;
+  };
+  postId: string;
+  createdAt: Date;
+};
 
 // TODO: 未來要把 PostCommentsUser 改成這個樣子
-// export type PostCommentsUser = {
-// user: User & UserState
-// id: string;
-// postId: string;
-// content: string;
-// createdAt: Date;
-// updatedAt: Date;
-// };
+export type PostCommentsUser = {
+  user: User & {
+    userState: UserState;
+  };
+  id: string;
+  postId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 /*
 
@@ -272,3 +276,12 @@ export type DeletedChatRoom = {
   deletedAtColumn: string | null;
   unreadColumn: string | null;
 };
+
+export type PostInteraction = {
+  type: "like" | "comment";
+  user: User & {
+    userState: UserState;
+  };
+  createdAt: Date;
+} & Partial<PostLikeUser> &
+  Partial<PostCommentsUser>;

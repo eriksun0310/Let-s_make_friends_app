@@ -41,6 +41,8 @@ const LikeAndComment: React.FC<LikesAndCommentsProps> = ({
         setLike(!like);
       }
 
+
+
       // dispatch(
       //   addPostLike({
       //     postId: post?.id,
@@ -69,9 +71,11 @@ const LikeAndComment: React.FC<LikesAndCommentsProps> = ({
 
   // 處理 按讚、收回讚 的預設值
   useEffect(() => {
-    const isLike = postLikes.some((like) => like.userId === personal.userId);
+    const isLike = postLikes.some((like) => like?.user?.userId === personal?.userId);
     setLike(isLike);
   }, [postLikes]);
+
+  console.log('postLikes 11111111', postLikes);
   return (
     <View>
       <View style={styles.footer}>

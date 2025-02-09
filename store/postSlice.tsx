@@ -1,6 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { PostTags, PostComments, PostLikes, PostDetail, User } from "../shared/types";
+import {
+  PostTags,
+  PostComments,
+  PostLikes,
+  PostDetail,
+  User,
+  PostLikeUser,
+  UserState,
+  PostCommentsUser,
+  PostInteraction,
+} from "../shared/types";
 
 interface InitialStateProps {
   tags: PostTags[];
@@ -9,6 +19,7 @@ interface InitialStateProps {
   postLikes: PostLikes[]; // 這個應該是用不到
   postMap: Record<string, PostDetail>; // 用於儲存文章id和對應的文章
   likeDrawer: boolean;
+  postInteractions: PostInteraction[]; // 貼文互動通知
 }
 
 const initialState: InitialStateProps = {
@@ -18,6 +29,7 @@ const initialState: InitialStateProps = {
   postLikes: [],
   postMap: {},
   likeDrawer: false,
+  postInteractions: [],
 };
 
 const postSlice = createSlice({
@@ -101,7 +113,7 @@ const postSlice = createSlice({
     deletePostComment(state, action) {},
 
     addPostLike(state, action) {
-      const postLike = action.payload as PostLikes;
+      const postLike = action.payload as PostLikeUser;
 
       // 找到對應的post
       const index = state.posts.findIndex(
@@ -115,7 +127,7 @@ const postSlice = createSlice({
 
         // 檢查是否已經存在該按讚
         const likeExists = existingPostLikes.some(
-          (like) => like.userId === postLike.userId
+          (like) => like.user.userId === postLike.user.userId
         );
 
         // 如果不存在
@@ -168,7 +180,7 @@ const postSlice = createSlice({
 
         // 將 postLikes 轉為Map 進行查找
         const likesMap = new Map(
-          existingPostLikes.map((like) => [like.userId, like])
+          existingPostLikes.map((like) => [like?.user?.userId, like])
         );
 
         // 如果存在該 like , 就刪除
@@ -218,6 +230,13 @@ const postSlice = createSlice({
           : post
       );
     },
+
+    setPostInteraction(state, action) {
+      state.postInteractions = action.payload;
+    },
+    addPostInteraction(state, action) {
+      state.postInteractions = [...state.postInteractions, action.payload];
+    },
   },
 });
 
@@ -232,10 +251,12 @@ export const {
   addPostComment,
   updatePostComment,
   deletePostComment,
-  addPostLike,
+addPostLike,
   deletePostLike,
   setLikeDrawer,
   updatePostUser,
+  setPostInteraction,
+  addPostInteraction,
 } = postSlice.actions;
 
 export const selectTags = (state: RootState) => state.post.tags;
@@ -243,5 +264,7 @@ export const selectPosts = (state: RootState) => state.post.posts;
 export const selectPostComments = (state: RootState) => state.post.postComments;
 export const selectPostLikes = (state: RootState) => state.post.postLikes;
 export const selectLikeDrawer = (state: RootState) => state.post.likeDrawer;
+export const selectPostInteractions = (state: RootState) =>
+  state.post.postInteractions;
 
 export default postSlice.reducer;

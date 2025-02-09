@@ -18,13 +18,16 @@ interface LikeUserProps {
 const LikeUser: React.FC<LikeUserProps> = ({ item }) => {
   const navigation = useNavigation();
 
+  const likeUser = item?.user;
+  const likeUserState = likeUser?.userState;
+
   // 點擊 LikeUser 進入使用者頁面
   const handleClickLikeUser = () => {
-    if (item.userState !== "personal") {
+    if (likeUserState !== "personal") {
       navigation.navigate("userInfoFriend", {
         isShowMsgIcon: true,
-        userState: item.userState,
-        friend: item,
+        userState: likeUserState,
+        friend: likeUser,
       });
     }
   };
@@ -32,18 +35,18 @@ const LikeUser: React.FC<LikeUserProps> = ({ item }) => {
   return (
     <TouchableOpacity
       onPress={handleClickLikeUser}
-      disabled={item.userState === "personal"}
+      disabled={likeUserState === "personal"}
     >
       <View style={styles.likeItem}>
         <Avatar
           rounded
-          source={item?.headShot?.imageUrl as ImageSourcePropType}
+          source={likeUser?.headShot?.imageUrl as ImageSourcePropType}
           size="medium"
         />
-        <Text style={styles.likeUserName}>{item.name}</Text>
+        <Text style={styles.likeUserName}>{likeUser?.name}</Text>
 
         {/* 訪客的話,顯示加好友 */}
-        {item?.userState === "visitor" && (
+        {likeUserState === "visitor" && (
           <TouchableOpacity style={styles.actionButton}>
             <Plus color={Colors.icon} />
           </TouchableOpacity>
