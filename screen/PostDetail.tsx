@@ -24,6 +24,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
   const { postId } = route.params;
   const postData = useAppSelector(selectPosts);
 
+
+  console.log('postData', postData)
   // 目前的貼文
   const currentPost = postData.find(
     (post) => post.post.id === postId
@@ -54,6 +56,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ route, navigation }) => {
       return () => clearTimeout(timeoutId);
     }
   }, [currentPost]);
+
+  console.log("currentPost", currentPost);
 
   return (
     <PaperProvider>

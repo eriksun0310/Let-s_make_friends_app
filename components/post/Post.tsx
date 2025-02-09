@@ -9,7 +9,7 @@ import PostTags from "./PostTags";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserRound } from "lucide-react-native";
 import { selectUser, useAppSelector } from "../../store";
-import LikesAndComments from "./LikesAndComments";
+import LikesAndComments from "./LikeAndComment";
 interface PostProps {
   userState: UserState;
   postDetail: PostDetail;

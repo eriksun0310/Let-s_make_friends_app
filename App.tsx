@@ -49,6 +49,7 @@ import { useMessagesListeners } from "components/hooks/useMessagesListeners";
 import { useUsersListeners } from "components/hooks/useUsersListeners";
 import { useUserSelectedOptionListeners } from "components/hooks/useUserSelectedOptionListeners";
 import { useUserHeadShotListeners } from "components/hooks/useUserHeadShotListeners";
+import PostInteractions from "screen/PostInteractions";
 
 // 顯示在螢幕的頁面(總是顯示所有頁面)
 const Tab = createBottomTabNavigator();
@@ -269,6 +270,9 @@ const AuthenticatedStack = () => {
 
       {/* 設定 */}
       <Stack.Screen name="settings" component={Settings} />
+
+      {/* 貼文互動通知(按讚、留言) */}
+      <Stack.Screen name="likesAndComments" component={PostInteractions} />
     </Stack.Navigator>
   );
 };

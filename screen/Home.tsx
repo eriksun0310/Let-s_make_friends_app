@@ -21,6 +21,7 @@ import { usePostListeners } from "../components/hooks/usePostListeners";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { getFriendList } from "../util/handleFriendsEvent";
 import { usePostLikesListeners } from "../components/hooks/usePostLikesListeners";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 // export const postList = Array(14).fill({
 //   date: "2024/08/02",
@@ -47,9 +48,14 @@ const Home: React.FC<HomePostProps> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <CustomIcon onPress={() => navigation.navigate("search")}>
-          <Search color={Colors.icon} size={25} />
-        </CustomIcon>
+        <View style={{ flexDirection: "row" }}>
+          <CustomIcon onPress={() => navigation.navigate("likesAndComments")}>
+            <AntDesign name={"hearto"} size={24} color={Colors.icon} />
+          </CustomIcon>
+          <CustomIcon onPress={() => navigation.navigate("search")}>
+            <Search color={Colors.icon} size={25} />
+          </CustomIcon>
+        </View>
       ),
     });
   }, [navigation]);

@@ -13,7 +13,7 @@ interface LikesAndCommentsProps {
   screen?: PostScreen;
 }
 
-const LikesAndComments: React.FC<LikesAndCommentsProps> = ({
+const LikeAndComment: React.FC<LikesAndCommentsProps> = ({
   postDetail,
   screen,
 }) => {
@@ -127,4 +127,4 @@ const styles = StyleSheet.create({
     color: Colors.icon,
   },
 });
-export default LikesAndComments;
+export default LikeAndComment;

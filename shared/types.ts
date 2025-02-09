@@ -169,8 +169,24 @@ export type PostLikeUser = User & {
   userState: UserState;
 
   // userId: string;
-  // createdAt: Date;
 };
+
+// TODO: 未來要把 PostLikeUser 改成這個樣子
+// export type PostLikeUser = {
+//   user: User & UserState
+//   postId: string;
+//   createdAt: Date;
+// };
+
+// TODO: 未來要把 PostCommentsUser 改成這個樣子
+// export type PostCommentsUser = {
+// user: User & UserState
+// id: string;
+// postId: string;
+// content: string;
+// createdAt: Date;
+// updatedAt: Date;
+// };
 
 /*
 
@@ -197,6 +213,8 @@ export type PostDetail = {
   tags: string[];
   postLikes: PostLikeUser[];
   postComments: PostComments[];
+  // TODO: 未來要改成這樣子
+  // postComments: PostCommentsUser[];
 };
 
 //新增文章

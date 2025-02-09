@@ -29,6 +29,8 @@ const LikeDrawer: React.FC<LikeDrawerProps> = ({ postLikes }) => {
     return <LikeUser item={item} />;
   };
 
+
+  console.log('postLikes',postLikes)
   useEffect(() => {
     if (likeDrawer) {
       modalizeRef.current?.open(); // 如果 likeDrawer 是 true，打開 Modal
