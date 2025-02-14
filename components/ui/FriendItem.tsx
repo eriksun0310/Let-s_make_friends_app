@@ -28,12 +28,17 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
 
   const resetRef = useRef(() => {}); // 用於存儲 `reset` 函數
 
-  // 刪除好友 事件
-  const handleDeleteFriend = async (mode: "delete" | "cancel") => {
-    setIsAlertVisible(false); // 關閉警告視窗
+  // 關閉右滑按鈕
+  const closeSwipeAble = () => {
     if (resetRef.current) {
       resetRef.current(); // 執行 `reset`
     }
+  };
+
+  // 刪除好友 事件
+  const handleDeleteFriend = async (mode: "delete" | "cancel") => {
+    setIsAlertVisible(false); // 關閉警告視窗
+    closeSwipeAble();
 
     if (mode === "delete") {
       const { success } = await deleteFriendDB({
@@ -49,9 +54,8 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
 
   // 好友詳細資料
   const handleUserInfoFriendPress = () => {
-    if (resetRef.current) {
-      resetRef.current(); // 執行 `reset`
-    }
+    closeSwipeAble();
+
     navigation.navigate("userInfoFriend", {
       isShowMsgIcon: true,
       userState: "friend",

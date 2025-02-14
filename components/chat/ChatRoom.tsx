@@ -35,12 +35,17 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 
   // const resetRef = useRef<() => void | null>(null); // current 是一個函數, 它的返回值可以是 void 或 null
   const resetRef = useRef<(() => void) | null>(null); // current 是一個函數 或 null
-  // 刪除聊天室 事件
-  const handleDeleteChat = async (mode: "delete" | "cancel") => {
-    setIsAlertVisible(false); // 關閉警告視窗
+
+  // 關閉右滑按鈕
+  const closeSwipeAble = () => {
     if (resetRef.current) {
       resetRef.current(); // 執行 `reset`
     }
+  };
+  // 刪除聊天室 事件
+  const handleDeleteChat = async (mode: "delete" | "cancel") => {
+    setIsAlertVisible(false); // 關閉警告視窗
+    closeSwipeAble();
 
     if (mode === "delete") {
       const { data: deletedChatRoomResult, success } = await deleteChatRoomDB({
@@ -57,8 +62,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 
   // 進入1對1 聊天室
   const handleChatRoomPress = async () => {
+    closeSwipeAble();
     dispatch(setCurrentChatRoomId(chatRoom.id));
-
     navigation.navigate("chatDetail", {
       chatRoomState: "old", // 從聊天列表進來通常會是舊的聊天室
       chatRoom: chatRoom,
@@ -89,17 +94,19 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ chatRoom, navigation }) => {
 
       <ListItem.Swipeable
         style={styles.chatItem}
-        rightContent={(reset) => (
-          <Button
-            title="刪除聊天室"
-            onPress={() => {
-              resetRef.current = reset; // 存儲 `reset`
-              setIsAlertVisible(true);
-            }}
-            icon={{ name: "delete", color: "white" }}
-            buttonStyle={{ height: 78, backgroundColor: "red" }}
-          />
-        )}
+        rightContent={(reset) => {
+          resetRef.current = reset; // 存儲 `reset`
+          return (
+            <Button
+              title="刪除聊天室"
+              onPress={() => {
+                setIsAlertVisible(true);
+              }}
+              icon={{ name: "delete", color: "white" }}
+              buttonStyle={{ height: 78, backgroundColor: "red" }}
+            />
+          );
+        }}
         onPress={handleChatRoomPress}
       >
         <Avatar
