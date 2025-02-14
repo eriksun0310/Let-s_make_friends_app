@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ImageSourcePropType } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import { Colors } from "../../constants/style";
@@ -49,13 +49,15 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
 
   // 好友詳細資料
   const handleUserInfoFriendPress = () => {
+    if (resetRef.current) {
+      resetRef.current(); // 執行 `reset`
+    }
     navigation.navigate("userInfoFriend", {
       isShowMsgIcon: true,
       userState: "friend",
       friend: friend,
     });
   };
-  //console.log("FriendItem 111111 ");
 
   return (
     <>
@@ -81,17 +83,19 @@ const FriendItem: React.FC<FriendItemProps> = ({ friend, navigation }) => {
       <ListItem.Swipeable
         style={styles.container}
         leftContent={null}
-        rightContent={(reset) => (
-          <Button
-            title="刪除好友"
-            onPress={() => {
-              resetRef.current = reset; // 存儲 `reset`
-              setIsAlertVisible(true);
-            }}
-            icon={{ name: "delete", color: "white" }}
-            buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
-          />
-        )}
+        rightContent={(reset) => {
+          resetRef.current = reset; // 存儲 `reset`
+          return (
+            <Button
+              title="刪除好友"
+              onPress={() => {
+                setIsAlertVisible(true);
+              }}
+              icon={{ name: "delete", color: "white" }}
+              buttonStyle={{ minHeight: 100, backgroundColor: "red" }}
+            />
+          );
+        }}
         onPress={handleUserInfoFriendPress}
       >
         <View style={styles.avatarContainer}>
