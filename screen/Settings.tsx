@@ -71,7 +71,7 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: "用戶設定",
+      headerTitle: "用戶隱私設定",
       headerTitleAlign: "center",
       gestureEnabled: false, // 禁用手勢返回
       headerLeft: () => (
@@ -113,7 +113,7 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
         }}
       />
       <CustomSwitch
-        label="貼文隱藏按讚"
+        label="文章隱藏按讚"
         value={userSettings.hideLikes}
         onChange={(v) => {
           handleSwitchChange({
@@ -123,7 +123,7 @@ const Settings: React.FC<SettingsProps> = ({ navigation }) => {
         }}
       />
       <CustomSwitch
-        label="貼文隱藏留言"
+        label="文章隱藏留言"
         value={userSettings.hideComments}
         onChange={(v) => {
           handleSwitchChange({
